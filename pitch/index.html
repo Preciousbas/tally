@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tally — Wave 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Fraunces:opsz,wght@9..144,500&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#1c1914; --bone:#e8dcc8; --ink:#c4b49a; --oxblood:#8c2f2b; --rule:#3d3428; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--bone); font-family: Figtree, sans-serif; }
+    .slide { min-height: 100vh; padding: 72px 80px; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; justify-content: center; }
+    h1, h2 { font-family: Fraunces, serif; font-weight: 500; margin: 0 0 16px; }
+    h1 { font-size: 64px; }
+    h2 { font-size: 40px; }
+    p, li { color: var(--ink); font-size: 22px; line-height: 1.45; max-width: 40rem; }
+    .rule { width: 72px; height: 3px; background: var(--oxblood); margin: 24px 0; }
+    .num { letter-spacing: 0.18em; text-transform: uppercase; font-size: 12px; color: #8a7a64; }
+  </style>
+</head>
+<body>
+  <section class="slide">
+    <p class="num">01 · Midnight Buildathon Wave 1</p>
+    <h1>Tally</h1>
+    <div class="rule"></div>
+    <p>The other half stays private.</p>
+  </section>
+  <section class="slide">
+    <p class="num">02 · Problem</p>
+    <h2>Bureaus publish one score.</h2>
+    <p>Trade credit was always pairwise. A split stick. Two halves. The grain had to match. Tally puts that instrument on Midnight.</p>
+  </section>
+  <section class="slide">
+    <p class="num">03 · Metaphor</p>
+    <h2>Public chain holds the grain.</h2>
+    <p>Amount, due, and names stay in witnesses. The ledger stores status, a payment commitment, a Merkle leaf, and a nullifier.</p>
+  </section>
+  <section class="slide">
+    <p class="num">04 · Dual ledger</p>
+    <h2>What discloses, what does not.</h2>
+    <p>Chain sees: id, status, payment grain, nullifier. You see: amount, due, counterparty. Identity is secret + PIN, not ownPublicKey.</p>
+  </section>
+  <section class="slide">
+    <p class="num">05 · Demo</p>
+    <h2>Offer, accept, disburse, repay, settle.</h2>
+    <p>Disburse binds a real Preprod payment grain. Funded is an oxblood seal. The explorer cannot print the amount.</p>
+  </section>
+  <section class="slide">
+    <p class="num">06 · Wave 2</p>
+    <h2>The leaf is the reputation edge.</h2>
+    <p>A third lender will verify standing from settled leaves without seeing this counterparty. Not in Wave 1.</p>
+  </section>
+  <section class="slide">
+    <p class="num">07 · Team</p>
+    <h2>Solo builder.</h2>
+    <p>Compact contract, Lace desk, tests, Apache-2.0. Same repo for Moonshots L1–L3.</p>
+  </section>
+  <section class="slide">
+    <p class="num">08 · Links</p>
+    <h2>tally-midnight</h2>
+    <p>GitHub public before 16 Sep. Topic midnightntwrk. Vercel for the desk. This deck is pitch/index.html.</p>
+  </section>
+</body>
+</html>

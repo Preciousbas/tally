@@ -1,0 +1,166 @@
+/**
+ * Tally — private bilateral loan origination on Midnight.
+ *
+ * Public ledger: loan id, status, pseudonymous identity commits, payment grain, Merkle root, nullifiers.
+ * Private (witnesses): user secret, PIN, amount, due. Amount never crosses disclose().
+ *
+ * Identity is derived from a witness secret + PIN. ownPublicKey() is not used.
+ *
+ * Disbursement Wave 1: lender binds a payment commitment (Zswap/Lace tx grain) into the loan.
+ * Shielded in-contract escrow (receiveShielded) is Wave 1 pull-ahead if the compiler accepts it.
+ */
+
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+export enum LoanStatus {
+  Vacant,
+  Offered,
+  Accepted,
+  Funded,
+  Repaid,
+  Settled
+}
+
+struct LoanPublic {
+  status: LoanStatus,
+  lenderPk: Bytes<32>,
+  borrowerPk: Bytes<32>,
+  paymentCommit: Bytes<32>
+}
+
+export ledger loans: Map<Uint<64>, LoanPublic>;
+export ledger nextId: Counter;
+export ledger relationships: HistoricMerkleTree<10, Bytes<32>>;
+export ledger nullifiers: Set<Bytes<32>>;
+
+witness getUserSecret(): Bytes<32>;
+witness getPin(): Uint<16>;
+witness getLoanAmount(): Uint<64>;
+witness getDueSlot(): Uint<64>;
+
+circuit deriveUserPublicKey(sk: Bytes<32>, pin: Uint<16>): Bytes<32> {
+  const pinHash = persistentHash<Uint<16>>(pin);
+  return persistentHash<Vector<3, Bytes<32>>>([
+    pad(32, "tally:user:pk:v1"),
+    pinHash,
+    sk
+  ]);
+}
+
+circuit loanIdBytes(loanId: Uint<64>): Bytes<32> {
+  return persistentHash<Uint<64>>(loanId);
+}
+
+circuit relationshipLeaf(loanId: Uint<64>, lenderPk: Bytes<32>, borrowerPk: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<4, Bytes<32>>>([
+    pad(32, "tally:rel:v1:repaid"),
+    loanIdBytes(loanId),
+    lenderPk,
+    borrowerPk
+  ]);
+}
+
+circuit settleNullifier(loanId: Uint<64>, lenderPk: Bytes<32>, borrowerPk: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<4, Bytes<32>>>([
+    pad(32, "tally:nul:v1"),
+    loanIdBytes(loanId),
+    lenderPk,
+    borrowerPk
+  ]);
+}
+
+circuit requireLoan(loanId: Uint<64>): LoanPublic {
+  assert(loans.member(disclose(loanId)), "loan not found");
+  return loans.lookup(disclose(loanId));
+}
+
+export circuit offerLoan(borrowerPk: Bytes<32>): [] {
+  const sk = getUserSecret();
+  const pin = getPin();
+  const lenderPk = deriveUserPublicKey(sk, pin);
+  const amount = getLoanAmount();
+  const due = getDueSlot();
+  assert(disclose(amount > 0), "amount must be positive");
+  assert(disclose(due > 0), "due must be set");
+  assert(disclose(lenderPk != borrowerPk), "cannot lend to self");
+
+  nextId.increment(1);
+  const id = disclose(nextId.read() as Uint<64>);
+  loans.insert(id, LoanPublic {
+    status: LoanStatus.Offered,
+    lenderPk: disclose(lenderPk),
+    borrowerPk: disclose(borrowerPk),
+    paymentCommit: disclose(pad(32, ""))
+  });
+}
+
+export circuit acceptLoan(loanId: Uint<64>): [] {
+  const loan = requireLoan(loanId);
+  assert(loan.status == LoanStatus.Offered, "loan is not offered");
+  const caller = deriveUserPublicKey(getUserSecret(), getPin());
+  assert(disclose(caller == loan.borrowerPk), "not the borrower");
+  assert(disclose(caller != loan.lenderPk), "cannot accept own offer");
+  loans.insert(disclose(loanId), LoanPublic {
+    status: LoanStatus.Accepted,
+    lenderPk: loan.lenderPk,
+    borrowerPk: loan.borrowerPk,
+    paymentCommit: loan.paymentCommit
+  });
+}
+
+/**
+ * Bind a real Preprod payment grain to the accepted loan.
+ * paymentCommit is a hash of the disbursement (tx id or coin commitment).
+ * The amount itself stays in witnesses / private state.
+ */
+export circuit disburse(loanId: Uint<64>, paymentCommit: Bytes<32>): [] {
+  const loan = requireLoan(loanId);
+  assert(loan.status == LoanStatus.Accepted, "loan is not accepted");
+  const caller = deriveUserPublicKey(getUserSecret(), getPin());
+  assert(disclose(caller == loan.lenderPk), "not the lender");
+  assert(disclose(paymentCommit != pad(32, "")), "payment grain required");
+  loans.insert(disclose(loanId), LoanPublic {
+    status: LoanStatus.Funded,
+    lenderPk: loan.lenderPk,
+    borrowerPk: loan.borrowerPk,
+    paymentCommit: disclose(paymentCommit)
+  });
+}
+
+export circuit repay(loanId: Uint<64>): [] {
+  const loan = requireLoan(loanId);
+  assert(loan.status == LoanStatus.Funded, "loan is not funded");
+  const caller = deriveUserPublicKey(getUserSecret(), getPin());
+  assert(disclose(caller == loan.borrowerPk), "not the borrower");
+  loans.insert(disclose(loanId), LoanPublic {
+    status: LoanStatus.Repaid,
+    lenderPk: loan.lenderPk,
+    borrowerPk: loan.borrowerPk,
+    paymentCommit: loan.paymentCommit
+  });
+}
+
+export circuit settle(loanId: Uint<64>): [] {
+  const loan = requireLoan(loanId);
+  assert(loan.status == LoanStatus.Repaid, "loan is not repaid");
+  const caller = deriveUserPublicKey(getUserSecret(), getPin());
+  if (disclose(caller != loan.borrowerPk)) {
+    assert(disclose(caller == loan.lenderPk), "not a party to this loan");
+  }
+
+  const nul = settleNullifier(loanId, loan.lenderPk, loan.borrowerPk);
+  assert(disclose(!nullifiers.member(disclose(nul))), "already settled");
+  nullifiers.insert(disclose(nul));
+
+  const leaf = relationshipLeaf(loanId, loan.lenderPk, loan.borrowerPk);
+  relationships.insert(disclose(leaf));
+
+  loans.insert(disclose(loanId), LoanPublic {
+    status: LoanStatus.Settled,
+    lenderPk: loan.lenderPk,
+    borrowerPk: loan.borrowerPk,
+    paymentCommit: loan.paymentCommit
+  });
+}
