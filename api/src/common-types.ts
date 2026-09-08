@@ -5,7 +5,13 @@ import { type TallyPrivateState } from '../../contract/src/index';
 export const tallyPrivateStateKey = 'tallyPrivateState';
 export type PrivateStateId = typeof tallyPrivateStateKey;
 
-export type TallyCircuitKeys = 'offerLoan' | 'acceptLoan' | 'disburse' | 'repay' | 'settle';
+export type TallyCircuitKeys =
+  | 'offerLoan'
+  | 'acceptLoan'
+  | 'disburse'
+  | 'repay'
+  | 'settle'
+  | 'proveStanding';
 export type TallyProviders = MidnightProviders<TallyCircuitKeys, PrivateStateId, TallyPrivateState>;
 export type DeployedTallyContract = FoundContract<any>;
 

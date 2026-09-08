@@ -11,7 +11,7 @@ const NETWORK_ID = import.meta.env.VITE_NETWORK_ID ?? 'preprod';
 const DEFAULT_CONTRACT = import.meta.env.VITE_DEFAULT_CONTRACT ?? '';
 
 type WalletState = 'detecting' | 'no-wallet' | 'ready' | 'connecting' | 'connected';
-type Role = 'lender' | 'borrower';
+type Role = 'lender' | 'borrower' | 'verifier';
 
 function trunc(addr: string): string {
   return addr.length <= 20 ? addr : `${addr.slice(0, 10)}…${addr.slice(-8)}`;
@@ -26,6 +26,9 @@ function friendlyError(e: any): string {
   if (msg.includes('insufficient') || msg.includes('DUST')) return 'Insufficient DUST. Register tNIGHT for dust in your wallet.';
   if (msg.includes('Network ID')) return 'Set your wallet to Preprod.';
   if (msg.includes('not compiled') || msg.includes('artifacts')) return 'Compact artifacts missing. Compile tally.compact first.';
+  if (msg.includes('not on allowlist') || msg.includes('not a party leaf')) return 'Standing proof failed. Settle a loan as a party first.';
+  if (msg.includes('loan is not settled')) return 'Settle the loan before proving standing.';
+  if (msg.includes('not a party to this loan')) return 'Only a party to the settled loan can prove standing.';
   return msg || 'Something failed. Check the console.';
 }
 
@@ -106,7 +109,12 @@ function GrainFlap() {
             <li>
               <span className="n">05</span>
               <span className="step">Settle</span>
-              <span className="gloss">close it</span>
+              <span className="gloss">mint allowlist leaf</span>
+            </li>
+            <li>
+              <span className="n">06</span>
+              <span className="step">Standing</span>
+              <span className="gloss">prove membership only</span>
             </li>
           </ol>
         </div>
@@ -136,6 +144,8 @@ export default function App() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [localLoans, setLocalLoans] = useState<PublicLoan[]>([]);
   const [deskMode, setDeskMode] = useState<'chain' | 'local'>('chain');
+  const [standingRoot, setStandingRoot] = useState<string | null>(null);
+  const [standingResult, setStandingResult] = useState<'pass' | 'fail' | null>(null);
 
   const simRef = useRef(new TallySimulator());
   const keysRef = useRef({
@@ -342,6 +352,52 @@ export default function App() {
     finally { setBusy(null); }
   };
 
+  const onProveStanding = async () => {
+    if (!selected) return;
+    if (deskMode === 'local') {
+      const sk = role === 'lender' ? keysRef.current.lender : keysRef.current.borrower;
+      try {
+        const proof = simRef.current.proveStanding(sk, 1234, BigInt(selected.id));
+        setStandingRoot(proof.root);
+        setStandingResult(null);
+        setError(null);
+      } catch (e) {
+        setStandingRoot(null);
+        setStandingResult('fail');
+        setError(friendlyError(e));
+      }
+      return;
+    }
+    setBusy('Proving standing');
+    try {
+      const result = await resolveApi();
+      await result.api.proveStanding();
+      setStandingResult('pass');
+      setStandingRoot('on-chain');
+      setTimeout(() => refresh(), 2500);
+    } catch (e) {
+      setStandingResult('fail');
+      setError(friendlyError(e));
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const onVerifyStanding = () => {
+    if (deskMode === 'local') {
+      if (!standingRoot) {
+        setStandingResult('fail');
+        setError('No standing proof yet. A party must prove standing first.');
+        return;
+      }
+      const ok = simRef.current.verifyStanding(standingRoot);
+      setStandingResult(ok ? 'pass' : 'fail');
+      setError(null);
+      return;
+    }
+    setStandingResult(standingRoot ? 'pass' : 'fail');
+  };
+
   const deploy = async () => {
     if (!wallet || !walletAPI) return;
     setBusy('Deploying');
@@ -410,6 +466,7 @@ export default function App() {
         <div className="seg">
           <button className={role === 'lender' ? 'on' : ''} onClick={() => setRole('lender')}>Lender</button>
           <button className={role === 'borrower' ? 'on' : ''} onClick={() => setRole('borrower')}>Borrower</button>
+          <button className={role === 'verifier' ? 'on' : ''} onClick={() => setRole('verifier')}>Verifier</button>
         </div>
         {deskMode === 'chain' && (
           <div className="join">
@@ -493,6 +550,7 @@ export default function App() {
                 <button className="btn primary" disabled={!!busy} onClick={onOffer}>Offer</button>
                 <button className="btn primary" disabled={!!busy || selected?.status !== 'Accepted'} onClick={onDisburse}>Disburse</button>
                 <button className="btn" disabled={!!busy || selected?.status !== 'Repaid'} onClick={onSettle}>Settle</button>
+                <button className="btn" disabled={!!busy || selected?.status !== 'Settled'} onClick={onProveStanding}>Prove standing</button>
               </div>
             </div>
           )}
@@ -502,6 +560,32 @@ export default function App() {
               <button className="btn primary" disabled={!!busy || selected?.status !== 'Offered'} onClick={onAccept}>Accept</button>
               <button className="btn primary" disabled={!!busy || selected?.status !== 'Funded'} onClick={onRepay}>Repay</button>
               <button className="btn" disabled={!!busy || selected?.status !== 'Repaid'} onClick={onSettle}>Settle</button>
+              <button className="btn" disabled={!!busy || selected?.status !== 'Settled'} onClick={onProveStanding}>Prove standing</button>
+            </div>
+          )}
+
+          {role === 'verifier' && (
+            <div className="fields">
+              <p className="quiet">
+                Third party check. You only learn yes or no — not amount, due, or which leaf.
+              </p>
+              <dl>
+                <div>
+                  <dt>Allowlist root</dt>
+                  <dd>{standingRoot ? trunc(standingRoot) : '—'}</dd>
+                </div>
+                <div>
+                  <dt>Standing</dt>
+                  <dd>
+                    {standingResult === 'pass' && <span className="seal settled">Pass</span>}
+                    {standingResult === 'fail' && <span className="seal vacant">Fail</span>}
+                    {!standingResult && '—'}
+                  </dd>
+                </div>
+              </dl>
+              <div className="actions">
+                <button className="btn primary" disabled={!!busy} onClick={onVerifyStanding}>Verify access</button>
+              </div>
             </div>
           )}
 

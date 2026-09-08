@@ -104,6 +104,10 @@ export class TallyAPI {
     await (this.deployedContract as any).callTx.settle(BigInt(loanId));
   }
 
+  async proveStanding(): Promise<void> {
+    await (this.deployedContract as any).callTx.proveStanding();
+  }
+
   static async deploy(providers: TallyProviders, secretKey: Uint8Array, logger?: Logger): Promise<TallyAPI> {
     const deployedContract = await deployContract(providers as any, {
       compiledContract: CompiledTallyContract,
