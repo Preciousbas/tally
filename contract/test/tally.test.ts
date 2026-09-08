@@ -90,14 +90,24 @@ describe('Tally loan lifecycle', () => {
   });
 });
 
-describe('Tally private allowlist (proveStanding)', () => {
+describe('Tally proveStanding (Private Allowlist Access)', () => {
   let sim: TallySimulator;
   let lenderSk: Uint8Array;
   let borrowerSk: Uint8Array;
   let strangerSk: Uint8Array;
   const pin = 1234;
   let borrowerPk: Uint8Array;
+  let lenderPk: Uint8Array;
   const grain = new Uint8Array(32).fill(9);
+
+  const settleOnce = () => {
+    const id = sim.offerLoan(lenderSk, pin, borrowerPk, 50n, 1n);
+    sim.acceptLoan(borrowerSk, pin, id);
+    sim.disburse(lenderSk, pin, id, grain);
+    sim.repay(borrowerSk, pin, id);
+    sim.settle(borrowerSk, pin, id);
+    return id;
+  };
 
   beforeEach(() => {
     sim = new TallySimulator();
@@ -105,34 +115,31 @@ describe('Tally private allowlist (proveStanding)', () => {
     borrowerSk = new Uint8Array(32).fill(2);
     strangerSk = new Uint8Array(32).fill(3);
     borrowerPk = sim.deriveUserPublicKey(borrowerSk, pin);
+    lenderPk = sim.deriveUserPublicKey(lenderSk, pin);
   });
 
-  function settleLoan(): bigint {
-    const id = sim.offerLoan(lenderSk, pin, borrowerPk, 50n, 1n);
-    sim.acceptLoan(borrowerSk, pin, id);
-    sim.disburse(lenderSk, pin, id, grain);
-    sim.repay(borrowerSk, pin, id);
-    sim.settle(borrowerSk, pin, id);
-    return id;
-  }
-
   it('proves standing for a settled party without exposing amount', () => {
-    const id = settleLoan();
+    const id = settleOnce();
     const proof = sim.proveStanding(borrowerSk, pin, id);
     expect(proof.ok).toBe(true);
     expect(proof.root).toBe(sim.relationshipRoot());
     expect(sim.verifyStanding(proof.root)).toBe(true);
+    expect(sim.proveStanding(lenderSk, pin, id, borrowerPk).ok).toBe(true);
   });
 
-  it('rejects standing for a stranger or unsettled loan', () => {
-    const id = settleLoan();
+  it('rejects a non-member stranger or unsettled loan', () => {
+    const id = settleOnce();
     expect(() => sim.proveStanding(strangerSk, pin, id)).toThrow('not a party to this loan');
+    expect(() => sim.proveStanding(borrowerSk, pin, id, sim.deriveUserPublicKey(strangerSk, pin))).toThrow(
+      'not on allowlist',
+    );
     const openId = sim.offerLoan(lenderSk, pin, borrowerPk, 10n, 1n);
     expect(() => sim.proveStanding(lenderSk, pin, openId)).toThrow('loan is not settled');
   });
 
-  it('verifier only learns yes or no against the allowlist root', () => {
-    const id = settleLoan();
+  it('rejects a wrong claimed root; verifier learns yes or no only', () => {
+    const id = settleOnce();
+    expect(() => sim.proveStanding(borrowerSk, pin, id, lenderPk, '00'.repeat(32))).toThrow('wrong root');
     const proof = sim.proveStanding(lenderSk, pin, id);
     expect(sim.verifyStanding(proof.root)).toBe(true);
     expect(sim.verifyStanding('deadbeef')).toBe(false);

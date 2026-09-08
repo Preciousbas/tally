@@ -3,10 +3,12 @@ export type TallyPrivateState = {
   readonly pin: number;
   readonly loanAmount: bigint;
   readonly dueSlot: bigint;
+  /** Settled loan id for proveStanding (witness). */
   readonly standingLoanId: bigint;
+  /** Counterparty pk for proveStanding (witness). */
   readonly standingCounterpartyPk: Uint8Array;
-  /** Opaque Merkle path from ledger findPathForLeaf; shape depends on Compact runtime. */
-  readonly relationshipPath: unknown | null;
+  /** Relationship leaf bytes for Merkle path lookup (witness). */
+  readonly standingLeaf: Uint8Array;
 };
 
 export const createTallyPrivateState = (
@@ -21,7 +23,7 @@ export const createTallyPrivateState = (
   dueSlot,
   standingLoanId: 0n,
   standingCounterpartyPk: new Uint8Array(32),
-  relationshipPath: null,
+  standingLeaf: new Uint8Array(32),
 });
 
 export const withTerms = (
@@ -43,15 +45,21 @@ export const withStanding = (
   state: TallyPrivateState,
   standingLoanId: bigint,
   standingCounterpartyPk: Uint8Array,
-  relationshipPath: unknown,
+  standingLeaf: Uint8Array,
 ): TallyPrivateState => ({
   ...state,
   standingLoanId,
   standingCounterpartyPk,
-  relationshipPath,
+  standingLeaf,
 });
 
 const pinToUint16 = (pin: number): bigint => BigInt(pin & 0xffff);
+
+type LedgerLike = {
+  relationships: {
+    findPathForLeaf: (leaf: Uint8Array) => unknown;
+  };
+};
 
 export const createWitnesses = () => ({
   getUserSecret: ({
@@ -86,12 +94,13 @@ export const createWitnesses = () => ({
   }): [TallyPrivateState, Uint8Array] => [privateState, privateState.standingCounterpartyPk],
   getRelationshipPath: ({
     privateState,
+    ledger,
   }: {
     privateState: TallyPrivateState;
+    ledger: LedgerLike;
   }): [TallyPrivateState, unknown] => {
-    if (privateState.relationshipPath == null) {
-      throw new Error('relationship path missing — settle a loan before proveStanding');
-    }
-    return [privateState, privateState.relationshipPath];
+    const path = ledger.relationships.findPathForLeaf(privateState.standingLeaf);
+    if (!path) throw new Error('standing leaf not in allowlist');
+    return [privateState, path];
   },
 });

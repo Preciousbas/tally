@@ -28,6 +28,8 @@ export class TallySimulator {
   nextId = 0n;
   relationshipLeaves: Uint8Array[] = [];
   nullifiers = new Set<string>();
+  /** Append-only historic roots after each settle (mirrors HistoricMerkleTree). */
+  rootHistory: string[] = [];
 
   persistentHash(parts: Array<Uint8Array | string | bigint | number>): Uint8Array {
     const bytes = new Uint8Array(32);
@@ -60,6 +62,10 @@ export class TallySimulator {
   deriveUserPublicKey(sk: Uint8Array, pin: number): Uint8Array {
     const pinHash = this.persistentHash([BigInt(pin & 0xffff)]);
     return this.persistentHash([DOMAIN_PK, pinHash, sk]);
+  }
+
+  relationshipLeaf(loanId: bigint, lenderPk: Uint8Array, borrowerPk: Uint8Array): Uint8Array {
+    return this.persistentHash([DOMAIN_REL, loanId, lenderPk, borrowerPk]);
   }
 
   private hex(bytes: Uint8Array): string {
@@ -127,35 +133,59 @@ export class TallySimulator {
     const nulHex = this.hex(nul);
     if (this.nullifiers.has(nulHex)) throw new Error('already settled');
     this.nullifiers.add(nulHex);
-    const leaf = this.persistentHash([DOMAIN_REL, loanId, loan.lenderPk, loan.borrowerPk]);
+    const leaf = this.relationshipLeaf(loanId, loan.lenderPk, loan.borrowerPk);
     this.relationshipLeaves.push(leaf);
+    this.rootHistory.push(this.relationshipRoot());
     this.loans.set(loanId, { ...loan, status: LoanStatus.Settled });
-  }
-
-  /**
-   * Private Allowlist Access — membership in settled relationships.
-   * Returns yes/no without exposing amount or which leaf index.
-   */
-  proveStanding(sk: Uint8Array, pin: number, loanId: bigint): { ok: true; root: string } {
-    const loan = this.requireLoan(loanId);
-    if (loan.status !== LoanStatus.Settled) throw new Error('loan is not settled');
-    const caller = this.deriveUserPublicKey(sk, pin);
-    const isParty =
-      this.hex(caller) === this.hex(loan.borrowerPk) || this.hex(caller) === this.hex(loan.lenderPk);
-    if (!isParty) throw new Error('not a party to this loan');
-    const leaf = this.persistentHash([DOMAIN_REL, loanId, loan.lenderPk, loan.borrowerPk]);
-    const leafHex = this.hex(leaf);
-    const onAllowlist = this.relationshipLeaves.some((l) => this.hex(l) === leafHex);
-    if (!onAllowlist) throw new Error('not on allowlist');
-    return { ok: true, root: this.relationshipRoot() };
-  }
-
-  /** Verifier view — only yes/no against a known allowlist root. */
-  verifyStanding(proofRoot: string): boolean {
-    return proofRoot === this.relationshipRoot() && this.relationshipLeaves.length > 0;
   }
 
   relationshipRoot(): string {
     return this.hex(this.persistentHash(this.relationshipLeaves));
+  }
+
+  /**
+   * proveStanding — Private Allowlist Access.
+   * Caller proves they are a party to a settled leaf without revealing amount.
+   * If counterpartyPk is omitted, the loan ledger supplies the other party.
+   * Optional claimedRoot must match a historic root (wrong root rejects).
+   */
+  proveStanding(
+    sk: Uint8Array,
+    pin: number,
+    loanId: bigint,
+    counterpartyPk?: Uint8Array,
+    claimedRoot?: string,
+  ): { ok: true; root: string } {
+    const loan = this.loans.get(loanId);
+    if (!loan || loan.status !== LoanStatus.Settled) {
+      throw new Error('loan is not settled');
+    }
+
+    const me = this.deriveUserPublicKey(sk, pin);
+    const meHex = this.hex(me);
+    const isLender = meHex === this.hex(loan.lenderPk);
+    const isBorrower = meHex === this.hex(loan.borrowerPk);
+    if (!isLender && !isBorrower) throw new Error('not a party to this loan');
+
+    const other = counterpartyPk ?? (isLender ? loan.borrowerPk : loan.lenderPk);
+    const asLender = this.relationshipLeaf(loanId, me, other);
+    const asBorrower = this.relationshipLeaf(loanId, other, me);
+    const member = this.relationshipLeaves.some(
+      (leaf) => this.hex(leaf) === this.hex(asLender) || this.hex(leaf) === this.hex(asBorrower),
+    );
+    if (!member) throw new Error('not on allowlist');
+
+    const root = this.relationshipRoot();
+    if (claimedRoot !== undefined) {
+      const historicOk = claimedRoot === root || this.rootHistory.includes(claimedRoot);
+      if (!historicOk) throw new Error('wrong root');
+    }
+
+    return { ok: true, root };
+  }
+
+  /** Verifier-facing check: yes/no against current or historic allowlist root. */
+  verifyStanding(claimedRoot: string): boolean {
+    return claimedRoot === this.relationshipRoot() || this.rootHistory.includes(claimedRoot);
   }
 }

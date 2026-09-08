@@ -17,6 +17,7 @@ import {
   CompiledTallyContract,
   createTallyPrivateState,
   withTerms,
+  withStanding,
   type TallyPrivateState,
 } from '../../contract/src/index';
 import * as utils from './utils/index.js';
@@ -104,7 +105,32 @@ export class TallyAPI {
     await (this.deployedContract as any).callTx.settle(BigInt(loanId));
   }
 
-  async proveStanding(): Promise<void> {
+  /**
+   * Private Allowlist Access — prove settled-relationship membership.
+   * Leaf / loan id / counterparty stay in private state; verifier learns yes/no only.
+   */
+  async proveStanding(
+    loanId: number,
+    counterpartyPkHex: string,
+    relationshipLeafHex: string,
+  ): Promise<void> {
+    const providers = (this.deployedContract as any).providers;
+    if (providers?.privateStateProvider) {
+      const current: TallyPrivateState = await providers.privateStateProvider.get(
+        tallyPrivateStateKey,
+        this.deployedContractAddress,
+      );
+      await providers.privateStateProvider.set(
+        tallyPrivateStateKey,
+        this.deployedContractAddress,
+        withStanding(
+          current,
+          BigInt(loanId),
+          utils.encodePk(counterpartyPkHex),
+          utils.encodePk(relationshipLeafHex),
+        ),
+      );
+    }
     await (this.deployedContract as any).callTx.proveStanding();
   }
 
