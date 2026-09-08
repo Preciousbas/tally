@@ -132,6 +132,29 @@ export class TallySimulator {
     this.loans.set(loanId, { ...loan, status: LoanStatus.Settled });
   }
 
+  /**
+   * Private Allowlist Access — membership in settled relationships.
+   * Returns yes/no without exposing amount or which leaf index.
+   */
+  proveStanding(sk: Uint8Array, pin: number, loanId: bigint): { ok: true; root: string } {
+    const loan = this.requireLoan(loanId);
+    if (loan.status !== LoanStatus.Settled) throw new Error('loan is not settled');
+    const caller = this.deriveUserPublicKey(sk, pin);
+    const isParty =
+      this.hex(caller) === this.hex(loan.borrowerPk) || this.hex(caller) === this.hex(loan.lenderPk);
+    if (!isParty) throw new Error('not a party to this loan');
+    const leaf = this.persistentHash([DOMAIN_REL, loanId, loan.lenderPk, loan.borrowerPk]);
+    const leafHex = this.hex(leaf);
+    const onAllowlist = this.relationshipLeaves.some((l) => this.hex(l) === leafHex);
+    if (!onAllowlist) throw new Error('not on allowlist');
+    return { ok: true, root: this.relationshipRoot() };
+  }
+
+  /** Verifier view — only yes/no against a known allowlist root. */
+  verifyStanding(proofRoot: string): boolean {
+    return proofRoot === this.relationshipRoot() && this.relationshipLeaves.length > 0;
+  }
+
   relationshipRoot(): string {
     return this.hex(this.persistentHash(this.relationshipLeaves));
   }

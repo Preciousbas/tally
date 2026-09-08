@@ -6,6 +6,7 @@ export {
   createTallyPrivateState,
   withTerms,
   withPin,
+  withStanding,
 } from './witnesses.js';
 export type { TallyPrivateState } from './witnesses.js';
 

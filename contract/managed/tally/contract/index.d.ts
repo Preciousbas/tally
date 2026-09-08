@@ -13,6 +13,14 @@ export type Witnesses<PS> = {
   getPin(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
   getLoanAmount(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
   getDueSlot(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
+  getRelationshipPath(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, { leaf: Uint8Array,
+                                                                                    path: { sibling: { field: bigint
+                                                                                                     },
+                                                                                            goes_left: boolean
+                                                                                          }[]
+                                                                                  }];
+  getStandingLoanId(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
+  getStandingCounterpartyPk(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, Uint8Array];
 }
 
 export type ImpureCircuits<PS> = {
@@ -24,6 +32,7 @@ export type ImpureCircuits<PS> = {
            paymentCommit_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   repay(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   settle(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  proveStanding(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type ProvableCircuits<PS> = {
@@ -35,6 +44,7 @@ export type ProvableCircuits<PS> = {
            paymentCommit_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   repay(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   settle(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  proveStanding(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type PureCircuits = {
@@ -49,6 +59,7 @@ export type Circuits<PS> = {
            paymentCommit_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   repay(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   settle(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  proveStanding(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type Ledger = {

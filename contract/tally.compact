@@ -39,6 +39,12 @@ witness getUserSecret(): Bytes<32>;
 witness getPin(): Uint<16>;
 witness getLoanAmount(): Uint<64>;
 witness getDueSlot(): Uint<64>;
+/** Merkle path for a settled relationship leaf owned by the caller (Private Allowlist Access). */
+witness getRelationshipPath(): MerkleTreePath<10, Bytes<32>>;
+/** Loan id used to rebuild the leaf privately when proving standing. */
+witness getStandingLoanId(): Uint<64>;
+/** Counterparty pk for that settled loan (other half of the relationship leaf). */
+witness getStandingCounterpartyPk(): Bytes<32>;
 
 circuit deriveUserPublicKey(sk: Bytes<32>, pin: Uint<16>): Bytes<32> {
   const pinHash = persistentHash<Uint<16>>(pin);
@@ -163,4 +169,21 @@ export circuit settle(loanId: Uint<64>): [] {
     borrowerPk: loan.borrowerPk,
     paymentCommit: loan.paymentCommit
   });
+}
+
+/**
+ * Private Allowlist Access — prove membership in relationships without disclosing
+ * which leaf, loan id, amount, or counterparty. Public transcript only shows checkRoot.
+ */
+export circuit proveStanding(): [] {
+  const me = deriveUserPublicKey(getUserSecret(), getPin());
+  const loanId = getStandingLoanId();
+  const other = getStandingCounterpartyPk();
+  const asLender = relationshipLeaf(loanId, me, other);
+  const asBorrower = relationshipLeaf(loanId, other, me);
+  const path = getRelationshipPath();
+  const leaf = path.leaf;
+  assert(disclose(leaf == asLender || leaf == asBorrower), "not a party leaf");
+  const computed = merkleTreePathRoot<10, Bytes<32>>(path);
+  assert(relationships.checkRoot(disclose(computed)), "not on allowlist");
 }

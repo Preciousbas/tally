@@ -89,3 +89,52 @@ describe('Tally loan lifecycle', () => {
     expect(() => sim.settle(lenderSk, pin, id)).toThrow('already settled');
   });
 });
+
+describe('Tally private allowlist (proveStanding)', () => {
+  let sim: TallySimulator;
+  let lenderSk: Uint8Array;
+  let borrowerSk: Uint8Array;
+  let strangerSk: Uint8Array;
+  const pin = 1234;
+  let borrowerPk: Uint8Array;
+  const grain = new Uint8Array(32).fill(9);
+
+  beforeEach(() => {
+    sim = new TallySimulator();
+    lenderSk = new Uint8Array(32).fill(1);
+    borrowerSk = new Uint8Array(32).fill(2);
+    strangerSk = new Uint8Array(32).fill(3);
+    borrowerPk = sim.deriveUserPublicKey(borrowerSk, pin);
+  });
+
+  function settleLoan(): bigint {
+    const id = sim.offerLoan(lenderSk, pin, borrowerPk, 50n, 1n);
+    sim.acceptLoan(borrowerSk, pin, id);
+    sim.disburse(lenderSk, pin, id, grain);
+    sim.repay(borrowerSk, pin, id);
+    sim.settle(borrowerSk, pin, id);
+    return id;
+  }
+
+  it('proves standing for a settled party without exposing amount', () => {
+    const id = settleLoan();
+    const proof = sim.proveStanding(borrowerSk, pin, id);
+    expect(proof.ok).toBe(true);
+    expect(proof.root).toBe(sim.relationshipRoot());
+    expect(sim.verifyStanding(proof.root)).toBe(true);
+  });
+
+  it('rejects standing for a stranger or unsettled loan', () => {
+    const id = settleLoan();
+    expect(() => sim.proveStanding(strangerSk, pin, id)).toThrow('not a party to this loan');
+    const openId = sim.offerLoan(lenderSk, pin, borrowerPk, 10n, 1n);
+    expect(() => sim.proveStanding(lenderSk, pin, openId)).toThrow('loan is not settled');
+  });
+
+  it('verifier only learns yes or no against the allowlist root', () => {
+    const id = settleLoan();
+    const proof = sim.proveStanding(lenderSk, pin, id);
+    expect(sim.verifyStanding(proof.root)).toBe(true);
+    expect(sim.verifyStanding('deadbeef')).toBe(false);
+  });
+});
