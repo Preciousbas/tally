@@ -394,6 +394,16 @@ dd {
 
 .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 
+.standing-line {
+  margin-top: 16px;
+}
+
+.seal.vacant {
+  border-color: var(--oxblood);
+  color: var(--oxblood);
+  background: color-mix(in srgb, var(--oxblood) 10%, transparent);
+}
+
 .flap {
   border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);

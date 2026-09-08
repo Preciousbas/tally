@@ -12,6 +12,7 @@ const DEFAULT_CONTRACT = import.meta.env.VITE_DEFAULT_CONTRACT ?? '';
 
 type WalletState = 'detecting' | 'no-wallet' | 'ready' | 'connecting' | 'connected';
 type Role = 'lender' | 'borrower' | 'verifier';
+type StandingResult = 'pass' | 'fail' | null;
 
 function trunc(addr: string): string {
   return addr.length <= 20 ? addr : `${addr.slice(0, 10)}…${addr.slice(-8)}`;
@@ -22,13 +23,15 @@ function friendlyError(e: any): string {
   if (msg.includes('User rejected')) return 'Transaction cancelled.';
   if (msg.includes('not the borrower')) return 'This instrument is not addressed to your key.';
   if (msg.includes('not the lender')) return 'Only the originating lender can disburse.';
+  if (msg.includes('not a party') || msg.includes('not on allowlist') || msg.includes('not a party leaf')) {
+    return 'No standing for this identity on the allowlist.';
+  }
+  if (msg.includes('wrong root')) return 'Allowlist root does not match.';
+  if (msg.includes('loan is not settled')) return 'Settle the instrument before proving standing.';
   if (msg.includes('Failed to fetch') || msg.includes('Failed Proof Server')) return 'Proof server unreachable. Start Docker on port 6300.';
   if (msg.includes('insufficient') || msg.includes('DUST')) return 'Insufficient DUST. Register tNIGHT for dust in your wallet.';
   if (msg.includes('Network ID')) return 'Set your wallet to Preprod.';
   if (msg.includes('not compiled') || msg.includes('artifacts')) return 'Compact artifacts missing. Compile tally.compact first.';
-  if (msg.includes('not on allowlist') || msg.includes('not a party leaf')) return 'Standing proof failed. Settle a loan as a party first.';
-  if (msg.includes('loan is not settled')) return 'Settle the loan before proving standing.';
-  if (msg.includes('not a party to this loan')) return 'Only a party to the settled loan can prove standing.';
   return msg || 'Something failed. Check the console.';
 }
 
@@ -145,7 +148,8 @@ export default function App() {
   const [localLoans, setLocalLoans] = useState<PublicLoan[]>([]);
   const [deskMode, setDeskMode] = useState<'chain' | 'local'>('chain');
   const [standingRoot, setStandingRoot] = useState<string | null>(null);
-  const [standingResult, setStandingResult] = useState<'pass' | 'fail' | null>(null);
+  const [standingResult, setStandingResult] = useState<StandingResult>(null);
+  const [verifyRootInput, setVerifyRootInput] = useState('');
 
   const simRef = useRef(new TallySimulator());
   const keysRef = useRef({
@@ -354,12 +358,14 @@ export default function App() {
 
   const onProveStanding = async () => {
     if (!selected) return;
+    setStandingResult(null);
     if (deskMode === 'local') {
       const sk = role === 'lender' ? keysRef.current.lender : keysRef.current.borrower;
       try {
         const proof = simRef.current.proveStanding(sk, 1234, BigInt(selected.id));
         setStandingRoot(proof.root);
-        setStandingResult(null);
+        setVerifyRootInput(proof.root);
+        setStandingResult('pass');
         setError(null);
       } catch (e) {
         setStandingRoot(null);
@@ -371,9 +377,12 @@ export default function App() {
     setBusy('Proving standing');
     try {
       const result = await resolveApi();
-      await result.api.proveStanding();
+      const counterparty = role === 'lender' ? selected.borrowerPk : selected.lenderPk;
+      // Prefer Local desk for the allowlist demo when Preprod proving is slow.
+      await result.api.proveStanding(selected.id, counterparty, selected.paymentCommit);
       setStandingResult('pass');
-      setStandingRoot('on-chain');
+      setStandingRoot(selected.paymentCommit);
+      setVerifyRootInput(selected.paymentCommit);
       setTimeout(() => refresh(), 2500);
     } catch (e) {
       setStandingResult('fail');
@@ -384,18 +393,21 @@ export default function App() {
   };
 
   const onVerifyStanding = () => {
-    if (deskMode === 'local') {
-      if (!standingRoot) {
-        setStandingResult('fail');
-        setError('No standing proof yet. A party must prove standing first.');
-        return;
-      }
-      const ok = simRef.current.verifyStanding(standingRoot);
-      setStandingResult(ok ? 'pass' : 'fail');
-      setError(null);
+    const claimed = (verifyRootInput || standingRoot || '').trim();
+    if (!claimed) {
+      setStandingResult('fail');
+      setError('No standing proof yet. A party must prove standing first.');
       return;
     }
-    setStandingResult(standingRoot ? 'pass' : 'fail');
+    if (deskMode === 'local') {
+      const ok = simRef.current.verifyStanding(claimed);
+      setStandingResult(ok ? 'pass' : 'fail');
+      setError(ok ? null : 'Allowlist root does not match.');
+      return;
+    }
+    const ok = !!standingRoot && claimed === standingRoot;
+    setStandingResult(ok ? 'pass' : 'fail');
+    setError(ok ? null : 'Allowlist root does not match.');
   };
 
   const deploy = async () => {
@@ -569,11 +581,16 @@ export default function App() {
               <p className="quiet">
                 Third party check. You only learn yes or no — not amount, due, or which leaf.
               </p>
+              <label>
+                Allowlist root
+                <input
+                  value={verifyRootInput || standingRoot || ''}
+                  onChange={(e) => setVerifyRootInput(e.target.value)}
+                  placeholder="root from standing proof"
+                  aria-label="Allowlist root"
+                />
+              </label>
               <dl>
-                <div>
-                  <dt>Allowlist root</dt>
-                  <dd>{standingRoot ? trunc(standingRoot) : '—'}</dd>
-                </div>
                 <div>
                   <dt>Standing</dt>
                   <dd>
@@ -587,6 +604,16 @@ export default function App() {
                 <button className="btn primary" disabled={!!busy} onClick={onVerifyStanding}>Verify access</button>
               </div>
             </div>
+          )}
+
+          {(role === 'lender' || role === 'borrower') && standingResult && (
+            <p className="standing-line" aria-live="polite">
+              {standingResult === 'pass' ? (
+                <span className="seal settled">Standing confirmed</span>
+              ) : (
+                <span className="seal vacant">Standing failed</span>
+              )}
+            </p>
           )}
 
           {busy && <p className="quiet busy-line" aria-live="polite">{busy}</p>}
