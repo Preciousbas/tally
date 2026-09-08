@@ -14,6 +14,6 @@ Start: "This is Tally for the Midnight Buildathon."
 
 1:15–1:35 Borrower Repay. Settle. Status Settled. How a stick is cut: Offer through Settle. Amount stayed private.
 
-1:35–1:55 "Wave 2: this settled leaf becomes a standing proof for a third lender. They never see this counterparty."
+1:35–1:55 Prove standing. Switch Verifier. Verify access shows Pass. They never see amount or which leaf.
 
-Do not use exclamation marks. Name the Buildathon in the first sentence.
+Do not use exclamation marks. Name the program in the first sentence.

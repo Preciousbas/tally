@@ -1,29 +1,55 @@
 # Tally
 
-Private bilateral loan origination on Midnight. Amount and due date stay in witnesses. The public ledger stores loan id, status, pseudonymous identity grains, a payment commitment, a relationship Merkle tree, and nullifiers.
+Private bilateral trade credit on Midnight. Amount and due stay in witnesses. Settlement mints a Merkle **allowlist** leaf. A third party verifies **standing** (membership) without learning which loan, counterparty, or amount.
 
-Wave 1 of the Midnight Buildathon: offer → accept → disburse → repay → settle on Preprod.
+Approved Moonshots idea: **Private Allowlist Access** ([notes/turn-proposal.md](notes/turn-proposal.md)).
 
-## Engineering (40)
+Repo: https://github.com/Preciousbas/tally  
+Preprod contract: `f8287add7fd6628c414dc876cb29a619694ecccb859bae5f0036c5dfb821b59e`
 
-Compact contract: [`contract/tally.compact`](contract/tally.compact)
+[![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
-- Dual ledger: public `LoanPublic` vs witnesses `getUserSecret`, `getPin`, `getLoanAmount`, `getDueSlot`
-- Identity from secret + PIN (`tally:user:pk:v1`). Does not use `ownPublicKey()`
-- Disburse binds a payment grain (Lace/Zswap tx id or coin commitment). Amount is never disclosed
-- Settle inserts a relationship leaf and a nullifier (Wave 2 standing proofs consume the leaf)
+## Privacy model
+
+What an **observer** (explorer, indexer, unrelated wallet) **can** learn:
+
+- Loan id and **status** (Offered → Accepted → Funded → Repaid → Settled)
+- Pseudonymous identity grains (`lenderPk`, `borrowerPk`) — not legal identity
+- That a **payment commitment** was bound at disbursement
+- The **Merkle root** (and history) of the relationships allowlist
+- That a **nullifier** was consumed at settle
+
+What an observer **cannot** learn:
+
+- Loan **amount** or **due**
+- User **secret** and **PIN**
+- Which **leaf** was used when only a membership / standing proof is presented
+- Economic terms of any prior loan used for standing
+
+What a **membership verifier** learns:
+
+- Yes or no: the prover is on the settled-relationship allowlist
+- Nothing about amount, due, leaf index, or counterparty pairing
+
+## Engineering
+
+Compact: [`contract/tally.compact`](contract/tally.compact)
+
+- Circuits: `offerLoan`, `acceptLoan`, `disburse`, `repay`, `settle`, `proveStanding`
+- Dual ledger: public `LoanPublic` vs witnesses for secret, PIN, amount, due, standing path
+- Identity from secret + PIN (`tally:user:pk:v1`)
+- Disburse binds a payment grain; amount never disclosed
+- Settle inserts a relationship leaf + nullifier
+- `proveStanding` checks Merkle membership via `HistoricMerkleTree.checkRoot`
 
 ## How judges test
 
-1. Node 22+, Docker Compose v2, Compact toolchain 0.31 (`compact --version`)
-2. Lace on Preprod. Faucet tNIGHT, generate tDUST. Proof server `http://localhost:6300` for local proving
-3. Two Chrome profiles (Lender / Borrower)
-4. `npm install`
-5. `compact compile tally.compact managed/tally` from `contract/`
-6. `npm test`
-7. `npm run dev` — or open the Vercel URL after a later deploy
-8. Local desk: Offer → switch to Borrower → Accept → Lender Disburse → Borrower Repay → Settle. Funded shows an oxblood seal
-9. Preprod: Deploy from Lender, copy address, Join from Borrower, same five steps. Paste a real Lace tx id into payment reference before Disburse
+1. Node 22+, Compact 0.31 (`compact --version`), Docker for proof server on Preprod
+2. `npm install`
+3. `cd contract && compact compile tally.compact managed/tally && npm test` (10 tests)
+4. Local desk (standing demo): `npm run dev` → **Local desk** → Offer → Accept → Disburse → Repay → Settle → **Prove standing** → switch **Verifier** → **Verify access** (Pass)
+5. Preprod: `npm run dev --workspace leaderboard-ui -- --mode preprod` → Connect Wallet → Join/Deploy → loan lifecycle
+6. Faucet: https://midnight-tmnight-preprod.nethermind.dev/
 
 ## Setup
 
@@ -34,28 +60,31 @@ cd contract && compact compile tally.compact managed/tally && npm test
 cd .. && npm run dev
 ```
 
-Install Compact:
+Preprod desk:
 
 ```bash
-curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
-compact update 0.31
+npm run dev --workspace leaderboard-ui -- --mode preprod
 ```
 
-Preprod faucet: https://midnight-tmnight-preprod.nethermind.dev/
+## QA
 
-## QA (15)
-
-`npm test` runs Compact-logic simulation tests (identity stability, happy path, wrong-party rejects, nullifier replay).
+`npm test` — identity, loan lifecycle, allowlist standing (happy path + reject + verifier yes/no).
 
 CI: `.github/workflows/ci.yml`
 
-## Product (15)
+## Live demo
 
-Credit is a pairwise instrument, not a bureau score. Privacy is the product: the explorer cannot see amount. Wave 2 proves standing from settled leaves.
+Host the desk on Vercel (`vercel.json`). After deploy, put the URL here:
 
-## Non-goals (Wave 1)
+- Live demo: _(add Vercel URL after deploy)_
 
-Third-party `proveStanding`, web2 attestors, marketplace, mainnet, Defaulted liquidation.
+## Product
+
+Credit is pairwise. Privacy is the product. Settled leaves populate a private allowlist for standing proofs (L3 Private Allowlist Access).
+
+## Non-goals
+
+Web2 attestors, credit bureau scores, loan marketplace, mainnet (L6), Defaulted liquidation, proving *which* prior counterparty you dealt with.
 
 ## License
 
