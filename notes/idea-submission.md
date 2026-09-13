@@ -19,7 +19,7 @@ Use this block when the form asks for more detail on the project, problem, audie
 - GitHub: https://github.com/Preciousbas/tally
 - Proposal: `PROPOSAL.md` in repo root
 - Preprod contract: `f8287add7fd6628c414dc876cb29a619694ecccb859bae5f0036c5dfb821b59e`
-- Live demo: paste your Vercel URL from README `## Live demo`
+- Live demo: https://tally-jet-mu.vercel.app
 - Demo video: paste your public video URL from README `## Demo`
 - Screenshots: `docs/screenshots/` in the repo (also embedded in README)
 

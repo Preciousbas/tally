@@ -18,7 +18,7 @@ Deployed from Lace on Preprod (see [`notes/l1.md`](notes/l1.md)). Desk path: Con
 
 ## Live demo
 
-- **Vercel:** *[paste production URL after `npx vercel --prod`]* — build config is in `vercel.json`
+- **Vercel:** https://tally-jet-mu.vercel.app
 - **Local desk (recommended for allowlist demo):** `npm run dev --workspace leaderboard-ui -- --mode preprod` then switch to **Local desk**.
 
 ## Demo
