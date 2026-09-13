@@ -4,16 +4,44 @@ Private bilateral loan origination on Midnight. Amount and due date stay in witn
 
 **Private Allowlist Access (L3 / Turn):** settled loans mint a relationship leaf. A party proves membership (`proveStanding`) to a third-party verifier who learns **yes or no only** — not which leaf, amount, or counterparty.
 
-Product name stays **Tally**. Turn proposal: [`notes/turn-proposal.md`](notes/turn-proposal.md) (Private Allowlist Access).
-
-Preprod contract (L1): `f8287add7fd6628c414dc876cb29a619694ecccb859bae5f0036c5dfb821b59e`
+Product name stays **Tally**. Full product write-up: [`PROPOSAL.md`](PROPOSAL.md). Turn notes: [`notes/turn-proposal.md`](notes/turn-proposal.md). Form paste: [`notes/idea-submission.md`](notes/idea-submission.md).
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
+## Contract Address
+
+| Network | Address |
+|---|---|
+| Midnight Preprod | `f8287add7fd6628c414dc876cb29a619694ecccb859bae5f0036c5dfb821b59e` |
+
+Deployed from Lace on Preprod (see [`notes/l1.md`](notes/l1.md)). Desk path: Connect Wallet → Join → paste the address above. Or Deploy from Lender and share the new address with Borrower.
+
 ## Live demo
 
-- **Vercel:** see deploy steps below if the URL is not yet live.
+- **Vercel:** https://tally-midnight.vercel.app *(replace with your production URL after `npx vercel --prod` if this host differs)*
 - **Local desk (recommended for allowlist demo):** `npm run dev --workspace leaderboard-ui -- --mode preprod` then switch to **Local desk**.
+
+## Demo
+
+Demo video (wallet connect + successful circuit call):
+
+- **Video:** *[add public Loom / YouTube / Drive link here after recording]*
+- **Script:** [`pitch/DEMO_SCRIPT.md`](pitch/DEMO_SCRIPT.md)
+
+Required coverage for Level 2 judges:
+
+1. Lace / 1AM wallet connect on the desk
+2. At least one successful circuit call (Offer on Local desk, or full Offer → Settle → Prove standing → Verifier Pass)
+
+## UI Screenshots
+
+![Desk hero and wallet connect](docs/screenshots/01-connect.png)
+
+![Lender offer — amount stays off-ledger](docs/screenshots/02-offer.png)
+
+![Instrument status without amount on ledger](docs/screenshots/03-instrument.png)
+
+![Verifier standing Pass — yes or no only](docs/screenshots/04-standing.png)
 
 ## Privacy model
 
@@ -40,6 +68,8 @@ What a **membership verifier** learns:
 
 Grounded in Compact (`contract/tally.compact`): public `LoanPublic` vs witnesses; settle writes `relationshipLeaf` + `settleNullifier`; `proveStanding` checks a Merkle path against `relationships` without disclosing the leaf.
 
+Desk copy reinforces the same split: amount and due are labeled off-ledger / witness-only; instrument rows show `Amount: off-ledger`; Verifier copy states yes/no only.
+
 ## Engineering
 
 Compact contract: [`contract/tally.compact`](contract/tally.compact)
@@ -60,7 +90,7 @@ Compact contract: [`contract/tally.compact`](contract/tally.compact)
 6. `npm test` (≥10 tests, including proveStanding happy path + rejects)
 7. UI: `npm run dev --workspace leaderboard-ui -- --mode preprod`
 8. **Local desk proveStanding:** Offer → Borrower Accept → Lender Disburse → Borrower Repay → Settle → **Prove standing** → switch to **Verifier** → **Verify access** (Pass seal, no amount shown)
-9. Preprod: Deploy from Lender, copy address, Join from Borrower, same five loan steps. Paste a real Lace tx id into payment reference before Disburse
+9. Preprod: Join the Contract Address above (or Deploy from Lender), same five loan steps. Paste a real Lace tx id into payment reference before Disburse
 
 ## Setup
 
@@ -114,7 +144,7 @@ npx vercel --prod --yes
 
 `vercel.json` builds workspaces and serves `leaderboard-ui/dist`. Set `VITE_DEFAULT_CONTRACT` / `VITE_NETWORK_ID=preprod` in the Vercel project env if joining the L1 Preprod address by default.
 
-If CLI auth is missing: open https://vercel.com/new and import `Preciousbas/tally`, root directory `.`, override build with the commands in `vercel.json`.
+If CLI auth is missing: open https://vercel.com/new and import `Preciousbas/tally`, root directory `.`, override build with the commands in `vercel.json`. After deploy, replace the Live demo URL above with the real production host.
 
 ## License
 
