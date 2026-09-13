@@ -459,6 +459,7 @@ export default function App() {
 
       <section className="hero">
         <h2>The other half stays private.</h2>
+        <p className="hero-sub">Amount and due stay off-ledger. The explorer sees status only.</p>
       </section>
 
       <GrainFlap />
@@ -532,6 +533,7 @@ export default function App() {
                 <div><dt>Lender id</dt><dd>{trunc(selected.lenderPk)}</dd></div>
                 <div><dt>Borrower id</dt><dd>{trunc(selected.borrowerPk)}</dd></div>
                 <div><dt>Payment</dt><dd>{selected.paymentCommit.replace(/0/g, '') ? trunc(selected.paymentCommit) : '—'}</dd></div>
+                <div><dt>Amount</dt><dd className="quiet">off-ledger</dd></div>
               </dl>
             </>
           ) : (
@@ -542,10 +544,12 @@ export default function App() {
             <div className="fields">
               <label>
                 Amount
+                <span className="field-hint">stays off-ledger</span>
                 <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="numeric" placeholder="how much" />
               </label>
               <label>
                 Due in days
+                <span className="field-hint">witness only</span>
                 <input value={due} onChange={(e) => setDue(e.target.value)} inputMode="numeric" placeholder="30" />
               </label>
               {deskMode === 'chain' && (

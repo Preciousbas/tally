@@ -99,6 +99,13 @@ body {
   letter-spacing: -0.02em;
   color: var(--bone);
 }
+.hero-sub {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.45;
+  max-width: 32rem;
+}
 
 .btn {
   display: inline-block;
@@ -390,6 +397,14 @@ dd {
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.field-hint {
+  letter-spacing: 0.08em;
+  text-transform: none;
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.85;
 }
 
 .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
