@@ -18,14 +18,14 @@ Deployed from Lace on Preprod (see [`notes/l1.md`](notes/l1.md)). Desk path: Con
 
 ## Live demo
 
-- **Vercel:** https://tally-midnight.vercel.app *(replace with your production URL after `npx vercel --prod` if this host differs)*
+- **Vercel:** *[paste production URL after `npx vercel --prod`]* — build config is in `vercel.json`
 - **Local desk (recommended for allowlist demo):** `npm run dev --workspace leaderboard-ui -- --mode preprod` then switch to **Local desk**.
 
 ## Demo
 
 Demo video (wallet connect + successful circuit call):
 
-- **Video:** *[add public Loom / YouTube / Drive link here after recording]*
+- **Video:** *[paste public Loom / YouTube / Drive link after recording — see `pitch/DEMO_SCRIPT.md`]*
 - **Script:** [`pitch/DEMO_SCRIPT.md`](pitch/DEMO_SCRIPT.md)
 
 Required coverage for Level 2 judges:
