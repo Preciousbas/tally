@@ -3,6 +3,12 @@ import semver from 'semver';
 
 export const COMPATIBLE_CONNECTOR_API_VERSION = '4.x';
 
+/** Official extension install pages for the no-wallet chip. Not wallet keys. */
+export const LACE_INSTALL_URL =
+  'https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiendhlofajokpaflmk';
+export const ONE_AM_INSTALL_URL =
+  'https://chromewebstore.google.com/detail/1am/bphnkdkcnfhompoegfpgnkidcjfbojjp';
+
 export type WalletOption = {
   readonly id: string;
   readonly name: string;
