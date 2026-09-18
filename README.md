@@ -21,6 +21,11 @@ Deployed from Lace on Preprod (see [`notes/l1.md`](notes/l1.md)). Desk path: Con
 - **Vercel:** https://tally-jet-mu.vercel.app
 - **Local desk (recommended for allowlist demo):** `npm run dev --workspace leaderboard-ui -- --mode preprod` then switch to **Local desk**.
 
+## Product profile
+
+- **X:** https://x.com/tally_midnight *(create account; fallbacks `@usetallydesk` / `@notch_tally` — see [`brand/X_PROFILE.md`](brand/X_PROFILE.md))*
+- Brand kit: [`brand/X_PROFILE.md`](brand/X_PROFILE.md) · avatar [`brand/x-avatar.svg`](brand/x-avatar.svg) · header [`brand/x-header.svg`](brand/x-header.svg)
+
 ## Demo
 
 Demo video (wallet connect + successful circuit call):
@@ -28,10 +33,10 @@ Demo video (wallet connect + successful circuit call):
 - **Video:** *[paste public Loom / YouTube / Drive link after recording — see `pitch/DEMO_SCRIPT.md`]*
 - **Script:** [`pitch/DEMO_SCRIPT.md`](pitch/DEMO_SCRIPT.md)
 
-Required coverage for Level 2 judges:
+Required coverage for L4 / MVP judges:
 
-1. Lace / 1AM wallet connect on the desk
-2. At least one successful circuit call (Offer on Local desk, or full Offer → Settle → Prove standing → Verifier Pass)
+1. Lace / 1AM wallet connect on the desk (or state Preprod Lace + show Local desk circuit path)
+2. Successful circuit path through Settle → Prove standing → Verifier Pass (amount never shown)
 
 ## UI Screenshots
 

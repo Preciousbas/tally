@@ -20,8 +20,10 @@ Use this block when the form asks for more detail on the project, problem, audie
 - Proposal: `PROPOSAL.md` in repo root
 - Preprod contract: `f8287add7fd6628c414dc876cb29a619694ecccb859bae5f0036c5dfb821b59e`
 - Live demo: https://tally-jet-mu.vercel.app
+- Product X: https://x.com/tally_midnight (create; see `brand/X_PROFILE.md`)
 - Demo video: paste your public video URL from README `## Demo`
 - Screenshots: `docs/screenshots/` in the repo (also embedded in README)
+- Users (L4): track in `notes/users-l4.md` — goal 20
 
 **One-liner (if the form has a short field)**
 
