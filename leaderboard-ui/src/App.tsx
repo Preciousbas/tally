@@ -234,6 +234,7 @@ export default function App() {
   const [standingResult, setStandingResult] = useState<StandingResult>(null);
   const [verifyRootInput, setVerifyRootInput] = useState('');
   const [showLocalBanner, setShowLocalBanner] = useState(() => !readBannerDismissed());
+  const [isMobile, setIsMobile] = useState(false);
   const [deskReady, setDeskReady] = useState(false);
   const autoLocalOnce = useRef(false);
 
@@ -260,6 +261,14 @@ export default function App() {
 
   useEffect(() => {
     setDeskReady(true);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
   }, []);
 
   useEffect(() => {
@@ -804,20 +813,51 @@ export default function App() {
         <a href={PRIVACY_DOC} target="_blank" rel="noreferrer">Privacy model</a>
       </div>
 
-      {showLocalBanner && walletState === 'no-wallet' && deskMode === 'chain' && (
-        <div className="notice notice-info" role="status">
-          <span>Run the demo here (Local desk) — no wallet. Preprod when Lace is ready.</span>
-          <div className="notice-actions">
-            <button type="button" onClick={() => { setDeskMode('local'); dismissLocalBanner(); }}>Use Local desk</button>
-            <button type="button" onClick={dismissLocalBanner}>Close</button>
+      {deskMode === 'chain' && (
+        <form
+          className="join-rail"
+          onSubmit={(event) => {
+            event.preventDefault();
+            onJoin();
+          }}
+          aria-label="Join Preprod contract"
+        >
+          <label className="contract-label" htmlFor="contract-join">
+            Midnight Preprod
+          </label>
+          <div className="join-field">
+            <input
+              id="contract-join"
+              className={contractFlash ? 'flash' : undefined}
+              value={joinInput || contractAddress}
+              onChange={(e) => setJoinInput(e.target.value)}
+              placeholder="64-hex contract address"
+              aria-label="Midnight Preprod contract address"
+              autoComplete="off"
+              spellCheck={false}
+            />
           </div>
-        </div>
+          <div className="join-actions">
+            <button type="submit" className="btn">Join</button>
+            <button type="button" className="btn" onClick={deploy} disabled={!isConnected || !!busy}>Deploy</button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => contractAddress && copyToClipboard(contractAddress).then((ok) => ok && flashContract())}
+            >
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+          </div>
+        </form>
       )}
 
-      {showLocalBanner && walletState === 'no-wallet' && deskMode === 'local' && (
+      {showLocalBanner && isMobile && deskMode === 'chain' && (
         <div className="notice notice-info" role="status">
-          <span>Local desk is ready — no wallet. Offer through Settle, then Prove standing.</span>
-          <button type="button" onClick={dismissLocalBanner}>Close</button>
+          <span>Try Local Desk first without any wallet.</span>
+          <div className="notice-actions">
+            <button type="button" onClick={() => { setDeskMode('local'); dismissLocalBanner(); }}>Local desk</button>
+            <button type="button" onClick={dismissLocalBanner}>Close</button>
+          </div>
         </div>
       )}
 
@@ -842,7 +882,7 @@ export default function App() {
             <button type="button" className={deskMode === 'local' ? 'on' : ''} onClick={() => setDeskMode('local')}>Local desk</button>
           </div>
           <p className="seg-caption">
-            {deskMode === 'chain' ? 'Preprod = live Midnight' : 'Local desk = in-browser simulator (session-only circuits)'}
+            {deskMode === 'chain' ? 'Midnight Preprod' : 'Demo/Simulator'}
           </p>
         </div>
 
@@ -856,35 +896,6 @@ export default function App() {
             You are acting as {role === 'lender' ? 'Lender' : role === 'borrower' ? 'Borrower' : 'Verifier'} on this desk.
           </p>
         </div>
-
-        {deskMode === 'chain' && (
-          <div className="join-block">
-            <label className="contract-label" htmlFor="contract-join">
-              Midnight Preprod
-            </label>
-            <div className="join-field">
-              <input
-                id="contract-join"
-                className={contractFlash ? 'flash' : undefined}
-                value={joinInput || contractAddress}
-                onChange={(e) => setJoinInput(e.target.value)}
-                placeholder="64-hex contract address"
-                aria-label="Midnight Preprod contract address"
-              />
-            </div>
-            <div className="join-actions">
-              <button type="button" className="btn" onClick={onJoin}>Join</button>
-              <button type="button" className="btn" onClick={deploy} disabled={!isConnected || !!busy}>Deploy</button>
-              <button
-                type="button"
-                className="btn"
-                onClick={() => contractAddress && copyToClipboard(contractAddress).then((ok) => ok && flashContract())}
-              >
-                {copied ? 'Copied' : 'Copy'}
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
       <main className="layout">
