@@ -1,155 +1,121 @@
 # Tally
 
-Private bilateral loan origination on Midnight. Amount and due date stay in witnesses. The public ledger stores loan id, status, pseudonymous identity grains, a payment commitment, a relationship Merkle allowlist, and nullifiers.
+Private bilateral trade credit on Midnight. Loan amounts and due dates stay off the public ledger. When a loan settles, you can prove repaid standing to someone new — yes or no only.
 
-**Private Allowlist Access (L3 / Turn):** settled loans mint a relationship leaf. A party proves membership (`proveStanding`) to a third-party verifier who learns **yes or no only** — not which leaf, amount, or counterparty.
-
-Product name stays **Tally**. Full product write-up: [`PROPOSAL.md`](PROPOSAL.md). Turn notes: [`notes/turn-proposal.md`](notes/turn-proposal.md). Form paste: [`notes/idea-submission.md`](notes/idea-submission.md).
+[Live desk](https://tally-jet-mu.vercel.app) · [X](https://x.com/tally_midnight)
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
-## Contract Address
+## What this is
 
-| Network | Address |
+Trade credit is pairwise. Proving “I have repaid before” usually means revealing amounts and counterparties or trusting a centralized score. Tally keeps economic terms in private witnesses and publishes only what a ledger needs for integrity: status, pseudonymous identities, a payment commitment, an allowlist root, and nullifiers.
+
+Settled loans mint a relationship leaf into a Merkle allowlist. A later membership proof answers a single question for a third party: is this identity in the allowlist? The verifier never learns the amount, the counterparty, or which loan was used.
+
+## Live deployment
+
+| | |
 |---|---|
-| Midnight Preprod | `f8287add7fd6628c414dc876cb29a619694ecccb859bae5f0036c5dfb821b59e` |
+| Desk | https://tally-jet-mu.vercel.app |
+| Network | Midnight Preprod |
+| Contract | `f8287add7fd6628c414dc876cb29a619694ecccb859bae5f0036c5dfb821b59e` |
 
-Deployed from Lace on Preprod (see [`notes/l1.md`](notes/l1.md)). Desk path: Connect Wallet → Join → paste the address above. Or Deploy from Lender and share the new address with Borrower.
+Use **Lace** or **1AM** on Preprod to join the contract, or switch to **Local desk** for a full in-browser demo with no wallet.
 
-## Live demo
+## Product tour
 
-- **Production desk (Vercel):** https://tally-jet-mu.vercel.app
-- **Local desk (recommended for allowlist demo without a wallet):** `npm run dev --workspace leaderboard-ui -- --mode preprod` then switch to **Local desk**.
+![Desk](docs/screenshots/01-connect.png)
 
-## Product profile
+The desk: brand, wallet connect, and a clear split between Preprod and Local.
 
-- **X:** https://x.com/tally_midnight *(create account; fallbacks `@usetallydesk` / `@notch_tally` — see [`brand/X_PROFILE.md`](brand/X_PROFILE.md))*
-- Brand kit: [`brand/X_PROFILE.md`](brand/X_PROFILE.md) · avatar [`brand/x-avatar.svg`](brand/x-avatar.svg) · header [`brand/x-header.svg`](brand/x-header.svg)
+![Offer](docs/screenshots/02-offer.png)
 
-## Demo
+Offer a loan. Amount stays off-ledger; the public instrument shows status, not terms.
 
-Demo video (wallet connect + successful circuit call):
+![Settled](docs/screenshots/03-instrument.png)
 
-- **Video:** *[paste public Loom / YouTube / Drive link after recording — see `pitch/DEMO_SCRIPT.md`]*
-- **Script:** [`pitch/DEMO_SCRIPT.md`](pitch/DEMO_SCRIPT.md)
+Lifecycle seals move Offered → Accepted → Funded → Repaid → Settled without disclosing amount.
 
-Required coverage for L4 / MVP judges:
+![Standing](docs/screenshots/04-standing.png)
 
-1. Lace / 1AM wallet connect on the desk (or state Preprod Lace + show Local desk circuit path)
-2. Successful circuit path through Settle → Prove standing → Verifier Pass (amount never shown)
+Prove standing, then verify as a third party. Pass or fail only — no book.
 
-## UI Screenshots
+## How it works
 
-![Desk hero and wallet connect](docs/screenshots/01-connect.png)
+1. **Offer** — Lender sets amount and due (private). Borrower is named by pseudonymous id on Preprod.
+2. **Accept** — Borrower accepts the instrument.
+3. **Disburse** — Lender binds a payment commitment. The amount itself is never disclosed on-chain.
+4. **Repay → Settle** — Settlement inserts a relationship leaf and consumes a nullifier.
+5. **Prove standing** — A party proves allowlist membership. A verifier learns membership only.
 
-![Lender offer — amount stays off-ledger](docs/screenshots/02-offer.png)
+## Privacy
 
-![Instrument status without amount on ledger](docs/screenshots/03-instrument.png)
+**Visible on the public ledger**
 
-![Verifier standing Pass — yes or no only](docs/screenshots/04-standing.png)
+- Loan id and status
+- Pseudonymous lender and borrower identity grains
+- Payment commitment at disbursement
+- Relationships allowlist Merkle root
+- Settle nullifiers
 
-## Privacy model
+**Not visible on the public ledger**
 
-What an **observer** (explorer, indexer, unrelated wallet) **can** learn:
+- Loan amount
+- Due date
+- User secret and PIN
+- Which allowlist leaf backs a standing proof
+- Economic terms of prior loans
 
-- That a loan id exists and its **status** (Offered → Accepted → Funded → Repaid → Settled)
-- Pseudonymous identity grains (`lenderPk`, `borrowerPk`) — not Lace display names or legal identity
-- That a **payment commitment** was bound at disbursement
-- The **Merkle root** (and history) of the relationships allowlist
-- That a **nullifier** was consumed at settle
+**What a membership verifier learns**
 
-What an observer **cannot** learn:
+- A boolean: the prover is in the settled-relationship allowlist at a stated root
+- Nothing about amount, due, leaf index, or counterparty
 
-- Loan **amount**
-- **Due** date / slot
-- User **secret** and **PIN**
-- Which **leaf** corresponds to which real-world relationship when only a membership proof is presented
-- The economic terms of any prior loan used for standing
+## Architecture
 
-What a **membership verifier** learns:
+```
+leaderboard-ui   React desk (Lace / 1AM, Local + Preprod, Lender / Borrower / Verifier)
+api              Contract glue and witnesses
+contract         tally.compact — offerLoan, acceptLoan, disburse, repay, settle, proveStanding
+proof-server     Local proving for Preprod flows
+```
 
-- Boolean: the prover is in the settled-relationship allowlist for this contract (at a stated root)
-- Nothing about amount, due, or which leaf / index / counterparty pair was used
-
-Grounded in Compact (`contract/tally.compact`): public `LoanPublic` vs witnesses; settle writes `relationshipLeaf` + `settleNullifier`; `proveStanding` checks a Merkle path against `relationships` without disclosing the leaf.
-
-Desk copy reinforces the same split: amount and due are labeled off-ledger / witness-only; instrument rows show `Amount: off-ledger`; Verifier copy states yes/no only.
-
-## Engineering
-
-Compact contract: [`contract/tally.compact`](contract/tally.compact)
-
-- Dual ledger: public `LoanPublic` vs witnesses `getUserSecret`, `getPin`, `getLoanAmount`, `getDueSlot`
-- Identity from secret + PIN (`tally:user:pk:v1`). Does not use `ownPublicKey()`
-- Disburse binds a payment grain. Amount is never disclosed
-- Settle inserts a relationship leaf and a nullifier
-- `proveStanding` — Private Allowlist Access against `relationships` (HistoricMerkleTree)
-
-## How judges test
-
-1. Node 22+, Docker Compose v2, Compact toolchain 0.31 (`compact --version`)
-2. Lace on Preprod. Faucet tNIGHT, generate tDUST. Proof server `http://localhost:6300` for local proving
-3. Two Chrome profiles (Lender / Borrower); use desk **Verifier** role as the third profile
-4. `npm install`
-5. `compact compile +0.31.1 tally.compact managed/tally` from `contract/`
-6. `npm test` (≥10 tests, including proveStanding happy path + rejects)
-7. UI: `npm run dev --workspace leaderboard-ui -- --mode preprod`
-8. **Local desk proveStanding:** Offer → Borrower Accept → Lender Disburse → Borrower Repay → Settle → **Prove standing** → switch to **Verifier** → **Verify access** (Pass seal, no amount shown)
-9. Preprod: Join the Contract Address above (or Deploy from Lender), same five loan steps. Paste a real Lace tx id into payment reference before Disburse
+Identity is derived from secret + PIN (`tally:user:pk:v1`), not `ownPublicKey()`. Public state is `LoanPublic`; amount and due remain witnesses.
 
 ## Setup
 
 ```bash
+git clone https://github.com/Preciousbas/tally
+cd tally
 nvm use 22
 npm install
-cd contract && compact compile +0.31.1 tally.compact managed/tally && npm test
-cd .. && npm run dev --workspace leaderboard-ui -- --mode preprod
 ```
 
-Install Compact:
+Install Compact 0.31.1:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
 compact update 0.31.1
 ```
 
-Preprod faucet: https://midnight-tmnight-preprod.nethermind.dev/
-
-## QA
-
-`npm test` runs Compact-logic simulation tests (identity, loan lifecycle, nullifier replay, **proveStanding** membership / non-member / wrong root).
-
-CI: `.github/workflows/ci.yml` — `npm install` + `npm test` on push/PR to `main`.
-
-## Product
-
-Credit is a pairwise instrument, not a bureau score. Privacy is the product: the explorer cannot see amount. Standing proofs answer only allowlist membership.
-
-## Non-goals
-
-- Credit bureau / third-party score issuance
-- Web2 attestors (KYC, bank statements, off-chain oracles)
-- Marketplace of loans or public order book
-- Revealing amounts under any transparency mode
-- Mainnet launch
-- Defaulted / liquidation flows
-- Replacing Lace/1AM identity with real-world legal identity
-- General-purpose credential wallet (no W3C VC format in MVP)
-- Proving *which* prior counterparty you dealt with (that would break allowlist privacy)
-
-`proveStanding` is **in scope** (Private Allowlist Access).
-
-## Vercel deploy
+Compile, test, and run the desk:
 
 ```bash
-# from repo root, logged into Vercel CLI for your account
-npx vercel link   # link to Preciousbas/tally project if needed
-npx vercel --prod --yes
+cd contract && compact compile +0.31.1 tally.compact managed/tally && npm test
+cd .. && npm run dev --workspace leaderboard-ui -- --mode preprod
 ```
 
-`vercel.json` builds workspaces and serves `leaderboard-ui/dist`. Set `VITE_DEFAULT_CONTRACT` / `VITE_NETWORK_ID=preprod` in the Vercel project env if joining the L1 Preprod address by default.
+Open http://localhost:3000. For Preprod wallet flows, use Lace or 1AM on Preprod and a proof server on port 6300. Faucet: https://midnight-tmnight-preprod.nethermind.dev/
 
-If CLI auth is missing: open https://vercel.com/new and import `Preciousbas/tally`, root directory `.`, override build with the commands in `vercel.json`. Live URL for judges: https://tally-jet-mu.vercel.app (see **Live demo** above).
+## Commands
+
+```bash
+npm install          # Install workspaces
+npm test             # Contract simulation tests (Vitest)
+npm run dev          # Desk UI (leaderboard-ui)
+```
+
+CI runs `npm install` and `npm test` on push and pull requests to `main`.
 
 ## License
 

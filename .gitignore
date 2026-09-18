@@ -78,3 +78,12 @@ leaderboard-ui/public/zkir/
 # ai scratch work
 .midnight-expert
 .claude
+
+# Internal / hackathon working notes (not part of the public product docs)
+notes/
+pitch/
+PROPOSAL.md
+docs/README.md
+docs/capture-screenshots.mjs
+docs/capture-screenshots.ps1
+brand/X_PROFILE.md
