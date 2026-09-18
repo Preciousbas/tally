@@ -5,7 +5,7 @@ import { BrowserTallyManager } from './contexts/BrowserTallyManager';
 import { TallySimulator } from '../../contract/src/tally-simulator';
 import pino from 'pino';
 import type { PublicLoan } from '../../api/src/common-types';
-import { findCompatibleWallet, listCompatibleWallets, type WalletOption } from './wallets';
+import { LACE_INSTALL_URL, ONE_AM_INSTALL_URL, listCompatibleWallets, type WalletOption } from './wallets';
 
 const NETWORK_ID = import.meta.env.VITE_NETWORK_ID ?? 'preprod';
 const DEFAULT_CONTRACT = import.meta.env.VITE_DEFAULT_CONTRACT ?? '';
@@ -138,7 +138,9 @@ export default function App() {
   const [joinInput, setJoinInput] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [rootCopied, setRootCopied] = useState(false);
   const [contractFlash, setContractFlash] = useState(false);
+  const deskTouchedRef = useRef(false);
   const [role, setRole] = useState<Role>('lender');
   const [borrowerPk, setBorrowerPk] = useState('');
   const [amount, setAmount] = useState('');
@@ -190,6 +192,7 @@ export default function App() {
         clearInterval(t);
       } else if (elapsed >= 5_000) {
         setWalletState('no-wallet');
+        if (!deskTouchedRef.current) setDeskMode('local');
         clearInterval(t);
       }
     }, 100);
@@ -206,13 +209,14 @@ export default function App() {
   }, [selectedWalletId, walletOptions]);
 
   useEffect(() => {
-    if (!copied && !contractFlash) return;
+    if (!copied && !contractFlash && !rootCopied) return;
     const t = window.setTimeout(() => {
       setCopied(false);
       setContractFlash(false);
+      setRootCopied(false);
     }, 2200);
     return () => window.clearTimeout(t);
-  }, [copied, contractFlash]);
+  }, [copied, contractFlash, rootCopied]);
 
   const flashContract = useCallback(() => {
     setContractFlash(true);
@@ -275,22 +279,40 @@ export default function App() {
   };
 
   const onOffer = async () => {
+    const trimmedAmount = amount.trim();
+    if (!trimmedAmount || !(Number(trimmedAmount) > 0)) {
+      setError('Enter an amount before offering.');
+      return;
+    }
     if (deskMode === 'local') {
       const pk = simRef.current.deriveUserPublicKey(keysRef.current.borrower, 1234);
       runLocal(() => {
-        simRef.current.offerLoan(keysRef.current.lender, 1234, pk, BigInt(amount || '1'), BigInt(due || '30'));
+        simRef.current.offerLoan(keysRef.current.lender, 1234, pk, BigInt(trimmedAmount), BigInt(due || '30'));
       });
       return;
     }
-    if (!wallet) return;
+    if (!wallet) {
+      setError('Connect Lace or 1AM, or switch to Local desk.');
+      return;
+    }
     setBusy('Offering');
     try {
       const result = await resolveApi();
       if (!contractAddress) setContractAddress(result.api.deployedContractAddress);
-      await result.api.offerLoan(borrowerPk, BigInt(amount || '1'), BigInt(due || '30'));
+      await result.api.offerLoan(borrowerPk, BigInt(trimmedAmount), BigInt(due || '30'));
       setTimeout(() => refresh(), 2500);
     } catch (e) { setError(friendlyError(e)); }
     finally { setBusy(null); }
+  };
+
+  const onJoin = () => {
+    const addr = joinInput.trim();
+    if (!addr || addr.length !== 64) {
+      setError('Paste a valid contract address to join.');
+      return;
+    }
+    setError(null);
+    setContractAddress(addr);
   };
 
   const onAccept = async () => {
@@ -359,6 +381,7 @@ export default function App() {
   const onProveStanding = async () => {
     if (!selected) return;
     setStandingResult(null);
+    setBusy('Proving standing');
     if (deskMode === 'local') {
       const sk = role === 'lender' ? keysRef.current.lender : keysRef.current.borrower;
       try {
@@ -371,10 +394,11 @@ export default function App() {
         setStandingRoot(null);
         setStandingResult('fail');
         setError(friendlyError(e));
+      } finally {
+        setBusy(null);
       }
       return;
     }
-    setBusy('Proving standing');
     try {
       const result = await resolveApi();
       const counterparty = role === 'lender' ? selected.borrowerPk : selected.lenderPk;
@@ -448,10 +472,17 @@ export default function App() {
           {isConnected && address ? (
             <span className="chip">{trunc(address)}</span>
           ) : walletState === 'no-wallet' ? (
-            <span className="chip quiet">Install Lace or 1AM</span>
+            <>
+              <a className="chip quiet" href={LACE_INSTALL_URL} target="_blank" rel="noopener noreferrer">
+                Install Lace
+              </a>
+              <a className="chip quiet" href={ONE_AM_INSTALL_URL} target="_blank" rel="noopener noreferrer">
+                Install 1AM
+              </a>
+            </>
           ) : (
             <button className="btn primary" onClick={connect} disabled={walletState !== 'ready' || !walletAPI}>
-              {walletState === 'connecting' ? 'Connecting' : 'Connect Wallet'}
+              {walletState === 'detecting' ? 'Detecting…' : walletState === 'connecting' ? 'Connecting…' : 'Connect'}
             </button>
           )}
         </div>
@@ -464,6 +495,12 @@ export default function App() {
 
       <GrainFlap />
 
+      {(walletState === 'no-wallet' || walletState === 'detecting') && (
+        <p className="desk-nudge">
+          Preprod needs Lace or 1AM. Or switch to Local desk to run the full demo without a wallet.
+        </p>
+      )}
+
       {error && (
         <div className="notice" role="alert">
           <span>{error}</span>
@@ -473,8 +510,8 @@ export default function App() {
 
       <div className="toolbar">
         <div className="seg">
-          <button className={deskMode === 'chain' ? 'on' : ''} onClick={() => setDeskMode('chain')}>Preprod</button>
-          <button className={deskMode === 'local' ? 'on' : ''} onClick={() => setDeskMode('local')}>Local desk</button>
+          <button className={deskMode === 'chain' ? 'on' : ''} onClick={() => { deskTouchedRef.current = true; setDeskMode('chain'); }}>Preprod</button>
+          <button className={deskMode === 'local' ? 'on' : ''} onClick={() => { deskTouchedRef.current = true; setDeskMode('local'); }}>Local desk</button>
         </div>
         <div className="seg">
           <button className={role === 'lender' ? 'on' : ''} onClick={() => setRole('lender')}>Lender</button>
@@ -490,7 +527,7 @@ export default function App() {
               placeholder="Contract Address"
               aria-label="Contract address"
             />
-            <button className="btn" onClick={() => setContractAddress(joinInput.trim())}>Join</button>
+            <button className="btn" onClick={onJoin}>Join</button>
             <button className="btn" onClick={deploy} disabled={!isConnected || !!busy}>Deploy</button>
             <button
               className="btn"
@@ -611,13 +648,30 @@ export default function App() {
           )}
 
           {(role === 'lender' || role === 'borrower') && standingResult && (
-            <p className="standing-line" aria-live="polite">
+            <div className="standing-line" aria-live="polite">
               {standingResult === 'pass' ? (
                 <span className="seal settled">Standing confirmed</span>
               ) : (
                 <span className="seal vacant">Standing failed</span>
               )}
-            </p>
+              {standingResult === 'pass' && (standingRoot || verifyRootInput) && (
+                <div className="standing-root">
+                  <span className="quiet">Allowlist root</span>
+                  <code>{standingRoot || verifyRootInput}</code>
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={() => {
+                      const root = (standingRoot || verifyRootInput || '').trim();
+                      if (!root) return;
+                      void copyToClipboard(root).then((ok) => ok && setRootCopied(true));
+                    }}
+                  >
+                    {rootCopied ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
           {busy && <p className="quiet busy-line" aria-live="polite">{busy}</p>}
