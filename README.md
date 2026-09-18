@@ -18,8 +18,8 @@ Deployed from Lace on Preprod (see [`notes/l1.md`](notes/l1.md)). Desk path: Con
 
 ## Live demo
 
-- **Vercel:** https://tally-jet-mu.vercel.app
-- **Local desk (recommended for allowlist demo):** `npm run dev --workspace leaderboard-ui -- --mode preprod` then switch to **Local desk**.
+- **Production desk (Vercel):** https://tally-jet-mu.vercel.app
+- **Local desk (recommended for allowlist demo without a wallet):** `npm run dev --workspace leaderboard-ui -- --mode preprod` then switch to **Local desk**.
 
 ## Product profile
 
@@ -149,7 +149,7 @@ npx vercel --prod --yes
 
 `vercel.json` builds workspaces and serves `leaderboard-ui/dist`. Set `VITE_DEFAULT_CONTRACT` / `VITE_NETWORK_ID=preprod` in the Vercel project env if joining the L1 Preprod address by default.
 
-If CLI auth is missing: open https://vercel.com/new and import `Preciousbas/tally`, root directory `.`, override build with the commands in `vercel.json`. After deploy, replace the Live demo URL above with the real production host.
+If CLI auth is missing: open https://vercel.com/new and import `Preciousbas/tally`, root directory `.`, override build with the commands in `vercel.json`. Live URL for judges: https://tally-jet-mu.vercel.app (see **Live demo** above).
 
 ## License
 
