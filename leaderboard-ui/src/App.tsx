@@ -962,7 +962,14 @@ export default function App() {
               <label>
                 Amount
                 <span className="field-hint">required · stays off-ledger</span>
-                <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="numeric" placeholder="how much" required />
+                <input
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value.replace(/\D/g, ''))}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="off"
+                  required
+                />
               </label>
               <label>
                 Due in days
