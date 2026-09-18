@@ -152,6 +152,20 @@ body {
 
 .chip.quiet { border-color: var(--rule); color: var(--muted); }
 
+a.chip {
+  display: inline-block;
+  cursor: pointer;
+}
+
+a.chip:hover { color: var(--bone); border-color: var(--rule-light); }
+
+.desk-nudge {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 .notice {
   display: flex;
   justify-content: space-between;
@@ -413,6 +427,22 @@ dd {
   margin-top: 16px;
 }
 
+.standing-root {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.standing-root code {
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  word-break: break-all;
+  color: var(--ink);
+}
+
 .seal.vacant {
   border-color: var(--oxblood);
   color: var(--oxblood);
@@ -528,6 +558,23 @@ dd {
 @media (max-width: 800px) {
   .layout { display: block; }
   .list { margin-bottom: 16px; }
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .seg { width: 100%; }
+  .seg button { flex: 1; min-width: 0; }
+  .join {
+    min-width: 0;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .join input {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+  .join .btn { flex: 1 1 auto; }
 }
 
 @media (max-width: 640px) {
@@ -543,6 +590,7 @@ dd {
     grid-row: 2;
     font-size: 14px;
   }
+  .mast-actions { flex-wrap: wrap; justify-content: flex-end; }
 }
 
 @media (max-width: 480px) {
@@ -553,5 +601,4 @@ dd {
   .brand h1 { font-size: 28px; }
   .hero { margin: 28px 0 8px; }
   .mast-actions .btn { padding: 8px 12px; font-size: 14px; }
-  .join { min-width: 100%; }
 }
