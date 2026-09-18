@@ -508,33 +508,39 @@ export default function App() {
         </div>
       )}
 
-      <div className="toolbar">
-        <div className="seg">
-          <button className={deskMode === 'chain' ? 'on' : ''} onClick={() => { deskTouchedRef.current = true; setDeskMode('chain'); }}>Preprod</button>
-          <button className={deskMode === 'local' ? 'on' : ''} onClick={() => { deskTouchedRef.current = true; setDeskMode('local'); }}>Local desk</button>
-        </div>
-        <div className="seg">
-          <button className={role === 'lender' ? 'on' : ''} onClick={() => setRole('lender')}>Lender</button>
-          <button className={role === 'borrower' ? 'on' : ''} onClick={() => setRole('borrower')}>Borrower</button>
-          <button className={role === 'verifier' ? 'on' : ''} onClick={() => setRole('verifier')}>Verifier</button>
+      <div className="desk-chrome">
+        <div className="toolbar">
+          <div className="seg">
+            <button className={deskMode === 'chain' ? 'on' : ''} onClick={() => { deskTouchedRef.current = true; setDeskMode('chain'); }}>Preprod</button>
+            <button className={deskMode === 'local' ? 'on' : ''} onClick={() => { deskTouchedRef.current = true; setDeskMode('local'); }}>Local desk</button>
+          </div>
+          <div className="seg">
+            <button className={role === 'lender' ? 'on' : ''} onClick={() => setRole('lender')}>Lender</button>
+            <button className={role === 'borrower' ? 'on' : ''} onClick={() => setRole('borrower')}>Borrower</button>
+            <button className={role === 'verifier' ? 'on' : ''} onClick={() => setRole('verifier')}>Verifier</button>
+          </div>
         </div>
         {deskMode === 'chain' && (
-          <div className="join">
+          <div className="join-rail">
+            <label className="join-rail-label" htmlFor="contract-address">Midnight Preprod</label>
             <input
+              id="contract-address"
               className={contractFlash ? 'flash' : undefined}
               value={joinInput || contractAddress}
               onChange={(e) => setJoinInput(e.target.value)}
               placeholder="Contract Address"
-              aria-label="Contract address"
             />
-            <button className="btn" onClick={onJoin}>Join</button>
-            <button className="btn" onClick={deploy} disabled={!isConnected || !!busy}>Deploy</button>
-            <button
-              className="btn"
-              onClick={() => contractAddress && copyToClipboard(contractAddress).then((ok) => ok && flashContract())}
-            >
-              {copied ? 'Copied' : 'Copy'}
-            </button>
+            <div className="join-rail-actions">
+              <button type="button" className="btn" onClick={onJoin}>Join</button>
+              <button type="button" className="btn" onClick={deploy} disabled={!isConnected || !!busy}>Deploy</button>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => contractAddress && copyToClipboard(contractAddress).then((ok) => ok && flashContract())}
+              >
+                {copied ? 'Copied' : 'Copy'}
+              </button>
+            </div>
           </div>
         )}
       </div>
