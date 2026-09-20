@@ -13,6 +13,7 @@ import { type TallyPrivateState } from '../../../contract/src/index';
 import { inMemoryPrivateStateProvider } from '../in-memory-private-state-provider';
 import { type NetworkId, setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import type { UnboundTransaction } from '@midnight-ntwrk/midnight-js-types';
+import { readOrCreateTallySecret } from '../deskId';
 
 export type TallyDeployment =
   | { readonly status: 'in-progress' }
@@ -51,14 +52,7 @@ export class BrowserTallyManager {
   }
 
   private getSecretKey(): Uint8Array {
-    const storageKey = 'tally-midnight-secret';
-    const stored = localStorage.getItem(storageKey);
-    if (stored) {
-      return Uint8Array.from(atob(stored), (c) => c.charCodeAt(0));
-    }
-    const secret = crypto.getRandomValues(new Uint8Array(32));
-    localStorage.setItem(storageKey, btoa(String.fromCharCode(...secret)));
-    return secret;
+    return readOrCreateTallySecret();
   }
 
   private getProviders(): Promise<TallyProviders> {
