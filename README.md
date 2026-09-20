@@ -18,27 +18,35 @@ Settled loans mint a relationship leaf into a Merkle allowlist. A later membersh
 |---|---|
 | Desk | https://tally-jet-mu.vercel.app |
 | Network | Midnight Preprod |
-| Contract | `f8287add7fd6628c414dc876cb29a619694ecccb859bae5f0036c5dfb821b59e` |
+| Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
 
 Use **Lace** or **1AM** on Preprod to join the contract, or switch to **Local desk** for a full in-browser demo with no wallet.
 
 ## Product tour
 
-![Desk](docs/screenshots/01-connect.png)
+![Offer](docs/screenshots/preprod/01-offer.png)
 
-The desk: brand, wallet connect, and a clear split between Preprod and Local.
+Offer on Preprod. Amount stays off-ledger; borrower is named by Desk ID, not a wallet address.
 
-![Offer](docs/screenshots/02-offer.png)
-
-Offer a loan. Amount stays off-ledger; the public instrument shows status, not terms.
-
-![Settled](docs/screenshots/03-instrument.png)
+![Funded](docs/screenshots/preprod/03-funded.png)
 
 Lifecycle seals move Offered → Accepted → Funded → Repaid → Settled without disclosing amount.
 
-![Standing](docs/screenshots/04-standing.png)
+![Settled](docs/screenshots/preprod/05-settled.png)
 
-Prove standing, then verify as a third party. Pass or fail only — no book.
+After settle, prove standing and copy the allowlist root for a third party.
+
+![Verifier](docs/screenshots/local/05-verifier-pass.png)
+
+Verifier checks membership only — Pass or Fail, never the book.
+
+### Local desk
+
+Same flow without a wallet (Demo/Simulator).
+
+![Local offered](docs/screenshots/local/01-offered.png)
+
+![Local standing](docs/screenshots/local/04-standing-confirmed.png)
 
 ## How it works
 

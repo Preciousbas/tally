@@ -3,6 +3,7 @@ import { ContractState } from '@midnight-ntwrk/midnight-js-protocol/compact-runt
 import { Tally } from '../../../contract/src/index';
 import { toHex } from '../../../api/src/utils/index.js';
 import type { PublicLoan, PublicLoanStatus } from '../../../api/src/common-types.js';
+import { digestToHex } from '../deskId';
 
 const INDEXER_URL = import.meta.env.VITE_INDEXER_URL ?? 'https://indexer.preprod.midnight.network/api/v4/graphql';
 
@@ -36,9 +37,36 @@ const statusFromLedger = (status: unknown): PublicLoanStatus => {
   return 'Unknown';
 };
 
+function collectRoots(ledgerState: ReturnType<typeof Tally.ledger>): {
+  current: string | null;
+  all: string[];
+} {
+  const roots = new Set<string>();
+  let current: string | null = null;
+  try {
+    current = digestToHex(ledgerState.relationships.root());
+    roots.add(current);
+  } catch {
+    /* empty tree */
+  }
+  try {
+    const hist = ledgerState.relationships.history();
+    let step = hist.next();
+    while (!step.done) {
+      roots.add(digestToHex(step.value));
+      step = hist.next();
+    }
+  } catch {
+    /* no history iterator */
+  }
+  return { current, all: [...roots] };
+}
+
 export function useTally(contractAddress: string | null, refreshInterval = 15_000) {
   const [loans, setLoans] = useState<PublicLoan[]>([]);
   const [loanCount, setLoanCount] = useState(0);
+  const [allowlistRoot, setAllowlistRoot] = useState<string | null>(null);
+  const [allowlistRoots, setAllowlistRoots] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,25 +98,38 @@ export function useTally(contractAddress: string | null, refreshInterval = 15_00
         });
       }
       parsed.sort((a, b) => a.id - b.id);
+      const { current, all } = collectRoots(ledgerState);
       setLoans(parsed);
       setLoanCount(Number(ledgerState.nextId));
+      setAllowlistRoot(current);
+      setAllowlistRoots(all);
       setError(null);
+      return { loans: parsed, allowlistRoot: current, allowlistRoots: all };
     } catch (e: any) {
       setError(e.message);
+      return null;
     } finally {
       setLoading(false);
     }
   }, [contractAddress]);
 
   useEffect(() => {
-    fetchLoans();
+    void fetchLoans();
   }, [fetchLoans]);
 
   useEffect(() => {
     if (!contractAddress) return;
-    const interval = setInterval(fetchLoans, refreshInterval);
+    const interval = setInterval(() => void fetchLoans(), refreshInterval);
     return () => clearInterval(interval);
   }, [contractAddress, refreshInterval, fetchLoans]);
 
-  return { loans, loanCount, loading, error, refresh: fetchLoans };
+  return {
+    loans,
+    loanCount,
+    allowlistRoot,
+    allowlistRoots,
+    loading,
+    error,
+    refresh: fetchLoans,
+  };
 }

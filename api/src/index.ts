@@ -40,16 +40,27 @@ const statusFromLedger = (status: unknown): PublicLoanStatus => {
   return 'Unknown';
 };
 
+/** Provider is scoped via setContractAddress — get/set take only (id) / (id, state). */
+async function requirePrivateState(psp: {
+  get: (id: typeof tallyPrivateStateKey) => Promise<TallyPrivateState | null>;
+}): Promise<TallyPrivateState> {
+  const current = await psp.get(tallyPrivateStateKey);
+  if (!current || !(current.secretKey instanceof Uint8Array) || current.secretKey.length !== 32) {
+    throw new Error('Private state missing or corrupted. Join the contract again on this desk.');
+  }
+  return current;
+}
+
 export class TallyAPI {
   private constructor(
     public readonly deployedContract: DeployedTallyContract,
-    providers: TallyProviders,
+    private readonly providers: TallyProviders,
     private readonly logger?: Logger,
   ) {
     this.deployedContractAddress = deployedContract.deployTxData.public.contractAddress;
-    providers.privateStateProvider.setContractAddress(this.deployedContractAddress);
+    this.providers.privateStateProvider.setContractAddress(this.deployedContractAddress);
 
-    this.state$ = providers.publicDataProvider
+    this.state$ = this.providers.publicDataProvider
       .contractStateObservable(this.deployedContractAddress, { type: 'latest' })
       .pipe(
         map((contractState) => Tally.ledger(contractState.data)),
@@ -74,18 +85,10 @@ export class TallyAPI {
   readonly state$: Observable<TallyDerivedState>;
 
   async offerLoan(borrowerPkHex: string, amount: bigint, dueSlot: bigint): Promise<void> {
-    const providers = (this.deployedContract as any).providers;
-    if (providers?.privateStateProvider) {
-      const current: TallyPrivateState = await providers.privateStateProvider.get(
-        tallyPrivateStateKey,
-        this.deployedContractAddress,
-      );
-      await providers.privateStateProvider.set(
-        tallyPrivateStateKey,
-        this.deployedContractAddress,
-        withTerms(current, amount, dueSlot),
-      );
-    }
+    const psp = this.providers.privateStateProvider;
+    psp.setContractAddress(this.deployedContractAddress);
+    const current = await requirePrivateState(psp);
+    await psp.set(tallyPrivateStateKey, withTerms(current, amount, dueSlot));
     await (this.deployedContract as any).callTx.offerLoan(utils.encodePk(borrowerPkHex));
   }
 
@@ -114,23 +117,19 @@ export class TallyAPI {
     counterpartyPkHex: string,
     relationshipLeafHex: string,
   ): Promise<void> {
-    const providers = (this.deployedContract as any).providers;
-    if (providers?.privateStateProvider) {
-      const current: TallyPrivateState = await providers.privateStateProvider.get(
-        tallyPrivateStateKey,
-        this.deployedContractAddress,
-      );
-      await providers.privateStateProvider.set(
-        tallyPrivateStateKey,
-        this.deployedContractAddress,
-        withStanding(
-          current,
-          BigInt(loanId),
-          utils.encodePk(counterpartyPkHex),
-          utils.encodePk(relationshipLeafHex),
-        ),
-      );
-    }
+    const psp = this.providers.privateStateProvider;
+    psp.setContractAddress(this.deployedContractAddress);
+    const current = await requirePrivateState(psp);
+    const leafHex = relationshipLeafHex.replace(/^0x/, '').replace(/\s/g, '');
+    await psp.set(
+      tallyPrivateStateKey,
+      withStanding(
+        current,
+        BigInt(loanId),
+        utils.encodePk(counterpartyPkHex),
+        utils.fromHex(leafHex.padStart(64, '0').slice(0, 64)),
+      ),
+    );
     await (this.deployedContract as any).callTx.proveStanding();
   }
 
@@ -140,7 +139,9 @@ export class TallyAPI {
       privateStateId: tallyPrivateStateKey,
       initialPrivateState: createTallyPrivateState(secretKey),
     });
-    return new TallyAPI(deployedContract, providers, logger);
+    const api = new TallyAPI(deployedContract, providers, logger);
+    await providers.privateStateProvider.set(tallyPrivateStateKey, createTallyPrivateState(secretKey));
+    return api;
   }
 
   static async join(
@@ -149,6 +150,9 @@ export class TallyAPI {
     secretKey: Uint8Array,
     logger?: Logger,
   ): Promise<TallyAPI> {
+    providers.privateStateProvider.setContractAddress(contractAddress);
+    // Always re-seed desk secret — prior 3-arg set() calls could leave a corrupted string in store.
+    await providers.privateStateProvider.set(tallyPrivateStateKey, createTallyPrivateState(secretKey));
     const deployedContract = await findDeployedContract(providers as any, {
       contractAddress,
       compiledContract: CompiledTallyContract,

@@ -86,4 +86,10 @@ PROPOSAL.md
 docs/README.md
 docs/capture-screenshots.mjs
 docs/capture-screenshots.ps1
+docs/**/DEMO*
+**/DEMO_SCRIPT.md
 brand/X_PROFILE.md
+brand/x-avatar.svg
+brand/x-header.svg
+.cursor/
+*.canvas.tsx

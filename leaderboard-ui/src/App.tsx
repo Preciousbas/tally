@@ -6,6 +6,7 @@ import { TallySimulator } from '../../contract/src/tally-simulator';
 import pino from 'pino';
 import type { PublicLoan } from '../../api/src/common-types';
 import { listCompatibleWallets, type WalletOption } from './wallets';
+import { DESK_PIN, deriveRelationshipLeafHex, getBrowserDeskIdHex } from './deskId';
 
 const NETWORK_ID = import.meta.env.VITE_NETWORK_ID ?? 'preprod';
 const DEFAULT_CONTRACT = import.meta.env.VITE_DEFAULT_CONTRACT ?? '';
@@ -33,11 +34,17 @@ function friendlyError(e: any): string {
   if (msg.includes('User rejected')) return 'Transaction cancelled.';
   if (msg.includes('not the borrower')) return 'This instrument is not addressed to your key.';
   if (msg.includes('not the lender')) return 'Only the originating lender can disburse.';
-  if (msg.includes('not a party') || msg.includes('not on allowlist') || msg.includes('not a party leaf')) {
+  if (msg.includes('Private state missing') || msg.includes('corrupted')) {
+    return 'Desk private state is missing. Join the contract again, then retry.';
+  }
+  if (msg.includes('not a party') || msg.includes('not on allowlist') || msg.includes('not a party leaf') || msg.includes('standing leaf not in allowlist')) {
     return 'No standing for this identity on the allowlist.';
   }
   if (msg.includes('wrong root')) return 'Allowlist root does not match.';
   if (msg.includes('loan is not settled')) return 'Settle the instrument before proving standing.';
+  if (msg.includes('Request failed') || msg.includes('submitting scoped transaction')) {
+    return 'Wallet could not submit the transaction. Check tDUST, Preprod network, and approve the wallet prompt.';
+  }
   if (msg.includes('Failed to fetch') || msg.includes('Failed Proof Server')) return 'Proof server unreachable. Start Docker on port 6300.';
   if (msg.includes('insufficient') || msg.includes('DUST')) return 'Insufficient DUST. Register tNIGHT for dust in your wallet.';
   if (msg.includes('Network ID')) return 'Set your wallet to Preprod.';
@@ -106,6 +113,39 @@ function CopyableId({ value, label }: { value: string; label?: string }) {
       }}
     >
       {flash ? 'Copied' : trunc(value)}
+    </button>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg className="desk-id-icon" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none">
+      <rect x="5.5" y="5.5" width="8" height="8" rx="1.25" stroke="currentColor" strokeWidth="1.25" />
+      <path d="M10.5 5.5V4.25A1.25 1.25 0 0 0 9.25 3H4.25A1.25 1.25 0 0 0 3 4.25v5A1.25 1.25 0 0 0 4.25 10.5H5.5" stroke="currentColor" strokeWidth="1.25" />
+    </svg>
+  );
+}
+
+/** Copies this browser's Tally desk pk (Offer → Borrower id), not Lace/1AM address. */
+function DeskIdCopy({ value }: { value: string }) {
+  const [flash, setFlash] = useState(false);
+  if (!value) return null;
+  return (
+    <button
+      type="button"
+      className={`desk-id-copy${flash ? ' flash' : ''}`}
+      title={flash ? 'Copied' : `Copy desk id\n${value}`}
+      aria-label={flash ? 'Desk ID copied' : 'Copy Desk ID'}
+      onClick={() => {
+        void copyToClipboard(value).then((ok) => {
+          if (!ok) return;
+          setFlash(true);
+          window.setTimeout(() => setFlash(false), 1200);
+        });
+      }}
+    >
+      <span>{flash ? 'Copied' : 'Desk ID'}</span>
+      <CopyIcon />
     </button>
   );
 }
@@ -251,13 +291,30 @@ export default function App() {
     return managerRef.current;
   }, []);
 
-  const { loans: chainLoans, refresh } = useTally(deskMode === 'chain' ? contractAddress || null : null);
+  const { loans: chainLoans, refresh, allowlistRoot, allowlistRoots } = useTally(deskMode === 'chain' ? contractAddress || null : null);
   const loans = deskMode === 'local' ? localLoans : chainLoans;
   const selected = loans.find((l) => l.id === selectedId) ?? loans[loans.length - 1];
   const selectedWalletName =
     walletOptions.find((w) => w.id === selectedWalletId)?.name
     ?? walletOptions[0]?.name
     ?? 'Wallet';
+
+  const deskIdHex = (() => {
+    if (deskMode === 'local') {
+      const sk =
+        role === 'borrower' ? keysRef.current.borrower
+        : role === 'lender' ? keysRef.current.lender
+        : keysRef.current.lender;
+      return Array.from(simRef.current.deriveUserPublicKey(sk, DESK_PIN))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+    try {
+      return getBrowserDeskIdHex();
+    } catch {
+      return '';
+    }
+  })();
 
   useEffect(() => {
     setDeskReady(true);
@@ -620,12 +677,24 @@ export default function App() {
     try {
       const result = await resolveApi();
       const counterparty = role === 'lender' ? selected.borrowerPk : selected.lenderPk;
-      await result.api.proveStanding(selected.id, counterparty, selected.paymentCommit);
+      const leafHex = deriveRelationshipLeafHex(selected.id, selected.lenderPk, selected.borrowerPk);
+      await result.api.proveStanding(selected.id, counterparty, leafHex);
+      const snapshot = await refresh();
+      const root = snapshot?.allowlistRoot ?? allowlistRoot ?? null;
+      if (!root) {
+        // Circuit succeeded; leaf was inserted at Settle — root may lag indexer briefly.
+        setStandingResult('pass');
+        setStandingRoot(null);
+        setError('Standing proved. Allowlist root not in indexer yet — refresh in a few seconds and copy it for the Verifier.');
+        setToast('Standing confirmed — refresh for allowlist root.');
+        return;
+      }
       setStandingResult('pass');
-      setStandingRoot(selected.paymentCommit);
-      setVerifyRootInput(selected.paymentCommit);
+      setStandingRoot(root);
+      setVerifyRootInput(root);
+      setError(null);
       setToast('Standing confirmed — copy the root for the Verifier.');
-      setTimeout(() => refresh(), 2500);
+      setTimeout(() => void refresh(), 2500);
     } catch (e) {
       setStandingResult('fail');
       setError(friendlyError(e));
@@ -635,7 +704,7 @@ export default function App() {
   };
 
   const onVerifyStanding = () => {
-    const claimed = (verifyRootInput || standingRoot || '').trim();
+    const claimed = (verifyRootInput || standingRoot || '').trim().toLowerCase();
     if (!claimed) {
       setStandingResult('fail');
       setError('No standing proof yet. A party must prove standing first.');
@@ -648,7 +717,12 @@ export default function App() {
       if (ok) setToast('Verifier Pass — membership only.');
       return;
     }
-    const ok = !!standingRoot && claimed === standingRoot;
+    const known = new Set(
+      [standingRoot, allowlistRoot, ...allowlistRoots]
+        .filter((r): r is string => !!r)
+        .map((r) => r.toLowerCase()),
+    );
+    const ok = known.has(claimed);
     setStandingResult(ok ? 'pass' : 'fail');
     setError(ok ? null : 'Allowlist root does not match.');
     if (ok) setToast('Verifier Pass — membership only.');
@@ -809,6 +883,8 @@ export default function App() {
         <span className="trust-contract">
           {contractAddress ? <CopyableId value={contractAddress} label="contract address" /> : 'No contract joined'}
         </span>
+        <span className="trust-sep" aria-hidden="true">·</span>
+        <DeskIdCopy value={deskIdHex} />
         <span className="trust-sep" aria-hidden="true">·</span>
         <a href={PRIVACY_DOC} target="_blank" rel="noreferrer">Privacy model</a>
       </div>
@@ -979,7 +1055,8 @@ export default function App() {
               {deskMode === 'chain' && (
                 <label>
                   Borrower id
-                  <input value={borrowerPk} onChange={(e) => setBorrowerPk(e.target.value)} placeholder="borrower's id" />
+                  <span className="field-hint">their Desk ID · not Lace address</span>
+                  <input value={borrowerPk} onChange={(e) => setBorrowerPk(e.target.value)} placeholder="borrower's Desk ID" />
                 </label>
               )}
               <label>

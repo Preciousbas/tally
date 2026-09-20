@@ -151,6 +151,12 @@ body {
   letter-spacing: 0.04em;
 }
 
+.trust-strip:has(+ .join-rail) {
+  margin-bottom: 0;
+  border-bottom: 0;
+  padding-bottom: 4px;
+}
+
 .trust-strip a {
   color: var(--ink);
   text-decoration: underline;
@@ -289,35 +295,53 @@ body {
   max-width: 18rem;
 }
 
-.join-block {
+.join-rail {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1 1 280px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 0 0 24px;
+  padding: 8px 0 14px;
+  border-bottom: 1px solid var(--rule);
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
 }
 
 .contract-label {
+  flex: 0 0 auto;
+  margin: 0;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .join-field {
   display: flex;
+  flex: 1 1 12rem;
   min-width: 0;
 }
 
 .join-field input {
   width: 100%;
+  min-width: 0;
 }
 
 .join-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.join-actions .btn {
+  flex: 0 0 auto;
 }
 
 .seg {
@@ -351,6 +375,7 @@ body {
 .seg button:focus-visible { outline: none; box-shadow: var(--focus-ring); z-index: 1; }
 
 .join input,
+.join-rail input,
 .join-field input,
 .fields input {
   flex: 1;
@@ -367,6 +392,7 @@ body {
 }
 
 .join input:focus-visible,
+.join-rail input:focus-visible,
 .join-field input:focus-visible,
 .fields input:focus-visible {
   outline: none;
@@ -375,6 +401,7 @@ body {
 }
 
 .join input.flash,
+.join-rail input.flash,
 .join-field input.flash {
   border-color: var(--oxblood);
   animation: contract-flash 2s var(--ease-out) forwards;
@@ -386,6 +413,7 @@ body {
 }
 
 .join input::placeholder,
+.join-rail input::placeholder,
 .join-field input::placeholder,
 .fields input::placeholder {
   color: var(--muted);
@@ -556,6 +584,41 @@ dd {
 .copy-id:hover { color: var(--bone); }
 .copy-id:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .copy-id.flash { color: var(--moss); text-decoration: none; }
+
+.desk-id-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--muted) 50%, transparent);
+  text-underline-offset: 3px;
+}
+
+.desk-id-copy:hover { color: var(--bone); }
+.desk-id-copy:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.desk-id-copy.flash {
+  color: var(--moss);
+  text-decoration: none;
+}
+
+.desk-id-icon {
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.desk-id-copy:hover .desk-id-icon,
+.desk-id-copy.flash .desk-id-icon {
+  opacity: 1;
+}
 
 .fields { display: grid; gap: 12px; }
 
@@ -742,8 +805,7 @@ dd {
     align-items: stretch;
   }
 
-  .toolbar-block,
-  .join-block {
+  .toolbar-block {
     width: 100%;
   }
 
@@ -756,14 +818,33 @@ dd {
     text-align: center;
   }
 
+  .join-rail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .join-rail .contract-label,
   .join-field,
   .join-actions {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .join-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
   }
 
   .join-actions .btn {
-    flex: 1 1 auto;
-    min-width: 5.5rem;
+    width: 100%;
+    min-width: 0;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .notches li {
