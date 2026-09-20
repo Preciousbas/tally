@@ -8,19 +8,13 @@ Private bilateral trade credit on Midnight. Loan amounts and due dates stay off 
 
 ## Documentation
 
-Product docs (Mintlify MDX) live in [`docs/`](docs/index.mdx). Use vs Build index: [`docs/llms.txt`](docs/llms.txt).
+Product docs are Mintlify (`docs/docs.json`, theme `mint`). Human nav is Use vs Build. Agent index: [`docs/llms.txt`](docs/llms.txt). Each page has an `.md` mirror next to the `.mdx` source.
 
 ```bash
-npx mint dev --port 3333
+cd docs && npx mint dev --port 3333
 ```
 
-`mint` is the Mintlify CLI. Port 3333 avoids the desk on 3000. If the Mintlify client is unavailable:
-
-```bash
-npm run docs:preview
-```
-
-That serves a Tally-themed HTML preview at http://127.0.0.1:3333. Hosted docs deploy via the Mintlify dashboard (repo root `docs.json`); the existing Vercel project still serves the desk only. Details: [`docs/contributing.mdx`](docs/contributing.mdx).
+Port 3333 avoids the desk on 3000. Fallback: `npm run docs:preview`. Hosted docs: Mintlify dashboard, documentation directory `docs/`. The existing Vercel project still serves the desk only.
 
 ## What this is
 

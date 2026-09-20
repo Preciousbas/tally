@@ -1,0 +1,147 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Tally",
+  "description": "Private bilateral trade credit on Midnight.",
+  "colors": {
+    "primary": "#8C2F2B",
+    "light": "#8C2F2B",
+    "dark": "#8C2F2B"
+  },
+  "fonts": {
+    "family": "Figtree",
+    "heading": {
+      "family": "Fraunces"
+    }
+  },
+  "logo": {
+    "light": "/images/tally-stick.svg",
+    "dark": "/images/tally-stick.svg",
+    "href": "https://tally-jet-mu.vercel.app"
+  },
+  "favicon": "/favicon.svg",
+  "appearance": {
+    "default": "dark",
+    "strict": false
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "codeblocks": "dark"
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/Preciousbas/tally"
+      },
+      {
+        "label": "llms.txt",
+        "href": "/llms.txt"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Open desk",
+      "href": "https://tally-jet-mu.vercel.app"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/tally_midnight",
+      "github": "https://github.com/Preciousbas/tally"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Use",
+        "icon": "book-open",
+        "groups": [
+          {
+            "group": "Start",
+            "pages": [
+              "index",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Use the desk",
+            "pages": [
+              "desk-tour",
+              "preprod",
+              "verify/overview",
+              "demo"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "how-it-works",
+              "privacy",
+              "concepts/standing",
+              "identity",
+              "concepts/glossary"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "resources/llms",
+              "design-system"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Build",
+        "icon": "blocks",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "architecture",
+              "contributing",
+              "build/common-errors"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "contract",
+              "reference/versions"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "redirects": [
+    {
+      "source": "/privacy-model",
+      "destination": "/privacy"
+    },
+    {
+      "source": "/concepts/privacy-model",
+      "destination": "/privacy"
+    },
+    {
+      "source": "/concepts/loan-lifecycle",
+      "destination": "/how-it-works"
+    },
+    {
+      "source": "/concepts/identity",
+      "destination": "/identity"
+    },
+    {
+      "source": "/concepts/architecture",
+      "destination": "/architecture"
+    },
+    {
+      "source": "/reference/contract-api",
+      "destination": "/contract"
+    }
+  ]
+}

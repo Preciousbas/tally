@@ -1,7 +1,4 @@
----
-title: Contract reference
-description: Six circuits. Amount never crosses disclose().
----
+# Contract reference
 
 > Six circuits. Amount never crosses disclose().
 
@@ -115,11 +112,6 @@ Also: `TallyAPI.deploy`, `TallyAPI.join`.
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Identity" href="/identity">
-    `tally:user:pk:v1` and the desk secret.
-  </Card>
-  <Card title="Privacy" href="/privacy">
-    What disclose() never sees.
-  </Card>
-</CardGroup>
+
+  - [Identity](/identity) — `tally:user:pk:v1` and the desk secret.
+  - [Privacy](/privacy) — What disclose() never sees.

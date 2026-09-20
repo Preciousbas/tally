@@ -1,7 +1,4 @@
----
-title: Contributing
-description: Node 22, Compact 0.31, npm test, then the desk.
----
+# Contributing
 
 > Node 22, Compact 0.31, npm test, then the desk.
 
@@ -89,11 +86,6 @@ Use `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`. Do not `--force` p
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Architecture" href="/architecture">
-    Which package to open first.
-  </Card>
-  <Card title="Design system" href="/design-system">
-    Tokens and the rejection list.
-  </Card>
-</CardGroup>
+
+  - [Architecture](/architecture) — Which package to open first.
+  - [Design system](/design-system) — Tokens and the rejection list.

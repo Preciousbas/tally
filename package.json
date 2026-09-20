@@ -15,7 +15,8 @@
     "dev": "npm run dev --workspace leaderboard-ui",
     "docs:dev": "npx mint@latest dev --port 3333",
     "docs:validate": "npx mint@latest validate",
-    "docs:preview": "node scripts/docs-preview.mjs"
+    "docs:preview": "node scripts/docs-preview.mjs",
+    "docs:mirrors": "node scripts/docs-md-mirrors.mjs"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.4",

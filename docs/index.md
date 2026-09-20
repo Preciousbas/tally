@@ -1,7 +1,4 @@
----
-title: Introduction
-description: Private bilateral trade credit on Midnight.
----
+# Introduction
 
 > Private bilateral trade credit on Midnight.
 
@@ -27,14 +24,14 @@ Every instrument follows one ordered path:
 
 **Offer → Accept → Disburse → Repay → Settle → Prove standing**
 
-<Steps>
-  <Step title="Offer">Lender sets amount and due privately. On Preprod the borrower is named by Desk ID, not a wallet address.</Step>
-  <Step title="Accept">The named borrower accepts. Status becomes Accepted.</Step>
-  <Step title="Disburse">Lender binds a payment commitment. The amount itself is never disclosed on-chain.</Step>
-  <Step title="Repay">Borrower marks the instrument repaid.</Step>
-  <Step title="Settle">Either party closes it. The contract inserts a relationship leaf and consumes a nullifier.</Step>
-  <Step title="Prove standing">A party proves allowlist membership. A verifier sees Pass or Fail only.</Step>
-</Steps>
+
+  1. **Offer** — Lender sets amount and due privately. On Preprod the borrower is named by Desk ID, not a wallet address.
+  2. **Accept** — The named borrower accepts. Status becomes Accepted.
+  3. **Disburse** — Lender binds a payment commitment. The amount itself is never disclosed on-chain.
+  4. **Repay** — Borrower marks the instrument repaid.
+  5. **Settle** — Either party closes it. The contract inserts a relationship leaf and consumes a nullifier.
+  6. **Prove standing** — A party proves allowlist membership. A verifier sees Pass or Fail only.
+
 
 ## Two ways in
 
@@ -52,14 +49,10 @@ Live desk: [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app)
 
 ## Use vs Build
 
-<CardGroup cols={2}>
-  <Card title="Use the desk" href="/desk-tour" icon="layout-panel-left">
-    Local vs Preprod, Lace or 1AM, and the Lender / Borrower / Verifier roles.
-  </Card>
-  <Card title="Build on the contract" href="/architecture" icon="blocks">
-    What Midnight already gives you, and what this repo implements.
-  </Card>
-</CardGroup>
+
+  - [Use the desk](/desk-tour) — Local vs Preprod, Lace or 1AM, and the Lender / Borrower / Verifier roles.
+  - [Build on the contract](/architecture) — What Midnight already gives you, and what this repo implements.
+
 
 ## What Tally is not
 
@@ -79,11 +72,6 @@ These are out of scope:
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="How it works" href="/how-it-works">
-    Each seal, who acts, and what the ledger stores.
-  </Card>
-  <Card title="Local quickstart" href="/quickstart">
-    Offer through Verifier Pass in about ten minutes. No wallet.
-  </Card>
-</CardGroup>
+
+  - [How it works](/how-it-works) — Each seal, who acts, and what the ledger stores.
+  - [Local quickstart](/quickstart) — Offer through Verifier Pass in about ten minutes. No wallet.
