@@ -1,7 +1,4 @@
----
-title: Demo video
-description: Placeholder. No recording or voiceover yet.
----
+# Demo video
 
 > Placeholder. No recording or voiceover yet.
 
@@ -36,17 +33,10 @@ When a public URL exists, replace the block below. Do not commit binary video as
 />
 ```
 
-<Note>
-Coming soon. No voiceover. No file in `docs/` until the public link is pasted here and in the root README.
-</Note>
+> Coming soon. No voiceover. No file in `docs/` until the public link is pasted here and in the root README.
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Local quickstart" href="/quickstart">
-    Run the same path yourself in about ten minutes.
-  </Card>
-  <Card title="Desk tour" href="/desk-tour">
-    Screenshots of each seal on Local and Preprod.
-  </Card>
-</CardGroup>
+
+  - [Local quickstart](/quickstart) — Run the same path yourself in about ten minutes.
+  - [Desk tour](/desk-tour) — Screenshots of each seal on Local and Preprod.

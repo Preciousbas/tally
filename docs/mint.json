@@ -1,0 +1,78 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Tally",
+  "logo": {
+    "dark": "/images/tally-stick.svg",
+    "light": "/images/tally-stick.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#8C2F2B",
+    "dark": "#8C2F2B",
+    "light": "#8C2F2B",
+    "background": {
+      "dark": "#1C1914"
+    }
+  },
+  "modeToggle": {
+    "default": "dark"
+  },
+  "font": {
+    "headings": {
+      "family": "Fraunces"
+    },
+    "body": {
+      "family": "Figtree"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/Preciousbas/tally"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Open desk",
+    "url": "https://tally-jet-mu.vercel.app"
+  },
+  "tabs": [
+    {
+      "name": "Use",
+      "url": "index"
+    },
+    {
+      "name": "Build",
+      "url": "architecture"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Start",
+      "pages": ["index", "quickstart"]
+    },
+    {
+      "group": "Use the desk",
+      "pages": ["desk-tour", "preprod", "verify/overview", "demo"]
+    },
+    {
+      "group": "Concepts",
+      "pages": ["how-it-works", "privacy", "concepts/standing", "identity", "concepts/glossary"]
+    },
+    {
+      "group": "Resources",
+      "pages": ["resources/llms", "design-system"]
+    },
+    {
+      "group": "Overview",
+      "pages": ["architecture", "contributing", "build/common-errors"]
+    },
+    {
+      "group": "Reference",
+      "pages": ["contract", "reference/versions"]
+    }
+  ],
+  "footerSocials": {
+    "x": "https://x.com/tally_midnight",
+    "github": "https://github.com/Preciousbas/tally"
+  }
+}
