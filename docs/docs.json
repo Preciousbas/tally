@@ -6,7 +6,11 @@
   "colors": {
     "primary": "#8C2F2B",
     "light": "#8C2F2B",
-    "dark": "#8C2F2B"
+    "dark": "#8C2F2B",
+    "background": {
+      "light": "#E8DCC8",
+      "dark": "#1C1914"
+    }
   },
   "fonts": {
     "family": "Figtree",
@@ -20,6 +24,7 @@
     "href": "https://tally-jet-mu.vercel.app"
   },
   "favicon": "/favicon.svg",
+  "css": ["/custom.css"],
   "appearance": {
     "default": "dark",
     "strict": false
@@ -61,36 +66,13 @@
         "icon": "book-open",
         "groups": [
           {
-            "group": "Start",
+            "group": "Use",
             "pages": [
               "index",
-              "quickstart"
-            ]
-          },
-          {
-            "group": "Use the desk",
-            "pages": [
-              "desk-tour",
-              "preprod",
-              "verify/overview",
-              "demo"
-            ]
-          },
-          {
-            "group": "Concepts",
-            "pages": [
-              "how-it-works",
+              "desk",
+              "lifecycle",
               "privacy",
-              "concepts/standing",
-              "identity",
-              "concepts/glossary"
-            ]
-          },
-          {
-            "group": "Resources",
-            "pages": [
-              "resources/llms",
-              "design-system"
+              "standing"
             ]
           }
         ]
@@ -100,18 +82,28 @@
         "icon": "blocks",
         "groups": [
           {
-            "group": "Overview",
+            "group": "Build",
             "pages": [
+              "overview",
+              "quickstart",
+              "preprod",
               "architecture",
-              "contributing",
-              "build/common-errors"
+              "identity",
+              "contract"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "icon": "library",
+        "groups": [
           {
             "group": "Reference",
             "pages": [
-              "contract",
-              "reference/versions"
+              "glossary",
+              "design-system",
+              "demo"
             ]
           }
         ]
@@ -129,7 +121,23 @@
     },
     {
       "source": "/concepts/loan-lifecycle",
-      "destination": "/how-it-works"
+      "destination": "/lifecycle"
+    },
+    {
+      "source": "/how-it-works",
+      "destination": "/lifecycle"
+    },
+    {
+      "source": "/desk-tour",
+      "destination": "/desk"
+    },
+    {
+      "source": "/concepts/standing",
+      "destination": "/standing"
+    },
+    {
+      "source": "/concepts/glossary",
+      "destination": "/glossary"
     },
     {
       "source": "/concepts/identity",
@@ -142,6 +150,14 @@
     {
       "source": "/reference/contract-api",
       "destination": "/contract"
+    },
+    {
+      "source": "/verify/overview",
+      "destination": "/standing"
+    },
+    {
+      "source": "/resources/llms",
+      "destination": "/llms.txt"
     }
   ]
 }

@@ -90,4 +90,4 @@ The verifier panel does not show amount, due, or which leaf was used.
 
 
   - [Preprod guide](/preprod) — Same five loan steps against the published contract.
-  - [How it works](/how-it-works) — What each circuit writes on the ledger.
+  - [Lifecycle](/lifecycle) — What each circuit writes on the ledger.

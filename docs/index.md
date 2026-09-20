@@ -50,8 +50,8 @@ Live desk: [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app)
 ## Use vs Build
 
 
-  - [Use the desk](/desk-tour) — Local vs Preprod, Lace or 1AM, and the Lender / Borrower / Verifier roles.
-  - [Build on the contract](/architecture) — What Midnight already gives you, and what this repo implements.
+  - [Use the desk](/desk) — Local vs Preprod, Lace or 1AM, and the Lender / Borrower / Verifier roles.
+  - [Build on the contract](/overview) — What Midnight already gives you, and what this repo implements.
 
 
 ## What Tally is not
@@ -73,5 +73,5 @@ These are out of scope:
 ## Next steps
 
 
-  - [How it works](/how-it-works) — Each seal, who acts, and what the ledger stores.
+  - [Lifecycle](/lifecycle) — Each seal, who acts, and what the ledger stores.
   - [Local quickstart](/quickstart) — Offer through Verifier Pass in about ten minutes. No wallet.

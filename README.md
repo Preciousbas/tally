@@ -6,15 +6,34 @@ Private bilateral trade credit on Midnight. Loan amounts and due dates stay off 
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
-## Documentation
+## Docs
 
-Product docs are Mintlify (`docs/docs.json`, theme `mint`). Human nav is Use vs Build. Agent index: [`docs/llms.txt`](docs/llms.txt). Each page has an `.md` mirror next to the `.mdx` source.
+Product docs are a Mintlify site in `docs/` (`docs/docs.json`, theme `mint`). Human nav is Use vs Build. Agent index: [`docs/llms.txt`](docs/llms.txt). Each page has an `.md` mirror next to the `.mdx` source.
+
+### Local preview
 
 ```bash
-cd docs && npx mint dev --port 3333
+cd docs && npx mintlify dev
 ```
 
-Port 3333 avoids the desk on 3000. Fallback: `npm run docs:preview`. Hosted docs: Mintlify dashboard, documentation directory `docs/`. The existing Vercel project still serves the desk only.
+Port 3333 avoids the desk on 3000:
+
+```bash
+cd docs && npx mintlify dev --port 3333
+```
+
+The current Mintlify CLI package is also `mint` (`npx mint dev --port 3333`). Fallback without the Mintlify client: `npm run docs:preview`.
+
+### Mintlify Cloud (Hobby / free)
+
+1. Open [dashboard.mintlify.com](https://dashboard.mintlify.com) and sign in with GitHub.
+2. Create a project and **connect this GitHub repo** (`Preciousbas/tally`).
+3. When asked where `docs.json` lives, select the **`docs`** folder (`/docs`, no trailing slash). Hobby is the free plan (one editor).
+4. **Publish**. Mintlify rebuilds on each push to the connected branch.
+
+Do not point the existing desk Vercel project at these docs. `vercel.json` still serves `leaderboard-ui/dist` (https://tally-jet-mu.vercel.app).
+
+Secondary (only if Mintlify is unavailable): generate `docs/.preview` with `npm run docs:preview -- --no-serve` and host that folder on Cloudflare Pages or GitHub Pages. That is a static export, not the Mintlify site.
 
 ## What this is
 

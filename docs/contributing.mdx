@@ -47,15 +47,13 @@ npm run compile      # compact compile tally.compact
 
 ## Preview these docs
 
-From the repository root:
+From `docs/` (port 3333 avoids the desk on 3000):
 
 ```bash
-npx mint dev --port 3333
+cd docs && npx mintlify dev --port 3333
 ```
 
-`mint` is the current Mintlify CLI (`npm i -g mint`). Default port 3000 collides with the desk; use 3333.
-
-If the Mintlify client cannot download, generate a local HTML preview:
+The current Mintlify CLI package is also `mint` (`npx mint dev --port 3333`). If the Mintlify client cannot download, generate a local HTML preview:
 
 ```bash
 npm run docs:preview
@@ -66,7 +64,7 @@ That writes `docs/.preview/` and serves it (default [http://127.0.0.1:3333](http
 Validate the Mintlify graph:
 
 ```bash
-npx mint validate
+cd docs && npx mintlify validate
 ```
 
 ## Deploy
@@ -79,9 +77,9 @@ npx vercel --prod --yes
 
 Set `VITE_DEFAULT_CONTRACT` and `VITE_NETWORK_ID=preprod` on the Vercel project if the hosted desk should Join the published address by default.
 
-**Docs (Mintlify):** import `Preciousbas/tally` in the [Mintlify dashboard](https://mintlify.com). Documentation directory is the repository root (`docs.json` + `mint.json`, pages under `docs/`). Mintlify hosts the site; do not point the existing desk `vercel.json` at MDX.
+**Docs (Mintlify Hobby):** connect `Preciousbas/tally` at [dashboard.mintlify.com](https://dashboard.mintlify.com). Select the **`docs`** folder (`docs/docs.json`). Publish. Do not point the existing desk `vercel.json` at MDX.
 
-**Docs (Vercel fallback):** create a *second* Vercel project whose build is `npm run docs:preview -- --no-serve` and whose output directory is `docs/.preview`. Leave the current desk project unchanged.
+**Docs (secondary static export):** Cloudflare Pages or GitHub Pages from `npm run docs:preview -- --no-serve` output `docs/.preview`. Leave the current desk project unchanged.
 
 ## Pull requests
 

@@ -11,7 +11,8 @@
     "dark": "#8C2F2B",
     "light": "#8C2F2B",
     "background": {
-      "dark": "#1C1914"
+      "dark": "#1C1914",
+      "light": "#E8DCC8"
     }
   },
   "modeToggle": {
@@ -42,33 +43,21 @@
     },
     {
       "name": "Build",
-      "url": "architecture"
+      "url": "overview"
     }
   ],
   "navigation": [
     {
-      "group": "Start",
-      "pages": ["index", "quickstart"]
+      "group": "Use",
+      "pages": ["index", "desk", "lifecycle", "privacy", "standing"]
     },
     {
-      "group": "Use the desk",
-      "pages": ["desk-tour", "preprod", "verify/overview", "demo"]
-    },
-    {
-      "group": "Concepts",
-      "pages": ["how-it-works", "privacy", "concepts/standing", "identity", "concepts/glossary"]
-    },
-    {
-      "group": "Resources",
-      "pages": ["resources/llms", "design-system"]
-    },
-    {
-      "group": "Overview",
-      "pages": ["architecture", "contributing", "build/common-errors"]
+      "group": "Build",
+      "pages": ["overview", "quickstart", "preprod", "architecture", "identity", "contract"]
     },
     {
       "group": "Reference",
-      "pages": ["contract", "reference/versions"]
+      "pages": ["glossary", "design-system", "demo"]
     }
   ],
   "footerSocials": {

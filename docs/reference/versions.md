@@ -38,5 +38,5 @@ Verified against **Preciousbas/tally `main` @ `9adf209`** (2026-09-20), reading 
 ## Next steps
 
 
-  - [Contributing](/contributing) — Compile +0.31.1 and run tests.
+  - [Overview](/overview) — Compile +0.31.1 and run tests.
   - [Contract reference](/contract) — Circuits verified against tally.compact.

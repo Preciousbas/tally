@@ -1,0 +1,30 @@
+/* Tally brand tokens — DESIGN_SYSTEM.md
+   --bg #1C1914 · --bone #E8DCC8 · --oxblood #8C2F2B */
+
+:root {
+  --tally-bg: #1C1914;
+  --tally-surface: #2A241C;
+  --tally-bone: #E8DCC8;
+  --tally-ink: #C4B49A;
+  --tally-muted: #8A7A64;
+  --tally-oxblood: #8C2F2B;
+  --tally-moss: #4F6F54;
+  --tally-rule: #3D3428;
+}
+
+html[class~="dark"] {
+  --background: #1C1914;
+  --background-secondary: #2A241C;
+}
+
+body {
+  background-color: var(--tally-bg);
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: Fraunces, ui-serif, Georgia, serif;
+  color: var(--tally-bone);
+}

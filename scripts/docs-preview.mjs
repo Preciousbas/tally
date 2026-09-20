@@ -29,23 +29,19 @@ const noServe = process.argv.includes('--no-serve');
 
 const PAGES = [
   { file: 'index.mdx', slug: 'index', nav: 'Introduction', tab: 'Use' },
-  { file: 'quickstart.mdx', slug: 'quickstart', nav: 'Local quickstart', tab: 'Use' },
-  { file: 'desk-tour.mdx', slug: 'desk-tour', nav: 'Desk tour', tab: 'Use' },
-  { file: 'preprod.mdx', slug: 'preprod', nav: 'Preprod guide', tab: 'Use' },
-  { file: 'verify/overview.mdx', slug: 'verify/overview', nav: 'Verify access', tab: 'Use' },
-  { file: 'demo.mdx', slug: 'demo', nav: 'Demo video', tab: 'Use' },
-  { file: 'how-it-works.mdx', slug: 'how-it-works', nav: 'How it works', tab: 'Use' },
+  { file: 'desk.mdx', slug: 'desk', nav: 'Desk', tab: 'Use' },
+  { file: 'lifecycle.mdx', slug: 'lifecycle', nav: 'Lifecycle', tab: 'Use' },
   { file: 'privacy.mdx', slug: 'privacy', nav: 'Privacy', tab: 'Use' },
-  { file: 'concepts/standing.mdx', slug: 'concepts/standing', nav: 'Standing', tab: 'Use' },
-  { file: 'identity.mdx', slug: 'identity', nav: 'Identity', tab: 'Use' },
-  { file: 'concepts/glossary.mdx', slug: 'concepts/glossary', nav: 'Glossary', tab: 'Use' },
-  { file: 'resources/llms.mdx', slug: 'resources/llms', nav: 'Agent index', tab: 'Use' },
-  { file: 'design-system.mdx', slug: 'design-system', nav: 'Design system', tab: 'Use' },
+  { file: 'standing.mdx', slug: 'standing', nav: 'Standing', tab: 'Use' },
+  { file: 'overview.mdx', slug: 'overview', nav: 'Overview', tab: 'Build' },
+  { file: 'quickstart.mdx', slug: 'quickstart', nav: 'Local quickstart', tab: 'Build' },
+  { file: 'preprod.mdx', slug: 'preprod', nav: 'Preprod', tab: 'Build' },
   { file: 'architecture.mdx', slug: 'architecture', nav: 'Architecture', tab: 'Build' },
-  { file: 'contributing.mdx', slug: 'contributing', nav: 'Contributing', tab: 'Build' },
-  { file: 'build/common-errors.mdx', slug: 'build/common-errors', nav: 'Common errors', tab: 'Build' },
-  { file: 'contract.mdx', slug: 'contract', nav: 'Contract reference', tab: 'Build' },
-  { file: 'reference/versions.mdx', slug: 'reference/versions', nav: 'Versions', tab: 'Build' },
+  { file: 'identity.mdx', slug: 'identity', nav: 'Identity', tab: 'Build' },
+  { file: 'contract.mdx', slug: 'contract', nav: 'Contract', tab: 'Build' },
+  { file: 'glossary.mdx', slug: 'glossary', nav: 'Glossary', tab: 'Reference' },
+  { file: 'design-system.mdx', slug: 'design-system', nav: 'Design system', tab: 'Reference' },
+  { file: 'demo.mdx', slug: 'demo', nav: 'Demo video', tab: 'Reference' },
 ];
 
 function parseFrontmatter(raw) {
@@ -97,6 +93,10 @@ function renderMarkdown(md) {
   );
   src = src.replace(
     /<Note>([\s\S]*?)<\/Note>/g,
+    (_, inner) => `<aside class="note">${inline(inner.trim())}</aside>`,
+  );
+  src = src.replace(
+    /<Warning>([\s\S]*?)<\/Warning>/g,
     (_, inner) => `<aside class="note">${inline(inner.trim())}</aside>`,
   );
 
@@ -249,6 +249,7 @@ figcaption { color: var(--muted); font-size: 0.85rem; margin-top: 0.4rem; }
 function pageHtml(page, html) {
   const use = PAGES.filter((p) => p.tab === 'Use');
   const build = PAGES.filter((p) => p.tab === 'Build');
+  const reference = PAGES.filter((p) => p.tab === 'Reference');
   const items = (list) =>
     list
       .map((p) => `<a class="item${p.slug === page.slug ? ' active' : ''}" href="/${p.slug === 'index' ? 'index' : p.slug}.html">${p.nav}</a>`)
@@ -271,6 +272,8 @@ function pageHtml(page, html) {
       ${items(use)}
       <p class="eyebrow">Build</p>
       ${items(build)}
+      <p class="eyebrow">Reference</p>
+      ${items(reference)}
       <a class="cta" href="https://tally-jet-mu.vercel.app">Open desk</a>
     </nav>
     <main>

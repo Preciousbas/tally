@@ -1,7 +1,4 @@
----
-title: How it works
-description: Offer → Accept → Disburse → Repay → Settle → Prove standing.
----
+# Lifecycle
 
 > Offer → Accept → Disburse → Repay → Settle → Prove standing.
 
@@ -90,11 +87,6 @@ Local desk verifies against the in-memory simulator root history. Preprod verifi
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Privacy" href="/privacy">
-    Visible / not visible / what a verifier learns.
-  </Card>
-  <Card title="Standing" href="/concepts/standing">
-    Leaf, root, and the boolean check.
-  </Card>
-</CardGroup>
+
+  - [Privacy](/privacy) — Visible / not visible / what a verifier learns.
+  - [Standing](/standing) — Leaf, root, and the boolean check.

@@ -94,10 +94,10 @@ From `leaderboard-ui/.env.preprod`:
 
 ## Hosting
 
-`vercel.json` builds `contract`, `api`, and `leaderboard-ui`, and serves `leaderboard-ui/dist`. That is the **desk**, not this documentation site. Docs preview and deploy are separate — see [Contributing](/contributing).
+`vercel.json` builds `contract`, `api`, and `leaderboard-ui`, and serves `leaderboard-ui/dist`. That is the **desk**, not this documentation site. Docs preview and deploy are separate — see the root README **Docs** section.
 
 ## Next steps
 
 
   - [Contract reference](/contract) — Circuit signatures, ledger, domains.
-  - [Contributing](/contributing) — Compile, test, and run from a clean clone.
+  - [Overview](/overview) — Compile, test, and run from a clean clone.

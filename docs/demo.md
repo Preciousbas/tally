@@ -39,4 +39,4 @@ When a public URL exists, replace the block below. Do not commit binary video as
 
 
   - [Local quickstart](/quickstart) — Run the same path yourself in about ten minutes.
-  - [Desk tour](/desk-tour) — Screenshots of each seal on Local and Preprod.
+  - [Desk](/desk) — Screenshots of each seal on Local and Preprod.

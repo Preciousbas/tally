@@ -71,5 +71,5 @@ Do not bulk-install shadcn or generic dashboard kits into `leaderboard-ui`. Map 
 ## Next steps
 
 
-  - [Desk tour](/desk-tour) — Where these tokens appear on the live desk.
-  - [Contributing](/contributing) — Run the UI locally before changing tokens.
+  - [Desk](/desk) — Where these tokens appear on the live desk.
+  - [Overview](/overview) — Run the UI locally before changing tokens.
