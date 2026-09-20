@@ -1,7 +1,4 @@
----
-title: Identity
-description: Desk ID is secret + PIN. It is not ownPublicKey() and not a Lace address.
----
+# Identity
 
 > Desk ID is secret + PIN. It is not ownPublicKey() and not a Lace address.
 
@@ -82,11 +79,6 @@ persistentHash([
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Privacy" href="/privacy">
-    What those grains leak, and what they do not.
-  </Card>
-  <Card title="Preprod guide" href="/preprod">
-    Copy Desk ID on one profile, paste it on the other.
-  </Card>
-</CardGroup>
+
+  - [Privacy](/privacy) — What those grains leak, and what they do not.
+  - [Preprod guide](/preprod) — Copy Desk ID on one profile, paste it on the other.

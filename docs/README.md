@@ -1,14 +1,16 @@
 # Tally documentation
 
-Mintlify docs-as-code. Pages are MDX in this directory. Config lives at the repo root (`docs.json`, `mint.json`).
+Mintlify docs-as-code (`docs.json` theme `mint`). MDX is the source; `.md` mirrors sit beside each page for agents. Human nav is Use vs Build. Agent index: [`llms.txt`](llms.txt).
 
 ## Preview
 
-From the repository root (port 3333 avoids the desk on 3000):
+From this directory (port 3333 avoids the desk on 3000):
 
 ```bash
 npx mint dev --port 3333
 ```
+
+From the repo root: `npm run docs:dev`.
 
 Fallback HTML preview (Tally tokens, no Mintlify client):
 

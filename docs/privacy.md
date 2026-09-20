@@ -1,7 +1,4 @@
----
-title: Privacy
-description: Amount and due stay in witnesses. A verifier learns yes or no only.
----
+# Privacy
 
 > Amount and due stay in witnesses. A verifier learns yes or no only.
 
@@ -65,11 +62,6 @@ The live desk repeats this model in the UI:
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Identity" href="/identity">
-    How Desk ID is derived. Not a wallet address.
-  </Card>
-  <Card title="Contract reference" href="/contract">
-    Each circuit and what it discloses.
-  </Card>
-</CardGroup>
+
+  - [Identity](/identity) — How Desk ID is derived. Not a wallet address.
+  - [Contract reference](/contract) — Each circuit and what it discloses.

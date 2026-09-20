@@ -1,7 +1,4 @@
----
-title: Desk tour
-description: Local vs Preprod. Lace or 1AM. Lender, Borrower, and Verifier.
----
+# Desk tour
 
 > Local vs Preprod. Lace or 1AM. Lender, Borrower, and Verifier.
 
@@ -101,11 +98,6 @@ Verifier copy: you only learn yes or no — not amount, due, or which leaf.
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Local quickstart" href="/quickstart">
-    Checkable steps, about ten minutes, no wallet.
-  </Card>
-  <Card title="Preprod guide" href="/preprod">
-    Join the published contract with Lace or 1AM.
-  </Card>
-</CardGroup>
+
+  - [Local quickstart](/quickstart) — Checkable steps, about ten minutes, no wallet.
+  - [Preprod guide](/preprod) — Join the published contract with Lace or 1AM.
