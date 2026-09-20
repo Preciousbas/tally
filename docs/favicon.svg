@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 160" fill="none" role="img" aria-label="Tally split stick">
+  <title>Tally</title>
+  <rect x="10" y="8" width="12" height="144" rx="2" fill="#C4B49A"/>
+  <rect x="26" y="8" width="12" height="144" rx="2" fill="#A89478"/>
+  <rect x="22" y="8" width="4" height="144" fill="#1C1914"/>
+  <g stroke="#1C1914" stroke-width="2" stroke-linecap="round">
+    <line x1="10" y1="36" x2="22" y2="36"/>
+    <line x1="26" y1="36" x2="38" y2="36"/>
+    <line x1="10" y1="60" x2="22" y2="60"/>
+    <line x1="26" y1="60" x2="38" y2="60"/>
+    <line x1="10" y1="84" x2="22" y2="84"/>
+    <line x1="26" y1="84" x2="38" y2="84"/>
+    <line x1="10" y1="108" x2="22" y2="108"/>
+    <line x1="26" y1="108" x2="38" y2="108"/>
+    <line x1="10" y1="132" x2="22" y2="132"/>
+    <line x1="26" y1="132" x2="38" y2="132"/>
+  </g>
+</svg>

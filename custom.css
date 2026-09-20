@@ -1,0 +1,28 @@
+/* Tally docs — warm ledger tokens. No purple neon, no glass. */
+:root {
+  --tally-bg: #1c1914;
+  --tally-surface: #2a241c;
+  --tally-bone: #e8dcc8;
+  --tally-ink: #c4b49a;
+  --tally-muted: #8a7a64;
+  --tally-oxblood: #8c2f2b;
+  --tally-moss: #4f6f54;
+  --tally-rule: #3d3428;
+}
+
+html[class*="dark"],
+.dark {
+  --background: var(--tally-bg);
+}
+
+body {
+  background-color: var(--tally-bg);
+}
+
+a[href] {
+  color: var(--tally-bone);
+}
+
+a[href]:hover {
+  color: var(--tally-oxblood);
+}

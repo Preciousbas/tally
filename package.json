@@ -12,7 +12,10 @@
     "compile": "cd contract && npm run compact",
     "test": "npm run test --workspace leaderboard-contract",
     "build": "cd contract && npm run build && cd ../api && npm run build",
-    "dev": "npm run dev --workspace leaderboard-ui"
+    "dev": "npm run dev --workspace leaderboard-ui",
+    "docs:dev": "npx mint@latest dev --port 3333",
+    "docs:validate": "npx mint@latest validate",
+    "docs:preview": "node scripts/docs-preview.mjs"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.4",

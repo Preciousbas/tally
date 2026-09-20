@@ -1,0 +1,81 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Tally",
+  "logo": {
+    "dark": "/docs/images/tally-stick.svg",
+    "light": "/docs/images/tally-stick.svg"
+  },
+  "favicon": "/docs/favicon.svg",
+  "colors": {
+    "primary": "#8C2F2B",
+    "dark": "#8C2F2B",
+    "light": "#8C2F2B",
+    "background": {
+      "dark": "#1C1914"
+    }
+  },
+  "modeToggle": {
+    "default": "dark"
+  },
+  "font": {
+    "headings": {
+      "family": "Fraunces"
+    },
+    "body": {
+      "family": "Figtree"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/Preciousbas/tally"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Open desk",
+    "url": "https://tally-jet-mu.vercel.app"
+  },
+  "tabs": [
+    {
+      "name": "Use",
+      "url": "docs/index"
+    },
+    {
+      "name": "Build",
+      "url": "docs/architecture"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "The desk",
+      "pages": [
+        "docs/index",
+        "docs/how-it-works",
+        "docs/privacy",
+        "docs/desk-tour",
+        "docs/quickstart",
+        "docs/preprod"
+      ]
+    },
+    {
+      "group": "Internals",
+      "pages": [
+        "docs/architecture",
+        "docs/contract",
+        "docs/identity"
+      ]
+    },
+    {
+      "group": "Contribute",
+      "pages": [
+        "docs/design-system",
+        "docs/contributing",
+        "docs/demo"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "x": "https://x.com/tally_midnight",
+    "github": "https://github.com/Preciousbas/tally"
+  }
+}
