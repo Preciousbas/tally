@@ -1,7 +1,4 @@
----
-title: Preprod guide
-description: Join the Midnight Preprod contract with Lace or 1AM.
----
+# Preprod guide
 
 > Join the Midnight Preprod contract with Lace or 1AM.
 
@@ -104,11 +101,6 @@ Use two profiles. Switch the role control to match the acting party.
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Architecture" href="/architecture">
-    Desk, API, Compact, proof server.
-  </Card>
-  <Card title="Identity" href="/identity">
-    Secret + PIN, and why Lace address is the wrong field.
-  </Card>
-</CardGroup>
+
+  - [Architecture](/architecture) — Desk, API, Compact, proof server.
+  - [Identity](/identity) — Secret + PIN, and why Lace address is the wrong field.

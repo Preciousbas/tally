@@ -1,7 +1,6 @@
----
-title: Desk tour
-description: Local vs Preprod. Lace or 1AM. Lender, Borrower, and Verifier.
----
+# Desk
+
+> Local vs Preprod. Lace or 1AM. Lender, Borrower, and Verifier.
 
 The desk is one screen: mast, flap, trust strip, mode/role toolbar, instrument list, and the selected loan. It is not a dashboard of charts.
 
@@ -57,27 +56,27 @@ Join / Deploy / Copy sit on the Preprod rail: paste a 64-hex contract address an
 
 ## Product tour (Preprod)
 
-![Offer on Preprod. Amount stays off-ledger; borrower is named by Desk ID.](/docs/screenshots/preprod/01-offer.png)
+![Offer on Preprod. Amount stays off-ledger; borrower is named by Desk ID.](/screenshots/preprod/01-offer.png)
 
 Offer. Amount required, stays off-ledger. Borrower id is their Desk ID, not a Lace address.
 
-![Accepted instrument ready to disburse.](/docs/screenshots/preprod/02-accepted-disburse.png)
+![Accepted instrument ready to disburse.](/screenshots/preprod/02-accepted-disburse.png)
 
 Accepted — Lender can Disburse. Payment field takes a Lace payment id; the chain stores a commitment.
 
-![Funded seal. Amount still off-ledger.](/docs/screenshots/preprod/03-funded.png)
+![Funded seal. Amount still off-ledger.](/screenshots/preprod/03-funded.png)
 
 Funded. Payment grain is present. Amount remains off-ledger.
 
-![Repaid, ready to settle.](/docs/screenshots/preprod/04-repaid-settle.png)
+![Repaid, ready to settle.](/screenshots/preprod/04-repaid-settle.png)
 
 Repaid — Settle mints the allowlist leaf.
 
-![Settled instrument.](/docs/screenshots/preprod/05-settled.png)
+![Settled instrument.](/screenshots/preprod/05-settled.png)
 
 Settled. Prove standing, then copy the allowlist root.
 
-![Standing confirmed with copyable root.](/docs/screenshots/preprod/06-standing-confirmed.png)
+![Standing confirmed with copyable root.](/screenshots/preprod/06-standing-confirmed.png)
 
 Standing confirmed. The root is what a verifier pastes.
 
@@ -85,25 +84,20 @@ Standing confirmed. The root is what a verifier pastes.
 
 Same seals, no wallet. Local instruments are session-only for circuits; the list may restore after refresh, but the simulator must be re-run Offer → Settle before Prove standing if the in-memory tree reset.
 
-![Local desk, Loan 1 Offered.](/docs/screenshots/local/01-offered.png)
+![Local desk, Loan 1 Offered.](/screenshots/local/01-offered.png)
 
-![Local desk, Funded.](/docs/screenshots/local/02-funded.png)
+![Local desk, Funded.](/screenshots/local/02-funded.png)
 
-![Local desk, Settled, Prove standing enabled.](/docs/screenshots/local/03-settled-prove.png)
+![Local desk, Settled, Prove standing enabled.](/screenshots/local/03-settled-prove.png)
 
-![Local desk, Standing confirmed.](/docs/screenshots/local/04-standing-confirmed.png)
+![Local desk, Standing confirmed.](/screenshots/local/04-standing-confirmed.png)
 
-![Verifier Pass — membership only.](/docs/screenshots/local/05-verifier-pass.png)
+![Verifier Pass — membership only.](/screenshots/local/05-verifier-pass.png)
 
 Verifier copy: you only learn yes or no — not amount, due, or which leaf.
 
-## Next
+## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Local quickstart" href="/docs/quickstart">
-    Checkable steps, about ten minutes, no wallet.
-  </Card>
-  <Card title="Preprod guide" href="/docs/preprod">
-    Join the published contract with Lace or 1AM.
-  </Card>
-</CardGroup>
+
+  - [Lifecycle](/lifecycle) — Each seal, who acts, and what the ledger stores.
+  - [Local quickstart](/quickstart) — Checkable steps, about ten minutes, no wallet.

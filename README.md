@@ -6,21 +6,34 @@ Private bilateral trade credit on Midnight. Loan amounts and due dates stay off 
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
-## Documentation
+## Docs
 
-Product docs (Mintlify MDX) live in [`docs/`](docs/index.mdx). Use vs Build index: [`docs/llms.txt`](docs/llms.txt).
+Product docs are a Mintlify site in `docs/` (`docs/docs.json`, theme `mint`). Human nav is Use vs Build. Agent index: [`docs/llms.txt`](docs/llms.txt). Each page has an `.md` mirror next to the `.mdx` source.
 
-```bash
-npx mint dev --port 3333
-```
-
-`mint` is the Mintlify CLI. Port 3333 avoids the desk on 3000. If the Mintlify client is unavailable:
+### Local preview
 
 ```bash
-npm run docs:preview
+cd docs && npx mintlify dev
 ```
 
-That serves a Tally-themed HTML preview at http://127.0.0.1:3333. Hosted docs deploy via the Mintlify dashboard (repo root `docs.json`); the existing Vercel project still serves the desk only. Details: [`docs/contributing.mdx`](docs/contributing.mdx).
+Port 3333 avoids the desk on 3000:
+
+```bash
+cd docs && npx mintlify dev --port 3333
+```
+
+The current Mintlify CLI package is also `mint` (`npx mint dev --port 3333`). Fallback without the Mintlify client: `npm run docs:preview`.
+
+### Mintlify Cloud (Hobby / free)
+
+1. Open [dashboard.mintlify.com](https://dashboard.mintlify.com) and sign in with GitHub.
+2. Create a project and **connect this GitHub repo** (`Preciousbas/tally`).
+3. When asked where `docs.json` lives, select the **`docs`** folder (`/docs`, no trailing slash). Hobby is the free plan (one editor).
+4. **Publish**. Mintlify rebuilds on each push to the connected branch.
+
+Do not point the existing desk Vercel project at these docs. `vercel.json` still serves `leaderboard-ui/dist` (https://tally-jet-mu.vercel.app).
+
+Secondary (only if Mintlify is unavailable): generate `docs/.preview` with `npm run docs:preview -- --no-serve` and host that folder on Cloudflare Pages or GitHub Pages. That is a static export, not the Mintlify site.
 
 ## What this is
 

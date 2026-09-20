@@ -1,7 +1,4 @@
----
-title: Design system
-description: Warm ledger desk. Fraunces, Figtree, oxblood. Not a default SaaS kit.
----
+# Design system
 
 > Warm ledger desk. Fraunces, Figtree, oxblood. Not a default SaaS kit.
 
@@ -73,11 +70,6 @@ Do not bulk-install shadcn or generic dashboard kits into `leaderboard-ui`. Map 
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Desk" href="/desk">
-    Where these tokens appear on the live desk.
-  </Card>
-  <Card title="Overview" href="/overview">
-    Run the UI locally before changing tokens.
-  </Card>
-</CardGroup>
+
+  - [Desk](/desk) — Where these tokens appear on the live desk.
+  - [Overview](/overview) — Run the UI locally before changing tokens.

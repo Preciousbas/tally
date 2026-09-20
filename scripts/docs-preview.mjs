@@ -29,17 +29,19 @@ const noServe = process.argv.includes('--no-serve');
 
 const PAGES = [
   { file: 'index.mdx', slug: 'index', nav: 'Introduction', tab: 'Use' },
-  { file: 'how-it-works.mdx', slug: 'how-it-works', nav: 'How it works', tab: 'Use' },
+  { file: 'desk.mdx', slug: 'desk', nav: 'Desk', tab: 'Use' },
+  { file: 'lifecycle.mdx', slug: 'lifecycle', nav: 'Lifecycle', tab: 'Use' },
   { file: 'privacy.mdx', slug: 'privacy', nav: 'Privacy', tab: 'Use' },
-  { file: 'desk-tour.mdx', slug: 'desk-tour', nav: 'Desk tour', tab: 'Use' },
-  { file: 'quickstart.mdx', slug: 'quickstart', nav: 'Local quickstart', tab: 'Use' },
-  { file: 'preprod.mdx', slug: 'preprod', nav: 'Preprod guide', tab: 'Use' },
+  { file: 'standing.mdx', slug: 'standing', nav: 'Standing', tab: 'Use' },
+  { file: 'overview.mdx', slug: 'overview', nav: 'Overview', tab: 'Build' },
+  { file: 'quickstart.mdx', slug: 'quickstart', nav: 'Local quickstart', tab: 'Build' },
+  { file: 'preprod.mdx', slug: 'preprod', nav: 'Preprod', tab: 'Build' },
   { file: 'architecture.mdx', slug: 'architecture', nav: 'Architecture', tab: 'Build' },
-  { file: 'contract.mdx', slug: 'contract', nav: 'Contract reference', tab: 'Build' },
   { file: 'identity.mdx', slug: 'identity', nav: 'Identity', tab: 'Build' },
-  { file: 'design-system.mdx', slug: 'design-system', nav: 'Design system', tab: 'Build' },
-  { file: 'contributing.mdx', slug: 'contributing', nav: 'Contributing', tab: 'Build' },
-  { file: 'demo.mdx', slug: 'demo', nav: 'Demo video', tab: 'Build' },
+  { file: 'contract.mdx', slug: 'contract', nav: 'Contract', tab: 'Build' },
+  { file: 'glossary.mdx', slug: 'glossary', nav: 'Glossary', tab: 'Reference' },
+  { file: 'design-system.mdx', slug: 'design-system', nav: 'Design system', tab: 'Reference' },
+  { file: 'demo.mdx', slug: 'demo', nav: 'Demo video', tab: 'Reference' },
 ];
 
 function parseFrontmatter(raw) {
@@ -63,17 +65,14 @@ function inline(s) {
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, h) => {
-      const href = h.startsWith('/docs/') ? `${h.replace(/^\/docs\//, '/').replace(/\/$/, '') || '/index'}.html` : h;
-      const mapped = h === '/docs/index' ? '/index.html' : href;
-      return `<a href="${mapped}">${t}</a>`;
+      return `<a href="${rewriteDocHref(h)}">${t}</a>`;
     });
 }
 
 function rewriteDocHref(href) {
-  if (!href.startsWith('/docs/')) return href;
-  const rest = href.slice('/docs/'.length);
+  if (/^https?:\/\//.test(href) || href.startsWith('#') || href.includes('.')) return href;
+  let rest = href.replace(/^\/docs\//, '').replace(/^\//, '');
   if (!rest || rest === 'index') return '/index.html';
-  if (rest.includes('.')) return href;
   return `/${rest}.html`;
 }
 
@@ -96,6 +95,10 @@ function renderMarkdown(md) {
     /<Note>([\s\S]*?)<\/Note>/g,
     (_, inner) => `<aside class="note">${inline(inner.trim())}</aside>`,
   );
+  src = src.replace(
+    /<Warning>([\s\S]*?)<\/Warning>/g,
+    (_, inner) => `<aside class="note">${inline(inner.trim())}</aside>`,
+  );
 
   const lines = src.split('\n');
   const out = [];
@@ -114,7 +117,7 @@ function renderMarkdown(md) {
       i += 1;
       continue;
     }
-    if (line.startsWith('| ') && i + 1 < lines.length && /^\|[\s:-|]+$/.test(lines[i + 1])) {
+    if (line.startsWith('|') && i + 1 < lines.length && /^\|[\s:|-]+$/.test(lines[i + 1])) {
       const rows = [];
       while (i < lines.length && lines[i].startsWith('|')) {
         rows.push(lines[i]);
@@ -183,7 +186,18 @@ function renderMarkdown(md) {
       para.push(lines[i]);
       i += 1;
     }
-    if (para.length) out.push(`<p>${inline(para.join(' '))}</p>`);
+    if (para.length) {
+      out.push(`<p>${inline(para.join(' '))}</p>`);
+      continue;
+    }
+    if (line.startsWith('|')) {
+      out.push(`<p>${inline(line)}</p>`);
+    } else if (line.startsWith('# ')) {
+      out.push(`<h1>${inline(line.slice(2))}</h1>`);
+    } else {
+      out.push(`<p>${inline(line)}</p>`);
+    }
+    i += 1;
   }
   return out.join('\n');
 }
@@ -235,6 +249,7 @@ figcaption { color: var(--muted); font-size: 0.85rem; margin-top: 0.4rem; }
 function pageHtml(page, html) {
   const use = PAGES.filter((p) => p.tab === 'Use');
   const build = PAGES.filter((p) => p.tab === 'Build');
+  const reference = PAGES.filter((p) => p.tab === 'Reference');
   const items = (list) =>
     list
       .map((p) => `<a class="item${p.slug === page.slug ? ' active' : ''}" href="/${p.slug === 'index' ? 'index' : p.slug}.html">${p.nav}</a>`)
@@ -257,6 +272,8 @@ function pageHtml(page, html) {
       ${items(use)}
       <p class="eyebrow">Build</p>
       ${items(build)}
+      <p class="eyebrow">Reference</p>
+      ${items(reference)}
       <a class="cta" href="https://tally-jet-mu.vercel.app">Open desk</a>
     </nav>
     <main>
@@ -304,7 +321,9 @@ for (const page of PAGES) {
   page.title = parsed.title;
   page.description = parsed.description;
   const html = renderMarkdown(parsed.body);
-  writeFileSync(join(OUT, `${page.slug}.html`), pageHtml(page, html));
+  const dest = join(OUT, `${page.slug}.html`);
+  mkdirSync(dirname(dest), { recursive: true });
+  writeFileSync(dest, pageHtml(page, html));
 }
 
 if (missing.length) {

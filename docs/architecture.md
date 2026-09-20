@@ -1,7 +1,4 @@
----
-title: Architecture
-description: Four packages. What Midnight already runs, and what this repo implements.
----
+# Architecture
 
 > Four packages. What Midnight already runs, and what this repo implements.
 
@@ -101,11 +98,6 @@ From `leaderboard-ui/.env.preprod`:
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Contract reference" href="/contract">
-    Circuit signatures, ledger, domains.
-  </Card>
-  <Card title="Overview" href="/overview">
-    Compile, test, and run from a clean clone.
-  </Card>
-</CardGroup>
+
+  - [Contract reference](/contract) — Circuit signatures, ledger, domains.
+  - [Overview](/overview) — Compile, test, and run from a clean clone.

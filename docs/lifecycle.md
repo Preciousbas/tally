@@ -1,9 +1,8 @@
----
-title: How it works
-description: Offer → Accept → Disburse → Repay → Settle → Prove standing.
----
+# Lifecycle
 
-Every Tally instrument is one bilateral loan. The desk and the Compact circuits share the same six steps. Amount and due are checked in-circuit, then left in witnesses. Status is what an explorer can see.
+> Offer → Accept → Disburse → Repay → Settle → Prove standing.
+
+Every Tally instrument is one bilateral loan. The desk and the Compact circuits share the same six steps. Amount and due are checked in-circuit, then left in witnesses. Status is what an explorer can see. Amount never appears on `LoanPublic`.
 
 ```mermaid
 flowchart LR
@@ -69,7 +68,7 @@ Who: **Lender or Borrower**.
 3. Inserts `relationshipLeaf` (domain `tally:rel:v1:repaid`) into `relationships` (`HistoricMerkleTree<10>`)
 4. Sets status to `Settled`
 
-A second settle on the same pair fails closed.
+A second settle on the same pair does not succeed. The nullifier check fails closed.
 
 ## Prove standing
 
@@ -86,13 +85,8 @@ On the desk:
 
 Local desk verifies against the in-memory simulator root history. Preprod verifies the pasted root against the current and historic roots read from the indexer.
 
-## Next
+## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Privacy" href="/docs/privacy">
-    Visible / not visible / what a verifier learns.
-  </Card>
-  <Card title="Desk tour" href="/docs/desk-tour">
-    Local vs Preprod and the three roles, with screenshots.
-  </Card>
-</CardGroup>
+
+  - [Privacy](/privacy) — Visible / not visible / what a verifier learns.
+  - [Standing](/standing) — Leaf, root, and the boolean check.

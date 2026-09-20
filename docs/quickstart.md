@@ -1,7 +1,4 @@
----
-title: Local quickstart
-description: Run the Local desk end-to-end in about ten minutes. No wallet.
----
+# Local quickstart
 
 > Run the Local desk end-to-end in about ten minutes. No wallet.
 
@@ -91,11 +88,6 @@ The verifier panel does not show amount, due, or which leaf was used.
 
 ## Next steps
 
-<CardGroup cols={2}>
-  <Card title="Preprod guide" href="/preprod">
-    Same five loan steps against the published contract.
-  </Card>
-  <Card title="Lifecycle" href="/lifecycle">
-    What each circuit writes on the ledger.
-  </Card>
-</CardGroup>
+
+  - [Preprod guide](/preprod) — Same five loan steps against the published contract.
+  - [Lifecycle](/lifecycle) — What each circuit writes on the ledger.

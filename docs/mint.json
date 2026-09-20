@@ -2,16 +2,17 @@
   "$schema": "https://mintlify.com/schema.json",
   "name": "Tally",
   "logo": {
-    "dark": "/docs/images/tally-stick.svg",
-    "light": "/docs/images/tally-stick.svg"
+    "dark": "/images/tally-stick.svg",
+    "light": "/images/tally-stick.svg"
   },
-  "favicon": "/docs/favicon.svg",
+  "favicon": "/favicon.svg",
   "colors": {
     "primary": "#8C2F2B",
     "dark": "#8C2F2B",
     "light": "#8C2F2B",
     "background": {
-      "dark": "#1C1914"
+      "dark": "#1C1914",
+      "light": "#E8DCC8"
     }
   },
   "modeToggle": {
@@ -38,40 +39,25 @@
   "tabs": [
     {
       "name": "Use",
-      "url": "docs/index"
+      "url": "index"
     },
     {
       "name": "Build",
-      "url": "docs/architecture"
+      "url": "overview"
     }
   ],
   "navigation": [
     {
-      "group": "The desk",
-      "pages": [
-        "docs/index",
-        "docs/how-it-works",
-        "docs/privacy",
-        "docs/desk-tour",
-        "docs/quickstart",
-        "docs/preprod"
-      ]
+      "group": "Use",
+      "pages": ["index", "desk", "lifecycle", "privacy", "standing"]
     },
     {
-      "group": "Internals",
-      "pages": [
-        "docs/architecture",
-        "docs/contract",
-        "docs/identity"
-      ]
+      "group": "Build",
+      "pages": ["overview", "quickstart", "preprod", "architecture", "identity", "contract"]
     },
     {
-      "group": "Contribute",
-      "pages": [
-        "docs/design-system",
-        "docs/contributing",
-        "docs/demo"
-      ]
+      "group": "Reference",
+      "pages": ["glossary", "design-system", "demo"]
     }
   ],
   "footerSocials": {

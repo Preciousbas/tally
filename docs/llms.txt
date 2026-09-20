@@ -6,20 +6,29 @@ Live desk: https://tally-jet-mu.vercel.app
 Network: Midnight Preprod
 Contract: 84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af
 
-## Use Tally
+Human navigation is in docs.json (Use vs Build vs Reference). This file is the agent index. Prefer the `.md` mirror of each page.
 
-- [Introduction](https://github.com/Preciousbas/tally/blob/main/docs/index.mdx): what Tally is, the pipeline, and how to start.
-- [How it works](https://github.com/Preciousbas/tally/blob/main/docs/how-it-works.mdx): Offer → Accept → Disburse → Repay → Settle → Prove standing.
-- [Privacy](https://github.com/Preciousbas/tally/blob/main/docs/privacy.mdx): what the public ledger sees, what it never sees, what a verifier learns.
-- [Desk tour](https://github.com/Preciousbas/tally/blob/main/docs/desk-tour.mdx): Local vs Preprod, Lace/1AM, Lender / Borrower / Verifier.
-- [Local quickstart](https://github.com/Preciousbas/tally/blob/main/docs/quickstart.mdx): full circuit path in about ten minutes, no wallet.
-- [Preprod guide](https://github.com/Preciousbas/tally/blob/main/docs/preprod.mdx): join the contract, wallets, proof server, faucet.
+## Use
+- [Introduction](https://github.com/Preciousbas/tally/blob/main/docs/index.md): what Tally is; the pipeline; Local vs Preprod.
+- [Desk](https://github.com/Preciousbas/tally/blob/main/docs/desk.md): Local vs Preprod; Lace or 1AM; Lender / Borrower / Verifier.
+- [Lifecycle](https://github.com/Preciousbas/tally/blob/main/docs/lifecycle.md): Offer → Accept → Disburse → Repay → Settle → Prove standing.
+- [Privacy](https://github.com/Preciousbas/tally/blob/main/docs/privacy.md): visible / not visible / what a verifier learns.
+- [Standing](https://github.com/Preciousbas/tally/blob/main/docs/standing.md): allowlist leaf, Merkle root, membership proof, Verifier Pass/Fail.
 
-## Build on Tally
+## Build
+- [Overview](https://github.com/Preciousbas/tally/blob/main/docs/overview.md): inherit vs build, pins, clone / compile / test.
+- [Local quickstart](https://github.com/Preciousbas/tally/blob/main/docs/quickstart.md): Offer through Verifier Pass in about ten minutes. No wallet.
+- [Preprod](https://github.com/Preciousbas/tally/blob/main/docs/preprod.md): join the contract, wallets, proof server, faucet.
+- [Architecture](https://github.com/Preciousbas/tally/blob/main/docs/architecture.md): leaderboard-ui, api, contract, proof-server.
+- [Identity](https://github.com/Preciousbas/tally/blob/main/docs/identity.md): secret + PIN Desk ID. Not ownPublicKey().
+- [Contract](https://github.com/Preciousbas/tally/blob/main/docs/contract.md): offerLoan, acceptLoan, disburse, repay, settle, proveStanding.
 
-- [Architecture](https://github.com/Preciousbas/tally/blob/main/docs/architecture.mdx): leaderboard-ui, api, contract, proof-server — what you inherit vs what you build.
-- [Contract reference](https://github.com/Preciousbas/tally/blob/main/docs/contract.mdx): offerLoan, acceptLoan, disburse, repay, settle, proveStanding.
-- [Identity](https://github.com/Preciousbas/tally/blob/main/docs/identity.mdx): secret + PIN Desk ID. Not ownPublicKey().
-- [Design system](https://github.com/Preciousbas/tally/blob/main/docs/design-system.mdx): tokens and rejection list for contributors.
-- [Contributing](https://github.com/Preciousbas/tally/blob/main/docs/contributing.mdx): Node 22, Compact 0.31, test and run.
-- [Demo video](https://github.com/Preciousbas/tally/blob/main/docs/demo.mdx): placeholder — no recording yet.
+## Reference
+- [Glossary](https://github.com/Preciousbas/tally/blob/main/docs/glossary.md): plain meaning → mechanism → owner page.
+- [Design system](https://github.com/Preciousbas/tally/blob/main/docs/design-system.md): tokens and rejection list.
+- [Demo video](https://github.com/Preciousbas/tally/blob/main/docs/demo.md): placeholder — no recording yet.
+
+## Extra (not in primary nav)
+- [Contributing](https://github.com/Preciousbas/tally/blob/main/docs/contributing.md): Node 22, Compact 0.31, test and run.
+- [Common errors](https://github.com/Preciousbas/tally/blob/main/docs/build/common-errors.md): desk messages from App.tsx.
+- [Versions](https://github.com/Preciousbas/tally/blob/main/docs/reference/versions.md): Compact / midnight-js / proof-server pins, verified against main @ 9adf209.

@@ -1,0 +1,111 @@
+---
+title: Desk
+description: Local vs Preprod. Lace or 1AM. Lender, Borrower, and Verifier.
+---
+
+> Local vs Preprod. Lace or 1AM. Lender, Borrower, and Verifier.
+
+The desk is one screen: mast, flap, trust strip, mode/role toolbar, instrument list, and the selected loan. It is not a dashboard of charts.
+
+Live: [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app)
+
+## Local desk vs Preprod
+
+| | Local desk | Preprod |
+| --- | --- | --- |
+| Caption on the desk | Demo/Simulator | Midnight Preprod |
+| Wallet | None | Lace or 1AM on Preprod |
+| State | `TallySimulator` in the browser | Compact contract + indexer |
+| Borrower id field | Hidden — built-in demo keys | Required — paste their Desk ID |
+| Proof server | Not used | Wallet-reported prover, typically port 6300 locally |
+
+The toolbar toggle persists in `localStorage` (`tally.deskMode`). If the browser has no compatible wallet after five seconds, the desk switches to Local so you can still run the circuits.
+
+On a narrow viewport, Preprod shows a one-time banner: try Local desk first.
+
+## Wallets
+
+Mast CTA is **Connect Wallet**. The desk enumerates `window.midnight` connectors that satisfy API `4.x`. Display names resolve to **Lace** or **1AM**. It does not hardcode `mnLace`.
+
+Install:
+
+- Lace: [Chrome Web Store](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd)
+- 1AM: [https://www.1am.xyz/](https://www.1am.xyz/)
+
+Connect is required for Join/Deploy and every Preprod circuit call. Local desk does not need it.
+
+## Roles
+
+One browser, three roles. Switch the segment control. Status hints tell you who acts next.
+
+| Role | Actions |
+| --- | --- |
+| Lender | Offer, Disburse (Accepted), Settle (Repaid), Prove standing (Settled) |
+| Borrower | Accept (Offered), Repay (Funded), Settle (Repaid), Prove standing (Settled) |
+| Verifier | Paste allowlist root, **Verify access** → Pass or Fail |
+
+On Preprod, Lender and Borrower are usually two Chrome profiles so each browser holds its own Desk ID secret.
+
+## Trust strip
+
+The strip under the flap shows:
+
+- Network: Midnight Preprod
+- Joined contract address (copyable)
+- **Desk ID** — this browser's Tally public key, not the wallet address
+- Privacy model link
+
+Join / Deploy / Copy sit on the Preprod rail: paste a 64-hex contract address and Join, or Deploy from a connected Lender and share the new address.
+
+## Product tour (Preprod)
+
+![Offer on Preprod. Amount stays off-ledger; borrower is named by Desk ID.](/screenshots/preprod/01-offer.png)
+
+Offer. Amount required, stays off-ledger. Borrower id is their Desk ID, not a Lace address.
+
+![Accepted instrument ready to disburse.](/screenshots/preprod/02-accepted-disburse.png)
+
+Accepted — Lender can Disburse. Payment field takes a Lace payment id; the chain stores a commitment.
+
+![Funded seal. Amount still off-ledger.](/screenshots/preprod/03-funded.png)
+
+Funded. Payment grain is present. Amount remains off-ledger.
+
+![Repaid, ready to settle.](/screenshots/preprod/04-repaid-settle.png)
+
+Repaid — Settle mints the allowlist leaf.
+
+![Settled instrument.](/screenshots/preprod/05-settled.png)
+
+Settled. Prove standing, then copy the allowlist root.
+
+![Standing confirmed with copyable root.](/screenshots/preprod/06-standing-confirmed.png)
+
+Standing confirmed. The root is what a verifier pastes.
+
+## Local desk
+
+Same seals, no wallet. Local instruments are session-only for circuits; the list may restore after refresh, but the simulator must be re-run Offer → Settle before Prove standing if the in-memory tree reset.
+
+![Local desk, Loan 1 Offered.](/screenshots/local/01-offered.png)
+
+![Local desk, Funded.](/screenshots/local/02-funded.png)
+
+![Local desk, Settled, Prove standing enabled.](/screenshots/local/03-settled-prove.png)
+
+![Local desk, Standing confirmed.](/screenshots/local/04-standing-confirmed.png)
+
+![Verifier Pass — membership only.](/screenshots/local/05-verifier-pass.png)
+
+Verifier copy: you only learn yes or no — not amount, due, or which leaf.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Lifecycle" href="/lifecycle">
+    Each seal, who acts, and what the ledger stores.
+  </Card>
+  <Card title="Local quickstart" href="/quickstart">
+    Checkable steps, about ten minutes, no wallet.
+  </Card>
+</CardGroup>
