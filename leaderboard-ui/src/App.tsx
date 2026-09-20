@@ -13,7 +13,7 @@ const DEFAULT_CONTRACT = import.meta.env.VITE_DEFAULT_CONTRACT ?? '';
 
 const LACE_INSTALL = 'https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd';
 const ONEAM_INSTALL = 'https://www.1am.xyz/';
-const PRIVACY_DOC = 'https://github.com/Preciousbas/tally#privacy-model';
+const PRIVACY_DOC = 'https://github.com/Preciousbas/tally/blob/main/docs/privacy.mdx';
 
 const DESK_MODE_KEY = 'tally.deskMode';
 const LOCAL_BANNER_KEY = 'tally.localBannerDismissed';

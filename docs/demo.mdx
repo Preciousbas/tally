@@ -1,0 +1,50 @@
+---
+title: Demo video
+description: Placeholder. No recording or voiceover yet.
+---
+
+The demo video is not recorded yet. This page is the slot for a public embed (Loom, unlisted YouTube, or Drive anyone-with-link). Do not add a voiceover track. The desk should carry the explanation: seals, off-ledger amount, and Verifier Pass.
+
+Until a URL exists, use the [Local quickstart](/docs/quickstart) or the hosted desk.
+
+## What the recording should show
+
+Self-explanatory UI. No narration required.
+
+1. Open [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app)
+2. Name Lace or 1AM for Preprod, or switch to **Local desk**
+3. Lender: Offer (amount stays off-ledger)
+4. Borrower: Accept
+5. Lender: Disburse (Funded seal; chain never shows how much)
+6. Borrower: Repay → Settle
+7. Prove standing → Verifier → **Verify access** → **Pass**
+
+The instrument row must stay **Amount: off-ledger** through the whole path.
+
+## Embed
+
+When a public URL exists, replace the block below. Do not commit binary video assets to this repository.
+
+```mdx
+<iframe
+  src="https://YOUR_PUBLIC_LINK"
+  title="Tally desk demo"
+  style={{ width: "100%", aspectRatio: "16 / 9", border: 0 }}
+  allow="fullscreen"
+/>
+```
+
+<Note>
+Coming soon. No voiceover. No file in `docs/` until the public link is pasted here and in the root README.
+</Note>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Local quickstart" href="/docs/quickstart">
+    Run the same path yourself in about ten minutes.
+  </Card>
+  <Card title="Desk tour" href="/docs/desk-tour">
+    Screenshots of each seal on Local and Preprod.
+  </Card>
+</CardGroup>

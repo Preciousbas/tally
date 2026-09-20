@@ -1,0 +1,119 @@
+---
+title: Contract reference
+description: Six circuits. Amount never crosses disclose().
+---
+
+Source: [`contract/tally.compact`](https://github.com/Preciousbas/tally/blob/main/contract/tally.compact). Language pragma `0.23`. Compile with Compact `+0.31.1`.
+
+TypeScript bindings live under `contract/managed/tally`. `TallyAPI` (`api/src/index.ts`) is the call surface the desk uses.
+
+## Ledger
+
+```compact
+export ledger loans: Map<Uint<64>, LoanPublic>;
+export ledger nextId: Counter;
+export ledger relationships: HistoricMerkleTree<10, Bytes<32>>;
+export ledger nullifiers: Set<Bytes<32>>;
+```
+
+```compact
+struct LoanPublic {
+  status: LoanStatus,
+  lenderPk: Bytes<32>,
+  borrowerPk: Bytes<32>,
+  paymentCommit: Bytes<32>
+}
+```
+
+`LoanStatus`: `Vacant`, `Offered`, `Accepted`, `Funded`, `Repaid`, `Settled`.
+
+There is no amount field on `LoanPublic`.
+
+## Witnesses
+
+| Witness | Type | Used by |
+| --- | --- | --- |
+| `getUserSecret` | `Bytes<32>` | All circuits that authorize a party |
+| `getPin` | `Uint<16>` | Same |
+| `getLoanAmount` | `Uint<64>` | `offerLoan` |
+| `getDueSlot` | `Uint<64>` | `offerLoan` |
+| `getRelationshipPath` | `MerkleTreePath<10, Bytes<32>>` | `proveStanding` |
+| `getStandingLoanId` | `Uint<64>` | `proveStanding` |
+| `getStandingCounterpartyPk` | `Bytes<32>` | `proveStanding` |
+
+## Domain tags
+
+| Circuit helper | Domain string |
+| --- | --- |
+| `deriveUserPublicKey` | `tally:user:pk:v1` |
+| `relationshipLeaf` | `tally:rel:v1:repaid` |
+| `settleNullifier` | `tally:nul:v1` |
+
+`ownPublicKey()` is not called.
+
+## Circuits
+
+### `offerLoan(borrowerPk: Bytes<32>): []`
+
+Derives `lenderPk` from secret + PIN. Reads amount and due from witnesses. Asserts `amount > 0`, `due > 0`, `lenderPk != borrowerPk`. Increments `nextId`, inserts `LoanPublic` at `Offered` with empty `paymentCommit`.
+
+`TallyAPI.offerLoan(borrowerPkHex, amount, dueSlot)` writes those terms into private state via `withTerms`, then `callTx.offerLoan`.
+
+### `acceptLoan(loanId: Uint<64>): []`
+
+Requires `Offered`. Caller Desk ID must equal `borrowerPk` and must not equal `lenderPk`. Status → `Accepted`.
+
+### `disburse(loanId: Uint<64>, paymentCommit: Bytes<32>): []`
+
+Requires `Accepted`. Caller must be the lender. `paymentCommit` must not be 32 zero bytes. Status → `Funded`; grain stored on the public struct. Amount is not an argument.
+
+### `repay(loanId: Uint<64>): []`
+
+Requires `Funded`. Caller must be the borrower. Status → `Repaid`.
+
+### `settle(loanId: Uint<64>): []`
+
+Requires `Repaid`. Caller must be lender or borrower. Inserts `settleNullifier` (rejects `"already settled"`). Inserts `relationshipLeaf` into `relationships`. Status → `Settled`.
+
+### `proveStanding(): []`
+
+No public arguments. Rebuilds the leaf as lender and as borrower; asserts the path leaf matches one of those. Computes the Merkle root from `getRelationshipPath` and asserts `relationships.checkRoot`. Failures: `"not a party leaf"`, `"not on allowlist"`.
+
+`TallyAPI.proveStanding(loanId, counterpartyPkHex, relationshipLeafHex)` loads standing witnesses via `withStanding`, then `callTx.proveStanding()`. The desk builds `relationshipLeafHex` with `deriveRelationshipLeafHex` in `deskId.ts` so the path lookup matches the on-chain hash — not the simulator's toy hash.
+
+## API mapping
+
+| Compact | `TallyAPI` | `TallyCircuitKeys` |
+| --- | --- | --- |
+| `offerLoan` | `offerLoan` | `'offerLoan'` |
+| `acceptLoan` | `acceptLoan` | `'acceptLoan'` |
+| `disburse` | `disburse` | `'disburse'` |
+| `repay` | `repay` | `'repay'` |
+| `settle` | `settle` | `'settle'` |
+| `proveStanding` | `proveStanding` | `'proveStanding'` |
+
+Also: `TallyAPI.deploy`, `TallyAPI.join`.
+
+## Tests
+
+`contract/test/tally.test.ts` (Vitest, `npm test`) covers:
+
+- Stable Desk ID from secret + PIN; PIN or secret change changes the key
+- Offer does not store amount
+- Zero amount and self-lend reject
+- Accept only the named borrower
+- Disburse only after accept, as lender, with a non-zero grain
+- Repay as borrower; settle inserts a leaf; nullifier blocks a second settle
+- `proveStanding` happy path; stranger / unsettled / wrong root reject
+- Verifier `verifyStanding` is boolean only
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Identity" href="/docs/identity">
+    `tally:user:pk:v1` and the desk secret.
+  </Card>
+  <Card title="Privacy" href="/docs/privacy">
+    What disclose() never sees.
+  </Card>
+</CardGroup>
