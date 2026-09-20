@@ -6,11 +6,7 @@
   "colors": {
     "primary": "#8C2F2B",
     "light": "#8C2F2B",
-    "dark": "#8C2F2B",
-    "background": {
-      "light": "#E8DCC8",
-      "dark": "#1C1914"
-    }
+    "dark": "#8C2F2B"
   },
   "fonts": {
     "family": "Figtree",
