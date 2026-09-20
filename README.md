@@ -2,9 +2,25 @@
 
 Private bilateral trade credit on Midnight. Loan amounts and due dates stay off the public ledger. When a loan settles, you can prove repaid standing to someone new — yes or no only.
 
-[Live desk](https://tally-jet-mu.vercel.app) · [X](https://x.com/tally_midnight)
+[Live desk](https://tally-jet-mu.vercel.app) · [Docs](docs/index.mdx) · [X](https://x.com/tally_midnight)
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
+
+## Documentation
+
+Product docs (Mintlify MDX) live in [`docs/`](docs/index.mdx). Use vs Build index: [`docs/llms.txt`](docs/llms.txt).
+
+```bash
+npx mint dev --port 3333
+```
+
+`mint` is the Mintlify CLI. Port 3333 avoids the desk on 3000. If the Mintlify client is unavailable:
+
+```bash
+npm run docs:preview
+```
+
+That serves a Tally-themed HTML preview at http://127.0.0.1:3333. Hosted docs deploy via the Mintlify dashboard (repo root `docs.json`); the existing Vercel project still serves the desk only. Details: [`docs/contributing.mdx`](docs/contributing.mdx).
 
 ## What this is
 

@@ -1,0 +1,25 @@
+# Tally
+
+> Tally is private bilateral trade credit on Midnight. Amount and due stay in witnesses. Settled loans mint a relationship leaf. A membership proof answers yes or no only.
+
+Live desk: https://tally-jet-mu.vercel.app
+Network: Midnight Preprod
+Contract: 84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af
+
+## Use Tally
+
+- [Introduction](https://github.com/Preciousbas/tally/blob/main/docs/index.mdx): what Tally is, the pipeline, and how to start.
+- [How it works](https://github.com/Preciousbas/tally/blob/main/docs/how-it-works.mdx): Offer → Accept → Disburse → Repay → Settle → Prove standing.
+- [Privacy](https://github.com/Preciousbas/tally/blob/main/docs/privacy.mdx): what the public ledger sees, what it never sees, what a verifier learns.
+- [Desk tour](https://github.com/Preciousbas/tally/blob/main/docs/desk-tour.mdx): Local vs Preprod, Lace/1AM, Lender / Borrower / Verifier.
+- [Local quickstart](https://github.com/Preciousbas/tally/blob/main/docs/quickstart.mdx): full circuit path in about ten minutes, no wallet.
+- [Preprod guide](https://github.com/Preciousbas/tally/blob/main/docs/preprod.mdx): join the contract, wallets, proof server, faucet.
+
+## Build on Tally
+
+- [Architecture](https://github.com/Preciousbas/tally/blob/main/docs/architecture.mdx): leaderboard-ui, api, contract, proof-server — what you inherit vs what you build.
+- [Contract reference](https://github.com/Preciousbas/tally/blob/main/docs/contract.mdx): offerLoan, acceptLoan, disburse, repay, settle, proveStanding.
+- [Identity](https://github.com/Preciousbas/tally/blob/main/docs/identity.mdx): secret + PIN Desk ID. Not ownPublicKey().
+- [Design system](https://github.com/Preciousbas/tally/blob/main/docs/design-system.mdx): tokens and rejection list for contributors.
+- [Contributing](https://github.com/Preciousbas/tally/blob/main/docs/contributing.mdx): Node 22, Compact 0.31, test and run.
+- [Demo video](https://github.com/Preciousbas/tally/blob/main/docs/demo.mdx): placeholder — no recording yet.

@@ -60,6 +60,9 @@ jspm_packages/
 # Vite
 .vite/
 
+# Generated docs preview
+docs/.preview/
+
 # Vercel
 .vercel
 .netlify
@@ -83,7 +86,8 @@ leaderboard-ui/public/zkir/
 notes/
 pitch/
 PROPOSAL.md
-docs/README.md
+# Public docs index is shipped; keep capture helpers private
+!docs/README.md
 docs/capture-screenshots.mjs
 docs/capture-screenshots.ps1
 docs/**/DEMO*
