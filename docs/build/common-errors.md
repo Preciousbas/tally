@@ -1,0 +1,55 @@
+# Common errors
+
+> Desk messages and the conditions that produce them.
+
+These strings come from `leaderboard-ui/src/App.tsx` (`friendlyError` and form checks). They are not a complete Midnight SDK catalog.
+
+## Wallet and network
+
+| You see | Condition in the desk |
+| --- | --- |
+| Transaction cancelled. | Wallet returned `User rejected` |
+| Connect Lace or 1AM on Preprod first. Or switch to Local desk… | A Preprod circuit ran with no connected wallet |
+| No wallet selected. Install Lace or 1AM, then refresh. | Connect clicked with no `window.midnight` option |
+| Set your wallet to Preprod. | Error text includes `Network ID` |
+| Install Lace or 1AM | Mast chip when no compatible connector (`4.x`) after five seconds |
+
+## Identity and party
+
+| You see | Condition in the desk |
+| --- | --- |
+| This instrument is not addressed to your key. | Compact: `not the borrower` |
+| Only the originating lender can disburse. | Compact: `not the lender` |
+| Desk private state is missing. Join the contract again, then retry. | `TallyAPI` private state missing or secret not 32 bytes |
+
+## Standing
+
+| You see | Condition in the desk |
+| --- | --- |
+| No standing for this identity on the allowlist. | `not a party`, `not on allowlist`, `not a party leaf`, `standing leaf not in allowlist` |
+| Allowlist root does not match. | `wrong root`, or verifier paste not in known roots |
+| Settle the instrument before proving standing. | Prove clicked when status is not Settled |
+| Standing proved. Allowlist root not in indexer yet… | Circuit succeeded; indexer snapshot has no root yet |
+
+## Proving and funds
+
+| You see | Condition in the desk |
+| --- | --- |
+| Proof server unreachable. Start Docker on port 6300. | `Failed to fetch` or `Failed Proof Server` |
+| Insufficient DUST. Register tNIGHT for dust in your wallet. | Error text includes `insufficient` or `DUST` |
+| Compact artifacts missing. Compile tally.compact first. | `not compiled` or `artifacts` |
+| Wallet could not submit the transaction. Check tDUST, Preprod network, and approve the wallet prompt. | `Request failed` or `submitting scoped transaction` |
+
+## Forms
+
+| You see | Condition in the desk |
+| --- | --- |
+| Amount must be greater than 0. | Offer amount not a whole number &gt; 0 |
+| Contract address must be 64 hex characters. | Join value fails `/^[0-9a-fA-F]{64}$/` |
+| Local simulator reset this session. | Local list restored after refresh but in-memory circuits did not |
+
+## Next steps
+
+
+  - [Preprod guide](/preprod) — Wallet, faucet, proof server.
+  - [Versions](/reference/versions) — Pins for Compact, midnight-js, and the prover image.
