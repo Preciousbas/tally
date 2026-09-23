@@ -16,6 +16,16 @@ Fallback HTML preview (Tally tokens, no Mintlify client):
 npm run docs:preview
 ```
 
+## Demo video
+
+Silent desk walkthrough (no narration):
+
+| Asset | Path |
+| --- | --- |
+| Recording | [`demo/Tally-Demo-Silent.mp4`](demo/Tally-Demo-Silent.mp4) |
+| Docs page | [`demo.mdx`](demo.mdx) |
+| README | Root [`README.md`](../README.md) · section **Demo** |
+
 ## Screenshots
 
 PNG files under `screenshots/local/` and `screenshots/preprod/` are used by the Desk tour, Local quickstart, and the root README. Do not delete them.
