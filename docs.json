@@ -39,7 +39,7 @@
       }
     ],
     "primary": {
-      "type": "link",
+      "type": "button",
       "label": "Open desk",
       "href": "https://tally-jet-mu.vercel.app"
     }
