@@ -10,7 +10,7 @@ Private bilateral trade credit on Midnight. Loan amounts and due dates stay off 
 
 Walkthrough of the desk with audio: Offer → Accept → Disburse → Repay → Settle → Prove standing → Verifier Pass. Amount stays **off-ledger**.
 
-**Video:** [docs/demo/Tally-Demo-Breathe.mp4](docs/demo/Tally-Demo-Breathe.mp4)
+**Video:** [Tally Demo video](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing)
 
 Docs page: [`docs/demo.mdx`](docs/demo.mdx).
 
