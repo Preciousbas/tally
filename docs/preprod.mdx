@@ -1,47 +1,39 @@
 ---
 title: Preprod guide
-description: Join the Midnight Preprod contract with Lace or 1AM.
+description: Run the desk on Midnight Preprod with Lace or 1AM.
 ---
 
-Run the same seals as Local desk against the published Compact contract. You need a wallet, tDUST, and a proof server.
+Preprod is Midnight’s public test network. You will use the same seals as Local desk, but against the published contract. You need a wallet, test tokens, and a working **proof server**. A proof server builds the zero-knowledge proof your wallet needs before it can submit.
 
 | | |
 | --- | --- |
 | Desk | [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app) |
 | Network | Midnight Preprod |
 | Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
-| Indexer | `https://indexer.preprod.midnight.network/api/v4/graphql` |
 | Faucet | [https://midnight-tmnight-preprod.nethermind.dev/](https://midnight-tmnight-preprod.nethermind.dev/) |
-
-Default contract is also set as `VITE_DEFAULT_CONTRACT` in `leaderboard-ui/.env.preprod`.
 
 ## Before you start
 
-1. Node 22 if you run the desk locally
-2. Two Chrome profiles (Lender / Borrower). Use the desk **Verifier** role as the third
-3. [Lace](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd) or [1AM](https://www.1am.xyz/) set to **Preprod**
-4. Faucet tNIGHT, then generate tDUST in the wallet
-5. Proof server for local proving
+1. Two Chrome profiles (one for Lender, one for Borrower). Use the desk **Verifier** role as the third view.
+2. Install [Lace](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd) or [1AM](https://www.1am.xyz/) and set the network to **Preprod**.
+3. Get **tNIGHT** from the faucet. Then generate **tDUST** in the wallet. tDUST pays fees on Preprod.
+4. Set the wallet proof server. Release wallets only allow `localhost` or hosts under `*.midnight.network` / `*.1am.xyz`. For many people that means **1AM ProofStation** on Preprod, or Docker on `http://localhost:6300`.
 
-## Proof server
-
-The desk takes `proverServerUri` from the connected wallet configuration. For local proving, run Midnight's proof server on port 6300:
+### Local Docker proof server (optional)
 
 ```bash
 docker run -d -p 6300:6300 midnightntwrk/proof-server:8.0.3 -- midnight-proof-server --network preprod
 ```
 
-The repo image is `proof-server/Dockerfile` (`midnightntwrk/proof-server:8.0.3`, `--network preprod`). If the wallet cannot reach a prover, the desk reports: start Docker on port 6300.
+If the browser console shows `localhost:6300` connection refused, either start Docker or point the wallet at an allowed hosted prover such as ProofStation.
 
 ## Open the desk
 
-Hosted:
-
-1. Open [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app)
+1. Go to [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app)
 2. Stay on **Preprod**
-3. **Connect Wallet**
+3. Click **Connect Wallet**
 
-Local:
+Or run locally after compile:
 
 ```bash
 nvm use 22
@@ -50,55 +42,47 @@ cd contract && compact compile +0.31.1 tally.compact managed/tally
 cd .. && npm run dev --workspace leaderboard-ui -- --mode preprod
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Compile first so `leaderboard-ui` can copy keys and ZKIR into `public/`.
+## Join the contract
 
-## Join or Deploy
-
-**Join** the published address (already filled on the hosted desk):
+Paste this address (64 hex characters) and click **Join**:
 
 ```
 84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af
 ```
 
-The field must be 64 hex characters. Click **Join**.
+**Deploy** creates a fresh contract if you want your own instance. Share the new address so the Borrower profile can Join the same one.
 
-**Deploy** from a connected Lender if you want a fresh instance. The new address is copied. Share it with the Borrower profile so they Join the same contract.
+## Desk ID on Preprod
 
-## Desk ID, not wallet address
+1. On the Borrower profile: Connect, Join, click **Desk ID**, copy
+2. On the Lender profile: Offer → paste that code into **Borrower id**
+3. Do not paste a Lace `mn_addr_…` payment address
 
-Each browser derives a Desk ID from a secret stored at `tally-midnight-secret` plus PIN `1234`. That is what you paste into **Borrower id**.
+More detail: [Identity](/docs/identity).
 
-1. On the Borrower profile: Connect, Join, click **Desk ID** in the trust strip, copy
-2. On the Lender profile: Offer → Borrower id → paste that 64-hex value
-3. Do not paste an `mn_addr_…` Lace address
+## Loan steps
 
-See [Identity](/docs/identity).
-
-## Loan steps on Preprod
-
-Use two profiles. Switch the role control to match the acting party.
-
-1. **Lender — Offer.** Amount (required, whole number &gt; 0), due (default 30), Borrower Desk ID, Offer
+1. **Lender — Offer** (amount, due, Borrower Desk ID)
 2. **Borrower — Accept**
-3. **Lender — Disburse.** Paste a real Lace payment id into Payment when you have one, then Disburse. The chain stores a commitment, not the amount
+3. **Lender — Disburse** (payment field can hold a Lace payment id when you have one)
 4. **Borrower — Repay**
-5. **Either party — Settle**
-6. **Party — Prove standing.** Copy the allowlist root (indexer can lag a few seconds)
-7. **Verifier — Verify access.** Pass or Fail, no amount
+5. **Either — Settle**
+6. **Party — Prove standing** (copy the allowlist root)
+7. **Verifier — Verify access** → Pass or Fail
 
 ![Preprod offer with Desk ID.](/docs/screenshots/preprod/01-offer.png)
 
 ## Common errors
 
-| Desk message | What to do |
+| Desk message | What to try |
 | --- | --- |
-| Set your wallet to Preprod | Network ID mismatch in Lace/1AM |
-| Insufficient DUST | Faucet tNIGHT, generate tDUST |
-| Proof server unreachable | Docker on `:6300`, or use the URI the wallet reports |
-| Contract address must be 64 hex | Join field is not a Midnight contract address |
-| This instrument is not addressed to your key | Wrong profile / Desk ID |
-| Desk private state is missing | Join the contract again on this desk |
-| Allowlist root not in indexer yet | Wait and refresh after a successful prove |
+| Set your wallet to Preprod | Switch Lace or 1AM to Preprod |
+| Insufficient DUST | Faucet tNIGHT, then generate tDUST |
+| Proof server unreachable / Request failed with no popup | Fix wallet prover URI (ProofStation or local Docker on 6300) |
+| Contract address must be 64 hex | Fix the Join field |
+| This instrument is not addressed to your key | Wrong profile or wrong Desk ID |
+| Desk private state is missing | Join again on this desk |
+| Allowlist root not in indexer yet | Wait a few seconds and refresh after Prove standing |
 
 ## Next
 
@@ -107,6 +91,6 @@ Use two profiles. Switch the role control to match the acting party.
     Desk, API, Compact, proof server.
   </Card>
   <Card title="Identity" href="/docs/identity">
-    Secret + PIN, and why Lace address is the wrong field.
+    How Desk ID works when you paste Borrower id.
   </Card>
 </CardGroup>

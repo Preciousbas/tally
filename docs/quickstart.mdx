@@ -1,19 +1,19 @@
 ---
 title: Local quickstart
-description: Run the Local desk end-to-end in about ten minutes. No wallet.
+description: Finish the full loan path in about ten minutes with no wallet.
 ---
 
-By the end you will have offered, accepted, disbursed, repaid, and settled a loan in the browser simulator, then proved standing and seen Verifier **Pass**. Amount never appears on the instrument.
+By the end you will Offer, Accept, Disburse, Repay, and Settle a loan in the browser, then Prove standing and see Verifier **Pass**. Amount never shows on the instrument row.
 
-This path does not talk to Midnight Preprod. For the chain, use the [Preprod guide](/docs/preprod).
+This path does not use Midnight Preprod. For the live test network, open the [Preprod guide](/docs/preprod).
 
 ## Before you start
 
 - Node 22 (`nvm use 22`)
 - npm
-- A current Chromium browser
+- A Chromium browser (Chrome, Edge, Brave, and similar)
 
-Compact is not required for Local desk. The UI runs `TallySimulator` in-page. Compile + `npm test` if you want the same circuits checked as TypeScript first.
+You do not need Compact for Local desk. The page runs a simulator. Compile and `npm test` only if you want the same circuits checked as code first.
 
 ## 1. Install and open the desk
 
@@ -29,9 +29,9 @@ Open [http://localhost:3000](http://localhost:3000). Or use the hosted desk at [
 
 ## 2. Switch to Local desk
 
-In the toolbar, click **Local desk**. The caption reads Demo/Simulator.
+Click **Local desk** in the toolbar. The caption should read Demo/Simulator.
 
-If no Lace/1AM connector appears, the desk switches to Local on its own.
+If no Lace or 1AM wallet is installed, the desk may switch to Local on its own.
 
 ## 3. Offer as Lender
 
@@ -41,17 +41,17 @@ Stay on **Lender**.
 2. Due in days: `30` or leave blank (defaults to 30)
 3. Click **Offer**
 
-A row `#1` appears with seal **Offered**. Lender id and Borrower id are demo Desk IDs. Amount reads **off-ledger**.
+A row `#1` appears with seal **Offered**. Amount reads **off-ledger**.
 
 ![Local offered instrument.](/docs/screenshots/local/01-offered.png)
 
 ## 4. Accept as Borrower
 
-Switch the role segment to **Borrower**. Click **Accept**. Seal becomes **Accepted**.
+Switch the role to **Borrower**. Click **Accept**. Seal becomes **Accepted**.
 
 ## 5. Disburse as Lender
 
-Switch to **Lender**. Payment may stay empty on Local desk; the UI derives a stand-in grain. Click **Disburse**. Seal becomes **Funded**.
+Switch to **Lender**. Payment may stay empty on Local desk. Click **Disburse**. Seal becomes **Funded**.
 
 ![Local funded instrument.](/docs/screenshots/local/02-funded.png)
 
@@ -59,8 +59,6 @@ Switch to **Lender**. Payment may stay empty on Local desk; the UI derives a sta
 
 1. Borrower → **Repay** → **Repaid**
 2. Lender or Borrower → **Settle** → **Settled**
-
-Settle inserts the relationship leaf in the simulator and records a historic root.
 
 ![Settled, Prove standing enabled.](/docs/screenshots/local/03-settled-prove.png)
 
@@ -72,28 +70,26 @@ As Lender or Borrower, click **Prove standing**. You should see **Standing confi
 
 ## 8. Verifier Pass
 
-Switch to **Verifier**. The allowlist root field should already hold the root. Click **Verify access**. Standing seal: **Pass**.
+Switch to **Verifier**. Click **Verify access**. Standing seal: **Pass**.
 
 ![Verifier Pass — yes or no only.](/docs/screenshots/local/05-verifier-pass.png)
 
-The verifier panel does not show amount, due, or which leaf was used.
+## If something fails
 
-## If a step fails
-
-| Symptom | Cause |
+| What you see | What to try |
 | --- | --- |
-| Amount error | Amount must be a whole number greater than 0 |
-| “Local simulator reset” | Refresh cleared in-memory circuits. Offer through Settle again |
-| Standing Fail | Root does not match the simulator history, or the loan is not Settled |
-| No instruments after refresh | The list can restore from `tally.localLoans.v1`, but proofs need a live simulator run |
+| Amount error | Use a whole number greater than 0 |
+| Local simulator reset | Refresh cleared memory. Run Offer through Settle again |
+| Standing Fail | Finish Settle first, or paste the root from a fresh Prove standing |
+| Empty list after refresh | Offer through Settle again before proving |
 
 ## Next
 
 <CardGroup cols={2}>
   <Card title="Preprod guide" href="/docs/preprod">
-    Same five loan steps against the published contract.
+    Same steps against the published contract.
   </Card>
   <Card title="How it works" href="/docs/how-it-works">
-    What each circuit writes on the ledger.
+    What each step writes on the ledger.
   </Card>
 </CardGroup>

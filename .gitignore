@@ -64,12 +64,6 @@ ehthumbs.db
 !.vscode/launch.json
 !.vscode/extensions.json
 
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-
 # Vite / bundlers
 .vite/
 *.local
@@ -81,20 +75,14 @@ ehthumbs.db
 # Generated docs preview
 docs/.preview/
 
-# Vercel
-.vercel
-.netlify
+# Midnight template / community boilerplate (not the Tally product surface)
 CHANGELOG.md
 CODEOWNERS
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 SECURITY.md
 SUPPORT.md
-SUPPORT.md
-index.mdx
-llms.txt
-demo.mdx
-*.mdx
+DESIGN_SYSTEM.md
 
 # Dev-time copies of circuit assets (originals in contract/managed/)
 leaderboard-ui/public/keys/
@@ -115,8 +103,6 @@ PROPOSAL.md
 brand/X_PROFILE.md
 brand/x-avatar.svg
 brand/x-header.svg
-.cursor/
-*.canvas.tsx
 
 # Screenshot capture helpers (local tooling)
 docs/capture-screenshots.mjs

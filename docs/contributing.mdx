@@ -1,11 +1,11 @@
 ---
 title: Contributing
-description: Node 22, Compact 0.31, npm test, then the desk.
+description: Install, test, run the desk, and preview these docs.
 ---
 
-Clone, compile `tally.compact`, run the simulator tests, then open the desk. CI on `main` is `npm install` and `npm test` (`.github/workflows/ci.yml`).
+Clone the repo, compile the Compact contract, run tests, then open the desk. GitHub Actions on `main` runs `npm install` and `npm test`.
 
-Midnight-related code in this repository is Apache-2.0. New TypeScript files should carry the SPDX header from [`CONTRIBUTING.md`](https://github.com/Preciousbas/tally/blob/main/CONTRIBUTING.md). Contributors sign the Midnight CLA via CLA assistant on the pull request.
+Midnight-related code in this repository uses the Apache-2.0 license.
 
 ## Setup
 
@@ -30,60 +30,42 @@ cd contract && compact compile +0.31.1 tally.compact managed/tally && npm test
 cd .. && npm run dev --workspace leaderboard-ui -- --mode preprod
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Switch to **Local desk** for circuits without a wallet.
+Open [http://localhost:3000](http://localhost:3000). Use **Local desk** if you want circuits without a wallet.
 
-## Commands
+## Useful commands
 
 ```bash
 npm install          # Workspaces: contract, api, leaderboard-ui
-npm test             # Vitest — identity, lifecycle, proveStanding
+npm test             # Contract simulator tests
 npm run dev          # Desk UI
 npm run compile      # compact compile tally.compact
 ```
 
-`leaderboard-ui` `dev` / `build` copies `contract/managed/tally/keys` and `zkir` into the web root so Preprod proving can fetch artifacts.
-
 ## Preview these docs
-
-From the repository root:
 
 ```bash
 npx mint dev --port 3333
 ```
 
-`mint` is the current Mintlify CLI (`npm i -g mint`). Default port 3000 collides with the desk; use 3333.
-
-If the Mintlify client cannot download, generate a local HTML preview:
+Port 3333 keeps the desk free on 3000. If Mintlify’s client will not download:
 
 ```bash
 npm run docs:preview
 ```
 
-That writes `docs/.preview/` and serves it (default [http://127.0.0.1:3333](http://127.0.0.1:3333)).
-
-Validate the Mintlify graph:
-
-```bash
-npx mint validate
-```
-
 ## Deploy
 
-**Desk (existing):** `vercel.json` builds workspaces and serves `leaderboard-ui/dist`. Production: [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app).
+**Desk:** Vercel serves the UI at [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app).
 
 ```bash
 npx vercel --prod --yes
 ```
 
-Set `VITE_DEFAULT_CONTRACT` and `VITE_NETWORK_ID=preprod` on the Vercel project if the hosted desk should Join the published address by default.
-
-**Docs (Mintlify):** import `Preciousbas/tally` in the [Mintlify dashboard](https://mintlify.com). Documentation directory is the repository root (`docs.json` + `mint.json`, pages under `docs/`). Mintlify hosts the site; do not point the existing desk `vercel.json` at MDX.
-
-**Docs (Vercel fallback):** create a *second* Vercel project whose build is `npm run docs:preview -- --no-serve` and whose output directory is `docs/.preview`. Leave the current desk project unchanged.
+**Docs:** Import `Preciousbas/tally` in the [Mintlify dashboard](https://mintlify.com). Config lives at the repo root (`docs.json`). Mintlify hosts the docs site. Keep the desk Vercel project pointed at the UI only.
 
 ## Pull requests
 
-Use `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`. Do not `--force` push. Match existing desk voice: no exclamation marks, no purple neon, no invented product claims. Circuit changes need a simulator test.
+Match the desk voice. No exclamation marks. No invented product claims. Circuit changes need a simulator test.
 
 ## Next
 
@@ -92,6 +74,6 @@ Use `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`. Do not `--force` p
     Which package to open first.
   </Card>
   <Card title="Design system" href="/docs/design-system">
-    Tokens and the rejection list.
+    Colors, type, and what we refuse.
   </Card>
 </CardGroup>

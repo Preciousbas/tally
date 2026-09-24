@@ -1,25 +1,26 @@
 # Tally
 
-> Tally is private bilateral trade credit on Midnight. Amount and due stay in witnesses. Settled loans mint a relationship leaf. A membership proof answers yes or no only.
+> Tally is private trade credit on Midnight. Amount stays off the public book. After settle, standing is yes or no only.
 
 Live desk: https://tally-jet-mu.vercel.app
 Network: Midnight Preprod
 Contract: 84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af
+Demo video: https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing
 
 ## Use Tally
 
-- [Introduction](https://github.com/Preciousbas/tally/blob/main/docs/index.mdx): what Tally is, the pipeline, and how to start.
-- [How it works](https://github.com/Preciousbas/tally/blob/main/docs/how-it-works.mdx): Offer → Accept → Disburse → Repay → Settle → Prove standing.
-- [Privacy](https://github.com/Preciousbas/tally/blob/main/docs/privacy.mdx): what the public ledger sees, what it never sees, what a verifier learns.
-- [Desk tour](https://github.com/Preciousbas/tally/blob/main/docs/desk-tour.mdx): Local vs Preprod, Lace/1AM, Lender / Borrower / Verifier.
-- [Local quickstart](https://github.com/Preciousbas/tally/blob/main/docs/quickstart.mdx): full circuit path in about ten minutes, no wallet.
-- [Preprod guide](https://github.com/Preciousbas/tally/blob/main/docs/preprod.mdx): join the contract, wallets, proof server, faucet.
+- [Introduction](https://github.com/Preciousbas/tally/blob/main/docs/index.mdx): what Tally is and how to start
+- [How it works](https://github.com/Preciousbas/tally/blob/main/docs/how-it-works.mdx): Offer through Prove standing
+- [Privacy](https://github.com/Preciousbas/tally/blob/main/docs/privacy.mdx): what the chain shows and what a verifier learns
+- [Desk tour](https://github.com/Preciousbas/tally/blob/main/docs/desk-tour.mdx): Local vs Preprod, roles, screenshots
+- [Local quickstart](https://github.com/Preciousbas/tally/blob/main/docs/quickstart.mdx): full path in about ten minutes, no wallet
+- [Preprod guide](https://github.com/Preciousbas/tally/blob/main/docs/preprod.mdx): Lace or 1AM on the test network
+- [Demo video](https://github.com/Preciousbas/tally/blob/main/docs/demo.mdx): Drive recording of the desk
 
 ## Build on Tally
 
-- [Architecture](https://github.com/Preciousbas/tally/blob/main/docs/architecture.mdx): leaderboard-ui, api, contract, proof-server — what you inherit vs what you build.
-- [Contract reference](https://github.com/Preciousbas/tally/blob/main/docs/contract.mdx): offerLoan, acceptLoan, disburse, repay, settle, proveStanding.
-- [Identity](https://github.com/Preciousbas/tally/blob/main/docs/identity.mdx): secret + PIN Desk ID. Not ownPublicKey().
-- [Design system](https://github.com/Preciousbas/tally/blob/main/docs/design-system.mdx): tokens and rejection list for contributors.
-- [Contributing](https://github.com/Preciousbas/tally/blob/main/docs/contributing.mdx): Node 22, Compact 0.31, test and run.
-- [Demo video](https://github.com/Preciousbas/tally/blob/main/docs/demo.mdx): desk walkthrough with audio (Offer → Verifier Pass). File: [Tally-Demo-Breathe.mp4](https://github.com/Preciousbas/tally/blob/main/docs/demo/Tally-Demo-Breathe.mp4).
+- [Architecture](https://github.com/Preciousbas/tally/blob/main/docs/architecture.mdx): packages and request path
+- [Contract reference](https://github.com/Preciousbas/tally/blob/main/docs/contract.mdx): the six circuits
+- [Identity](https://github.com/Preciousbas/tally/blob/main/docs/identity.mdx): Desk ID
+- [Design system](https://github.com/Preciousbas/tally/blob/main/docs/design-system.mdx): colors and rejection list
+- [Contributing](https://github.com/Preciousbas/tally/blob/main/docs/contributing.mdx): install, test, Mintlify preview

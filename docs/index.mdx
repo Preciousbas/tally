@@ -1,80 +1,85 @@
 ---
 title: Introduction
-description: Private bilateral trade credit on Midnight.
+description: Private trade credit on Midnight. Amount stays off the chain. Standing is yes or no.
 ---
 
-Tally is a desk for private bilateral loan origination on Midnight. Amount and due date stay in witnesses. The public ledger stores loan id, status, pseudonymous identity grains, a payment commitment, a relationship Merkle allowlist, and nullifiers.
+Tally is a desk for private loans between two people on **Midnight**. Midnight is a blockchain built so some facts can stay private.
 
-When a loan settles, it mints a relationship leaf. A later membership proof (`proveStanding`) answers one question for a third party: is this identity in the allowlist? The verifier learns **yes or no only** — not which leaf, amount, or counterparty.
+Here is the idea in plain words. Two people make a loan. The **amount** (how much money) and the **due** date stay private. The public chain only sees that a loan exists and what step it is on. When the loan is fully done, either person can prove they have a repaid history. A checker only learns **yes** or **no**. They do not learn how much was lent.
 
-The product name is **Tally**. Credit is a pairwise instrument, not a bureau score.
-
-## The pipeline
-
-Every instrument follows one ordered path:
+## The path every loan follows
 
 **Offer → Accept → Disburse → Repay → Settle → Prove standing**
 
 <Steps>
-  <Step title="Offer">Lender sets amount and due privately. On Preprod the borrower is named by Desk ID, not a wallet address.</Step>
-  <Step title="Accept">The named borrower accepts. Status becomes Accepted.</Step>
-  <Step title="Disburse">Lender binds a payment commitment. The amount itself is never disclosed on-chain.</Step>
-  <Step title="Repay">Borrower marks the instrument repaid.</Step>
-  <Step title="Settle">Either party closes it. The contract inserts a relationship leaf and consumes a nullifier.</Step>
-  <Step title="Prove standing">A party proves allowlist membership. A verifier sees Pass or Fail only.</Step>
+  <Step title="Offer">The lender writes the amount and due in private. On the live network they name the borrower with a Desk ID.</Step>
+  <Step title="Accept">The borrower agrees.</Step>
+  <Step title="Disburse">The lender records that money was sent. The chain stores a sealed mark called a payment commitment. It still does not show the amount.</Step>
+  <Step title="Repay">The borrower marks the loan as paid back.</Step>
+  <Step title="Settle">Either person closes the loan. Tally adds them to an allowlist. An allowlist is like a guest list of people who finished a repaid loan.</Step>
+  <Step title="Prove standing">Someone proves they are on that guest list. A verifier only sees Pass or Fail.</Step>
 </Steps>
 
-## Two ways in
-
-| Path | What you need | What you get |
-| --- | --- | --- |
-| [Local desk](/docs/quickstart) | Node 22 and a browser. No wallet. | Full circuit path in-browser (Demo/Simulator). |
-| [Preprod](/docs/preprod) | Lace or 1AM on Midnight Preprod, tDUST, proof server. | The same seals against the live contract. |
-
-Live desk: [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app) · [Demo video](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing)
-
-| | |
-| --- | --- |
-| Network | Midnight Preprod |
-| Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
-
-## Use vs Build
+## How to use
 
 <CardGroup cols={2}>
-  <Card title="Use the desk" href="/docs/desk-tour" icon="layout-panel-left">
-    Local vs Preprod, Lace or 1AM, and the Lender / Borrower / Verifier roles.
+  <Card title="Open the desk" href="https://tally-jet-mu.vercel.app" icon="app-window">
+    The live app on Vercel. Try Local desk for a full walkthrough with no wallet.
   </Card>
-  <Card title="Demo video" href="/docs/demo" icon="clapperboard">
-    Desk walkthrough with audio — Offer through Verifier Pass.
+  <Card title="Watch the demo" href="/docs/demo" icon="clapperboard">
+    A short video of Offer through Verifier Pass.
   </Card>
-  <Card title="Build on the contract" href="/docs/architecture" icon="blocks">
-    What Midnight already gives you, and what this repo implements.
+  <Card title="Local quickstart" href="/docs/quickstart" icon="play">
+    About ten minutes on your computer. No Lace or 1AM needed.
+  </Card>
+  <Card title="Preprod guide" href="/docs/preprod" icon="wallet">
+    Same steps on Midnight Preprod with a real wallet.
   </Card>
 </CardGroup>
 
-## What Tally is not
+## How to build
 
-These are out of scope:
+<CardGroup cols={2}>
+  <Card title="Architecture" href="/docs/architecture" icon="blocks">
+    The four packages in this repo and what Midnight already gives you.
+  </Card>
+  <Card title="Contract" href="/docs/contract" icon="file-code">
+    The six circuits and what each one writes.
+  </Card>
+  <Card title="Identity" href="/docs/identity" icon="fingerprint">
+    What Desk ID means and how the desk makes one.
+  </Card>
+  <Card title="Contributing" href="/docs/contributing" icon="git-branch">
+    Install, test, run the desk, and preview these docs.
+  </Card>
+</CardGroup>
 
-- Credit bureau / third-party score issuance
-- Web2 attestors (KYC, bank statements, off-chain oracles)
-- A marketplace of loans or a public order book
-- Revealing amounts under any transparency mode
-- Mainnet launch
-- Defaulted / liquidation flows
-- Replacing Lace/1AM with real-world legal identity
-- A general-purpose credential wallet (no W3C VC format)
-- Proving *which* prior counterparty you dealt with
+## Live deployment
 
-`proveStanding` is in scope. It is Private Allowlist Access — membership only.
+| | |
+| --- | --- |
+| Desk | [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app) |
+| Network | Midnight Preprod |
+| Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
+
+**Preprod** means Midnight’s public test network. Tokens there are for testing. They are not real money.
+
+## What Tally does not try to be
+
+- A credit score company
+- A place that shows loan amounts to the world
+- A marketplace of many open loans
+- Mainnet (the live money network) yet
+
+Tally answers one standing question. Are you on the repaid allowlist. Yes or no.
 
 ## Next
 
 <CardGroup cols={2}>
   <Card title="How it works" href="/docs/how-it-works">
-    Each seal, who acts, and what the ledger stores.
+    Each step, who clicks, and what the chain can see.
   </Card>
-  <Card title="Local quickstart" href="/docs/quickstart">
-    Offer through Verifier Pass in about ten minutes. No wallet.
+  <Card title="Privacy" href="/docs/privacy">
+    What stays secret and what a verifier learns.
   </Card>
 </CardGroup>

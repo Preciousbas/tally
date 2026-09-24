@@ -1,77 +1,73 @@
 ---
 title: Desk tour
-description: Local vs Preprod. Lace or 1AM. Lender, Borrower, and Verifier.
+description: Local desk and Preprod. Lace or 1AM. Lender, Borrower, Verifier.
 ---
 
-The desk is one screen: mast, flap, trust strip, mode/role toolbar, instrument list, and the selected loan. It is not a dashboard of charts.
-
-Live: [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app)
+The desk is one screen. Mast, help flap, trust strip, mode and role controls, loan list, and the selected loan. Live app: [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app)
 
 ## Local desk vs Preprod
 
 | | Local desk | Preprod |
 | --- | --- | --- |
-| Caption on the desk | Demo/Simulator | Midnight Preprod |
+| Label on screen | Demo/Simulator | Midnight Preprod |
 | Wallet | None | Lace or 1AM on Preprod |
-| State | `TallySimulator` in the browser | Compact contract + indexer |
-| Borrower id field | Hidden — built-in demo keys | Required — paste their Desk ID |
-| Proof server | Not used | Wallet-reported prover, typically port 6300 locally |
+| Where state lives | Simulator inside the browser | Live Compact contract plus indexer |
+| Borrower id field | Hidden (demo keys) | Paste their Desk ID |
+| Proof server | Not used | Comes from the wallet settings |
 
-The toolbar toggle persists in `localStorage` (`tally.deskMode`). If the browser has no compatible wallet after five seconds, the desk switches to Local so you can still run the circuits.
+**Local desk** is a practice mode. It runs the same seals without talking to the chain. **Preprod** is Midnight’s public test network.
 
-On a narrow viewport, Preprod shows a one-time banner: try Local desk first.
+If the browser finds no Midnight wallet after a few seconds, the desk switches to Local so you can still try the flow.
 
 ## Wallets
 
-Mast CTA is **Connect Wallet**. The desk enumerates `window.midnight` connectors that satisfy API `4.x`. Display names resolve to **Lace** or **1AM**. It does not hardcode `mnLace`.
-
-Install:
+**Connect Wallet** looks for Lace or 1AM in the browser.
 
 - Lace: [Chrome Web Store](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd)
 - 1AM: [https://www.1am.xyz/](https://www.1am.xyz/)
 
-Connect is required for Join/Deploy and every Preprod circuit call. Local desk does not need it.
+You need Connect for Join, Deploy, and every Preprod action. Local desk does not need a wallet.
 
 ## Roles
 
-One browser, three roles. Switch the segment control. Status hints tell you who acts next.
+One browser has three roles. Switch the control to match who is acting.
 
-| Role | Actions |
+| Role | What they do |
 | --- | --- |
-| Lender | Offer, Disburse (Accepted), Settle (Repaid), Prove standing (Settled) |
-| Borrower | Accept (Offered), Repay (Funded), Settle (Repaid), Prove standing (Settled) |
-| Verifier | Paste allowlist root, **Verify access** → Pass or Fail |
+| Lender | Offer, Disburse, Settle, Prove standing |
+| Borrower | Accept, Repay, Settle, Prove standing |
+| Verifier | Paste allowlist root, Verify access → Pass or Fail |
 
-On Preprod, Lender and Borrower are usually two Chrome profiles so each browser holds its own Desk ID secret.
+On Preprod, Lender and Borrower are usually two Chrome profiles so each one keeps its own Desk ID secret.
 
 ## Trust strip
 
-The strip under the flap shows:
+Under the flap you will see:
 
-- Network: Midnight Preprod
-- Joined contract address (copyable)
-- **Desk ID** — this browser's Tally public key, not the wallet address
-- Privacy model link
+- Network name
+- Joined contract address (you can copy it)
+- **Desk ID** button
+- Link to the privacy write-up
 
-Join / Deploy / Copy sit on the Preprod rail: paste a 64-hex contract address and Join, or Deploy from a connected Lender and share the new address.
+On Preprod you **Join** a 64-character contract address or **Deploy** a new one from a connected Lender.
 
 ## Product tour (Preprod)
 
-![Offer on Preprod. Amount stays off-ledger; borrower is named by Desk ID.](/docs/screenshots/preprod/01-offer.png)
+![Offer on Preprod. Amount stays off-ledger. Borrower is named by Desk ID.](/docs/screenshots/preprod/01-offer.png)
 
-Offer. Amount required, stays off-ledger. Borrower id is their Desk ID, not a Lace address.
+Offer. Amount is required and stays off-ledger. Borrower id is their Desk ID.
 
 ![Accepted instrument ready to disburse.](/docs/screenshots/preprod/02-accepted-disburse.png)
 
-Accepted — Lender can Disburse. Payment field takes a Lace payment id; the chain stores a commitment.
+Accepted. Lender can Disburse.
 
 ![Funded seal. Amount still off-ledger.](/docs/screenshots/preprod/03-funded.png)
 
-Funded. Payment grain is present. Amount remains off-ledger.
+Funded. Amount remains off-ledger.
 
 ![Repaid, ready to settle.](/docs/screenshots/preprod/04-repaid-settle.png)
 
-Repaid — Settle mints the allowlist leaf.
+Repaid. Settle adds the allowlist leaf.
 
 ![Settled instrument.](/docs/screenshots/preprod/05-settled.png)
 
@@ -81,9 +77,7 @@ Settled. Prove standing, then copy the allowlist root.
 
 Standing confirmed. The root is what a verifier pastes.
 
-## Local desk
-
-Same seals, no wallet. Local instruments are session-only for circuits; the list may restore after refresh, but the simulator must be re-run Offer → Settle before Prove standing if the in-memory tree reset.
+## Local desk screenshots
 
 ![Local desk, Loan 1 Offered.](/docs/screenshots/local/01-offered.png)
 
@@ -95,7 +89,7 @@ Same seals, no wallet. Local instruments are session-only for circuits; the list
 
 ![Verifier Pass — membership only.](/docs/screenshots/local/05-verifier-pass.png)
 
-Verifier copy: you only learn yes or no — not amount, due, or which leaf.
+Verifier copy on screen: you only learn yes or no.
 
 ## Next
 

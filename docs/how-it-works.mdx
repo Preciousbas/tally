@@ -1,9 +1,11 @@
 ---
 title: How it works
-description: Offer → Accept → Disburse → Repay → Settle → Prove standing.
+description: Offer, Accept, Disburse, Repay, Settle, then Prove standing.
 ---
 
-Every Tally instrument is one bilateral loan. The desk and the Compact circuits share the same six steps. Amount and due are checked in-circuit, then left in witnesses. Status is what an explorer can see.
+Every Tally loan is between two people. The desk and the Compact contract share the same six steps. **Compact** is Midnight’s language for private smart contracts. A **circuit** is one named action in that contract.
+
+Amount and due are checked inside the proof. They stay in witnesses. Status is what an explorer can see.
 
 ```mermaid
 flowchart LR
@@ -15,84 +17,72 @@ flowchart LR
   F --> G[Verifier yes or no]
 ```
 
-The desk flap (`How a stick is cut`) lists the same notches. It is not a route and not a modal.
+On the desk, the wooden flap labeled **How a stick is cut** lists the same steps. It is a help panel, not a separate page.
 
 ## Status seals
 
-`LoanStatus` in `contract/tally.compact`:
+Each loan carries a seal. The seal is the public status.
 
-| Status | After | Public `LoanPublic` |
+| Seal | After this action | What the public row holds |
 | --- | --- | --- |
-| Vacant | Unused slot | — |
-| Offered | `offerLoan` | `lenderPk`, `borrowerPk`, empty `paymentCommit` |
-| Accepted | `acceptLoan` | Same identities, still no payment grain |
-| Funded | `disburse` | `paymentCommit` bound; amount still absent |
-| Repaid | `repay` | Status only |
-| Settled | `settle` | Leaf in `relationships`, nullifier consumed |
+| Vacant | Empty slot | — |
+| Offered | Offer | Lender and borrower Desk IDs |
+| Accepted | Accept | Same identities |
+| Funded | Disburse | Plus a payment commitment |
+| Repaid | Repay | Status only |
+| Settled | Settle | Leaf added to the allowlist |
 
-Instrument rows on the desk always show **Amount: off-ledger**.
+Instrument rows always show **Amount: off-ledger**.
 
 ## Offer
 
-Who: **Lender**.
+Who clicks: **Lender**.
 
-The lender supplies amount and due as witnesses (`getLoanAmount`, `getDueSlot`). The circuit asserts both are positive and that the lender is not offering to their own key. `nextId` increments. The new `LoanPublic` row stores only identities and `Offered`.
+The lender sets amount and due as private witnesses. The circuit checks that both are greater than zero and that you are not lending to yourself. A new loan id is created. The public row shows Offered.
 
-On Local desk the borrower key is the built-in demo borrower. On Preprod you paste the borrower's **Desk ID** (64 hex), not a Lace or 1AM address.
+On Local desk the borrower is built in. On Preprod you paste the borrower’s **Desk ID**.
 
 ## Accept
 
-Who: **Borrower**.
+Who clicks: **Borrower**.
 
-`acceptLoan(loanId)` derives the caller's Desk ID from secret + PIN and asserts it equals `loan.borrowerPk`. Status must already be `Offered`. A stranger or the originating lender cannot accept.
+Only the Desk ID named in the offer can accept. The seal becomes Accepted.
 
 ## Disburse
 
-Who: **Lender**.
+Who clicks: **Lender**.
 
-`disburse(loanId, paymentCommit)` binds a 32-byte payment grain. The grain must be non-zero. The amount does not appear in the public struct. On Preprod the desk hashes a Lace payment id (or a local stand-in) into that grain. Status becomes `Funded`.
+Disburse means “record that payout happened.” You pass a **payment commitment**. That is a 32-byte sealed mark. It is not the amount. The seal becomes Funded.
 
 ## Repay
 
-Who: **Borrower**.
+Who clicks: **Borrower**.
 
-`repay(loanId)` requires `Funded` and the borrower key. Status becomes `Repaid`. No amount is written.
+The seal becomes Repaid. No amount is written to the chain.
 
 ## Settle
 
-Who: **Lender or Borrower**.
+Who clicks: **Lender or Borrower**.
 
-`settle(loanId)` requires `Repaid` and a party to the loan. It:
+Settle closes the loan after Repaid. The contract:
 
-1. Builds `settleNullifier` over domain `tally:nul:v1`, loan id, and both public keys
-2. Rejects if that nullifier is already in `nullifiers`
-3. Inserts `relationshipLeaf` (domain `tally:rel:v1:repaid`) into `relationships` (`HistoricMerkleTree<10>`)
-4. Sets status to `Settled`
-
-A second settle on the same pair fails closed.
+1. Builds a **nullifier** (a one-time ticket) so the same settle cannot run twice
+2. Inserts a **relationship leaf** into the allowlist tree
+3. Sets the seal to Settled
 
 ## Prove standing
 
-Who: **Lender or Borrower** of a settled loan, then a **Verifier**.
+Who clicks: a party to a Settled loan, then a **Verifier**.
 
-`proveStanding()` rebuilds the leaf privately from the caller's key, `getStandingLoanId`, and `getStandingCounterpartyPk`. It checks the Merkle path from `getRelationshipPath` against `relationships.checkRoot`. The public transcript is a root check. The leaf, loan id, amount, and counterparty pairing stay in witnesses.
-
-On the desk:
-
-1. A party clicks **Prove standing** after Settled
-2. The desk copies the allowlist root
-3. Switch to **Verifier**, paste the root, **Verify access**
-4. Seal is **Pass** or **Fail** — no amount, no leaf
-
-Local desk verifies against the in-memory simulator root history. Preprod verifies the pasted root against the current and historic roots read from the indexer.
+**Prove standing** builds a membership proof. That means “show I belong on the allowlist without showing which leaf.” The desk copies an allowlist **root** (a fingerprint of the guest list). The Verifier pastes that root and clicks **Verify access**. The seal is Pass or Fail.
 
 ## Next
 
 <CardGroup cols={2}>
   <Card title="Privacy" href="/docs/privacy">
-    Visible / not visible / what a verifier learns.
+    What stays secret at each step.
   </Card>
   <Card title="Desk tour" href="/docs/desk-tour">
-    Local vs Preprod and the three roles, with screenshots.
+    Screenshots and the three roles.
   </Card>
 </CardGroup>

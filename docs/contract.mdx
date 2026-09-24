@@ -1,119 +1,64 @@
 ---
 title: Contract reference
-description: Six circuits. Amount never crosses disclose().
+description: Six circuits. Amount never appears on the public loan row.
 ---
 
-Source: [`contract/tally.compact`](https://github.com/Preciousbas/tally/blob/main/contract/tally.compact). Language pragma `0.23`. Compile with Compact `+0.31.1`.
+Source file: [`contract/tally.compact`](https://github.com/Preciousbas/tally/blob/main/contract/tally.compact). Compile with Compact `0.31.1`. The desk talks to the contract through `TallyAPI` in the `api` package.
 
-TypeScript bindings live under `contract/managed/tally`. `TallyAPI` (`api/src/index.ts`) is the call surface the desk uses.
+A **ledger** is the on-chain book the contract keeps. A **circuit** is one action you can call.
 
-## Ledger
+## Public book
 
-```compact
-export ledger loans: Map<Uint<64>, LoanPublic>;
-export ledger nextId: Counter;
-export ledger relationships: HistoricMerkleTree<10, Bytes<32>>;
-export ledger nullifiers: Set<Bytes<32>>;
-```
+The contract stores:
 
-```compact
-struct LoanPublic {
-  status: LoanStatus,
-  lenderPk: Bytes<32>,
-  borrowerPk: Bytes<32>,
-  paymentCommit: Bytes<32>
-}
-```
+- A map of loans
+- The next loan id
+- An allowlist tree of settled relationships
+- A set of nullifiers (one-time settle tickets)
 
-`LoanStatus`: `Vacant`, `Offered`, `Accepted`, `Funded`, `Repaid`, `Settled`.
+Each public loan row holds status, lender Desk ID, borrower Desk ID, and a payment commitment. There is no amount field on that row.
 
-There is no amount field on `LoanPublic`.
+## Private witnesses
 
-## Witnesses
+Witnesses are private inputs. They include user secret, PIN, amount, due, and the standing proof path pieces. Circuits read them. Explorers do not print them as clear text.
 
-| Witness | Type | Used by |
-| --- | --- | --- |
-| `getUserSecret` | `Bytes<32>` | All circuits that authorize a party |
-| `getPin` | `Uint<16>` | Same |
-| `getLoanAmount` | `Uint<64>` | `offerLoan` |
-| `getDueSlot` | `Uint<64>` | `offerLoan` |
-| `getRelationshipPath` | `MerkleTreePath<10, Bytes<32>>` | `proveStanding` |
-| `getStandingLoanId` | `Uint<64>` | `proveStanding` |
-| `getStandingCounterpartyPk` | `Bytes<32>` | `proveStanding` |
+## The six circuits
 
-## Domain tags
+### offerLoan
 
-| Circuit helper | Domain string |
-| --- | --- |
-| `deriveUserPublicKey` | `tally:user:pk:v1` |
-| `relationshipLeaf` | `tally:rel:v1:repaid` |
-| `settleNullifier` | `tally:nul:v1` |
+Lender creates a loan aimed at a borrower Desk ID. Amount and due must be greater than zero. You cannot offer to yourself.
 
-`ownPublicKey()` is not called.
+### acceptLoan
 
-## Circuits
+Borrower accepts an Offered loan. Only the named Desk ID works.
 
-### `offerLoan(borrowerPk: Bytes<32>): []`
+### disburse
 
-Derives `lenderPk` from secret + PIN. Reads amount and due from witnesses. Asserts `amount > 0`, `due > 0`, `lenderPk != borrowerPk`. Increments `nextId`, inserts `LoanPublic` at `Offered` with empty `paymentCommit`.
+Lender attaches a non-zero payment commitment after Accept. Seal becomes Funded. Amount is still not a public argument.
 
-`TallyAPI.offerLoan(borrowerPkHex, amount, dueSlot)` writes those terms into private state via `withTerms`, then `callTx.offerLoan`.
+### repay
 
-### `acceptLoan(loanId: Uint<64>): []`
+Borrower marks a Funded loan as Repaid.
 
-Requires `Offered`. Caller Desk ID must equal `borrowerPk` and must not equal `lenderPk`. Status → `Accepted`.
+### settle
 
-### `disburse(loanId: Uint<64>, paymentCommit: Bytes<32>): []`
+Lender or borrower closes a Repaid loan. Inserts a nullifier and a relationship leaf. Seal becomes Settled. A second settle on the same ticket fails.
 
-Requires `Accepted`. Caller must be the lender. `paymentCommit` must not be 32 zero bytes. Status → `Funded`; grain stored on the public struct. Amount is not an argument.
+### proveStanding
 
-### `repay(loanId: Uint<64>): []`
-
-Requires `Funded`. Caller must be the borrower. Status → `Repaid`.
-
-### `settle(loanId: Uint<64>): []`
-
-Requires `Repaid`. Caller must be lender or borrower. Inserts `settleNullifier` (rejects `"already settled"`). Inserts `relationshipLeaf` into `relationships`. Status → `Settled`.
-
-### `proveStanding(): []`
-
-No public arguments. Rebuilds the leaf as lender and as borrower; asserts the path leaf matches one of those. Computes the Merkle root from `getRelationshipPath` and asserts `relationships.checkRoot`. Failures: `"not a party leaf"`, `"not on allowlist"`.
-
-`TallyAPI.proveStanding(loanId, counterpartyPkHex, relationshipLeafHex)` loads standing witnesses via `withStanding`, then `callTx.proveStanding()`. The desk builds `relationshipLeafHex` with `deriveRelationshipLeafHex` in `deskId.ts` so the path lookup matches the on-chain hash — not the simulator's toy hash.
-
-## API mapping
-
-| Compact | `TallyAPI` | `TallyCircuitKeys` |
-| --- | --- | --- |
-| `offerLoan` | `offerLoan` | `'offerLoan'` |
-| `acceptLoan` | `acceptLoan` | `'acceptLoan'` |
-| `disburse` | `disburse` | `'disburse'` |
-| `repay` | `repay` | `'repay'` |
-| `settle` | `settle` | `'settle'` |
-| `proveStanding` | `proveStanding` | `'proveStanding'` |
-
-Also: `TallyAPI.deploy`, `TallyAPI.join`.
+Builds a membership proof against the allowlist. No public amount. Failures include “not on allowlist” style errors when the leaf or root is wrong.
 
 ## Tests
 
-`contract/test/tally.test.ts` (Vitest, `npm test`) covers:
-
-- Stable Desk ID from secret + PIN; PIN or secret change changes the key
-- Offer does not store amount
-- Zero amount and self-lend reject
-- Accept only the named borrower
-- Disburse only after accept, as lender, with a non-zero grain
-- Repay as borrower; settle inserts a leaf; nullifier blocks a second settle
-- `proveStanding` happy path; stranger / unsettled / wrong root reject
-- Verifier `verifyStanding` is boolean only
+`npm test` in the contract workspace checks identity, the full loan path, nullifiers, and standing pass/fail cases.
 
 ## Next
 
 <CardGroup cols={2}>
   <Card title="Identity" href="/docs/identity">
-    `tally:user:pk:v1` and the desk secret.
+    How Desk ID ties into these circuits.
   </Card>
   <Card title="Privacy" href="/docs/privacy">
-    What disclose() never sees.
+    What the public row never holds.
   </Card>
 </CardGroup>

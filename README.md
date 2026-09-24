@@ -2,15 +2,15 @@
 
 Private bilateral trade credit on Midnight. Loan amounts and due dates stay off the public ledger. When a loan settles, you can prove repaid standing to someone new — yes or no only.
 
-[Live desk](https://tally-jet-mu.vercel.app) · [Docs](docs/index.mdx) · [Demo](docs/demo/Tally-Demo-Breathe.mp4) · [X](https://x.com/tally_midnight)
+[Live desk](https://tally-jet-mu.vercel.app) · [Docs](docs/index.mdx) · [Demo](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing) · [X](https://x.com/tally_midnight)
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
 ## Demo
 
-Walkthrough of the desk with audio: Offer → Accept → Disburse → Repay → Settle → Prove standing → Verifier Pass. Amount stays **off-ledger**.
+Desk walkthrough with audio: Offer → Accept → Disburse → Repay → Settle → Prove standing → Verifier Pass. Amount stays **off-ledger**.
 
-**Video:** [Tally Demo video](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing)
+**Video:** [Tally demo on Google Drive](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing)
 
 Docs page: [`docs/demo.mdx`](docs/demo.mdx).
 
@@ -28,13 +28,11 @@ npx mint dev --port 3333
 npm run docs:preview
 ```
 
-That serves a Tally-themed HTML preview at http://127.0.0.1:3333. Hosted docs deploy via the Mintlify dashboard (repo root `docs.json`); the existing Vercel project still serves the desk only. Details: [`docs/contributing.mdx`](docs/contributing.mdx).
+That serves a Tally-themed HTML preview at http://127.0.0.1:3333. Host docs with [Mintlify](https://mintlify.com) from this repo (`docs.json`). The Vercel project still serves the desk only.
 
 ## What this is
 
-Trade credit is pairwise. Proving “I have repaid before” usually means revealing amounts and counterparties or trusting a centralized score. Tally keeps economic terms in private witnesses and publishes only what a ledger needs for integrity: status, pseudonymous identities, a payment commitment, an allowlist root, and nullifiers.
-
-Settled loans mint a relationship leaf into a Merkle allowlist. A later membership proof answers a single question for a third party: is this identity in the allowlist? The verifier never learns the amount, the counterparty, or which loan was used.
+Two people make a private loan on Midnight. The amount and due date stay off the public book. When the loan settles, either person can prove they have repaid standing. A checker only learns yes or no. They do not learn how much was lent or who the other party was.
 
 ## Live deployment
 
@@ -50,7 +48,7 @@ Use **Lace** or **1AM** on Preprod to join the contract, or switch to **Local de
 
 ![Offer](docs/screenshots/preprod/01-offer.png)
 
-Offer on Preprod. Amount stays off-ledger; borrower is named by Desk ID, not a wallet address.
+Offer on Preprod. Amount stays off-ledger. Borrower is named by Desk ID, not a wallet address.
 
 ![Funded](docs/screenshots/preprod/03-funded.png)
 
@@ -112,7 +110,7 @@ contract         tally.compact — offerLoan, acceptLoan, disburse, repay, settl
 proof-server     Local proving for Preprod flows
 ```
 
-Identity is derived from secret + PIN (`tally:user:pk:v1`), not `ownPublicKey()`. Public state is `LoanPublic`; amount and due remain witnesses.
+Identity comes from a desk secret and PIN (`tally:user:pk:v1`). It does not use `ownPublicKey()`. Public state is `LoanPublic`. Amount and due remain witnesses.
 
 ## Setup
 

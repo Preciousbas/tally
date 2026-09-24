@@ -63,7 +63,8 @@
               "docs/privacy",
               "docs/desk-tour",
               "docs/quickstart",
-              "docs/preprod"
+              "docs/preprod",
+              "docs/demo"
             ]
           }
         ]
@@ -83,8 +84,7 @@
             "group": "Contribute",
             "pages": [
               "docs/design-system",
-              "docs/contributing",
-              "docs/demo"
+              "docs/contributing"
             ]
           }
         ]

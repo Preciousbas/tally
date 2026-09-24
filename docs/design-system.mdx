@@ -1,81 +1,58 @@
 ---
 title: Design system
-description: Warm ledger desk. Fraunces, Figtree, oxblood. Not a default SaaS kit.
+description: Warm ledger desk. Fraunces, Figtree, oxblood.
 ---
 
-Tally is archival trade-credit on Midnight, not a crypto casino. The canonical file is [`DESIGN_SYSTEM.md`](https://github.com/Preciousbas/tally/blob/main/DESIGN_SYSTEM.md) at the repo root. This page is the contributor summary. If copy or color drifts, the root file wins.
+Tally should feel like an old trade ledger, not a neon crypto casino. Long ago, people split a wooden stick to record a debt. Each person kept half. The wood had to match. Tally borrows that idea. The public chain holds the matching grain. Amount and names stay in the private halves.
 
-## Brand core
+Product name: **Tally**. Logo: the split stick in `brand/tally-stick.svg`. Desk headline: **The other half stays private.**
 
-A medieval tally stick was split down the grain. Creditor kept one half, debtor the other. Forgery failed because the wood had to match. Tally does that on Midnight: the public ledger holds the matching grain. Amount and names live only in the two private halves.
+## Colors
 
-Product name: **Tally**. Repo: `tally-midnight`. Mascot: Notch (the split stick). Logo: `brand/tally-stick.svg` — vertical stick, five notches, hairline gap. Favicon is the stick.
-
-Headline on the desk: `The other half stays private.` How-it-works is the ledger flap `How a stick is cut`, never a route or a modal.
-
-## Tokens
-
-| Slot | Value | Role |
+| Token | Value | Use |
 | --- | --- | --- |
-| `--bg` | `#1C1914` | Page background (not black) |
-| `--surface` | `#2A241C` | Cards, instrument paper |
-| `--bone` | `#E8DCC8` | Headlines, primary text |
-| `--ink` | `#C4B49A` | Body |
-| `--muted` | `#8A7A64` | Eyebrows, chain strip |
-| `--oxblood` | `#8C2F2B` | Primary action, Funded seal (2–3 uses per screen) |
-| `--moss` | `#4F6F54` | Settled only |
-| `--rule` | `#3D3428` | Hairline borders |
+| Background | `#1C1914` | Page (not pure black) |
+| Surface | `#2A241C` | Cards and instrument paper |
+| Bone | `#E8DCC8` | Headlines |
+| Ink | `#C4B49A` | Body text |
+| Muted | `#8A7A64` | Small labels |
+| Oxblood | `#8C2F2B` | Main buttons and the Funded seal (use sparingly) |
+| Moss | `#4F6F54` | Settled seal |
+| Rule | `#3D3428` | Thin borders |
 
 ## Type
 
-- Display: **Fraunces** (opsz, soft) — headlines
-- Body: **Figtree** — UI, forms, this docs body
-- Eyebrows: Figtree 600, letter-spacing 0.18em, uppercase
+- Headlines: **Fraunces**
+- Body and forms: **Figtree**
+- Small labels: Figtree, wider letter spacing, uppercase
 
-Do not use Inter, Roboto, or Space Grotesk.
+Avoid Inter, Roboto, and Space Grotesk.
 
-## Button laws
+## Buttons
 
-- Primary: oxblood fill, bone text, hover `scale(0.97)`
-- Secondary: transparent, bone border
-- Never `scale(1.02)` or grow
+Primary buttons use oxblood fill. On hover they shrink a little (`scale(0.97)`). They never grow.
 
-## Motion
+## What we refuse
 
-Desk actions are high frequency. Connect, Deploy, Preprod/Local, loan list, Offer / Accept / Repay / Settle: no animation, or ≤180ms. Purposeful motion is reserved for the grain flap, the Funded seal on status change, and Copied feedback. Cap UI transitions at 300ms. Keyboard-initiated actions: zero delay.
+No gradient text. No purple neon. No glass blur stacks. No pure white or pure black. No exclamation marks. No words like seamless, robust, empower, unlock, or supercharge. No three-column feature grids. The product is a desk of instruments, not a chart dashboard.
 
-## Rejection list
+## Desk words to keep
 
-No gradient text. No purple neon. No glassmorphism. No pure white or black. No exclamation marks. No seamless / robust / empower / unlock / supercharge. No three-column feature grids. No “unlock credit”. The product is a desk of instruments, not a dashboard.
-
-Do not bulk-install shadcn or generic dashboard kits into `leaderboard-ui`. Map any new token to the CSS variables above.
-
-## Desk copy (do not invent)
-
-| Surface | Copy |
+| Place | Words |
 | --- | --- |
-| Flap tab | How a stick is cut |
-| Offer gloss | amount and due stay private |
-| Accept gloss | borrower agrees |
-| Disburse gloss | pay out. Chain never sees how much |
-| Repay gloss | borrower pays it back |
-| Settle gloss | mint allowlist leaf |
-| Standing gloss | prove membership only |
-| Funded seal | Funded |
-| Mast | Connect Wallet |
+| Flap | How a stick is cut |
 | Amount hint | stays off-ledger |
 | Due hint | witness only |
-| Borrower id | borrower's Desk ID |
-| Join | Contract Address |
-| Amount on the row | off-ledger |
+| Borrower field | borrower's Desk ID |
+| Amount on a row | off-ledger |
 
 ## Next
 
 <CardGroup cols={2}>
   <Card title="Desk tour" href="/docs/desk-tour">
-    Where these tokens appear on the live desk.
+    Where these choices show up on screen.
   </Card>
   <Card title="Contributing" href="/docs/contributing">
-    Run the UI locally before changing tokens.
+    Run the UI before you change tokens.
   </Card>
 </CardGroup>
