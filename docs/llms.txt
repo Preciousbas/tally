@@ -22,4 +22,4 @@ Contract: 84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af
 - [Identity](https://github.com/Preciousbas/tally/blob/main/docs/identity.mdx): secret + PIN Desk ID. Not ownPublicKey().
 - [Design system](https://github.com/Preciousbas/tally/blob/main/docs/design-system.mdx): tokens and rejection list for contributors.
 - [Contributing](https://github.com/Preciousbas/tally/blob/main/docs/contributing.mdx): Node 22, Compact 0.31, test and run.
-- [Demo video](https://github.com/Preciousbas/tally/blob/main/docs/demo.mdx): silent desk walkthrough (Offer → Verifier Pass). File: [Tally-Demo-Silent.mp4](https://github.com/Preciousbas/tally/blob/main/docs/demo/Tally-Demo-Silent.mp4).
+- [Demo video](https://github.com/Preciousbas/tally/blob/main/docs/demo.mdx): desk walkthrough with audio (Offer → Verifier Pass). File: [Tally-Demo-Breathe.mp4](https://github.com/Preciousbas/tally/blob/main/docs/demo/Tally-Demo-Breathe.mp4).

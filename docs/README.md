@@ -18,11 +18,11 @@ npm run docs:preview
 
 ## Demo video
 
-Silent desk walkthrough (no narration):
+Desk walkthrough with audio:
 
 | Asset | Path |
 | --- | --- |
-| Recording | [`demo/Tally-Demo-Silent.mp4`](demo/Tally-Demo-Silent.mp4) |
+| Recording | [`demo/Tally-Demo-Breathe.mp4`](demo/Tally-Demo-Breathe.mp4) |
 | Docs page | [`demo.mdx`](demo.mdx) |
 | README | Root [`README.md`](../README.md) · section **Demo** |
 

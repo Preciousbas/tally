@@ -2,15 +2,15 @@
 
 Private bilateral trade credit on Midnight. Loan amounts and due dates stay off the public ledger. When a loan settles, you can prove repaid standing to someone new — yes or no only.
 
-[Live desk](https://tally-jet-mu.vercel.app) · [Docs](docs/index.mdx) · [Demo](docs/demo/Tally-Demo-Silent.mp4) · [X](https://x.com/tally_midnight)
+[Live desk](https://tally-jet-mu.vercel.app) · [Docs](docs/index.mdx) · [Demo](docs/demo/Tally-Demo-Breathe.mp4) · [X](https://x.com/tally_midnight)
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
 ## Demo
 
-Silent walkthrough of the desk: Offer → Accept → Disburse → Repay → Settle → Prove standing → Verifier Pass. No narration — the UI carries the explanation. Amount stays **off-ledger**.
+Walkthrough of the desk with audio: Offer → Accept → Disburse → Repay → Settle → Prove standing → Verifier Pass. Amount stays **off-ledger**.
 
-**Video:** [docs/demo/Tally-Demo-Silent.mp4](docs/demo/Tally-Demo-Silent.mp4)
+**Video:** [docs/demo/Tally-Demo-Breathe.mp4](docs/demo/Tally-Demo-Breathe.mp4)
 
 Docs page: [`docs/demo.mdx`](docs/demo.mdx).
 
