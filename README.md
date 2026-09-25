@@ -2,7 +2,7 @@
 
 Private bilateral trade credit on Midnight. Loan amounts and due dates stay off the public ledger. When a loan settles, you can prove repaid standing to someone new — yes or no only.
 
-[Live desk](https://tally-jet-mu.vercel.app) · [Docs](docs/index.mdx) · [Demo](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing) · [X](https://x.com/tally_midnight)
+[Live desk](https://tally-jet-mu.vercel.app) · [Docs](docs/index.mdx) · [Demo](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing) · [X](https://x.com/tally_lend)
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
