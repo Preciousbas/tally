@@ -4,7 +4,7 @@ Private bilateral trade credit on Midnight. Loan amounts and due dates stay off 
 
 This project is built on the Midnight Network.
 
-[Live desk](https://www.tallylend.site) · [Docs](docs/index.mdx) · [Demo](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing) · [X](https://x.com/tally_lend)
+[Live desk](https://www.tallylend.site) · [Docs](https://tally-a9233c8f.mintlify.site/) · [Demo](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing) · [X](https://x.com/tally_lend)
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
