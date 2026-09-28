@@ -40,7 +40,7 @@ Two people make a private loan on Midnight. The amount and due date stay off the
 
 | | |
 |---|---|
-| Desk | https://tally-jet-mu.vercel.app |
+| Desk | https://www.tallylend.site |
 | Network | Midnight Preprod |
 | Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
 
