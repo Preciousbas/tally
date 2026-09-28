@@ -20,7 +20,7 @@ Each public loan row holds status, lender Desk ID, borrower Desk ID, and a payme
 
 ## Private witnesses
 
-Witnesses are private inputs. They include user secret, PIN, amount, due, and the standing proof path pieces. Circuits read them. Explorers do not print them as clear text.
+Witnesses are private inputs. They include the browser secret, amount, due, and the standing proof path. The contract also mixes in a fixed public number, `1234`, when it builds a Desk ID. That number is a domain tag, not a password anyone types. Circuits read these inputs. Explorers do not print the secret, the amount, or the due date as clear text.
 
 ## The six circuits
 

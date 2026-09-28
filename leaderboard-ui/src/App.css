@@ -377,7 +377,8 @@ body {
 .join input,
 .join-rail input,
 .join-field input,
-.fields input {
+.fields input,
+.loan-find input {
   flex: 1;
   background: var(--surface-inset);
   border: 1px solid var(--rule);
@@ -394,7 +395,8 @@ body {
 .join input:focus-visible,
 .join-rail input:focus-visible,
 .join-field input:focus-visible,
-.fields input:focus-visible {
+.fields input:focus-visible,
+.loan-find input:focus-visible {
   outline: none;
   border-color: color-mix(in srgb, var(--oxblood) 50%, var(--rule));
   box-shadow: var(--focus-ring);
@@ -415,7 +417,8 @@ body {
 .join input::placeholder,
 .join-rail input::placeholder,
 .join-field input::placeholder,
-.fields input::placeholder {
+.fields input::placeholder,
+.loan-find input::placeholder {
   color: var(--muted);
   opacity: 1;
 }
@@ -652,6 +655,57 @@ dd {
   font-size: 12px;
   line-height: 1.4;
   margin: 0 0 12px;
+}
+
+.loan-find {
+  position: relative;
+  margin: 0 0 12px;
+  min-width: 0;
+}
+
+.loan-find input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding-right: 34px;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 14px;
+}
+
+.loan-find-submit {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  width: 30px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.loan-find-submit:hover {
+  color: var(--bone);
+}
+
+.loan-find-submit:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.loan-find-submit svg {
+  display: block;
+}
+
+.list-more {
+  margin-top: 12px;
 }
 
 .verifier-empty {

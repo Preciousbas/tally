@@ -48,7 +48,7 @@ What an observer **cannot** learn:
 
 - Loan **amount**
 - **Due** date / slot
-- User **secret** and **PIN**
+- User **secret** stored in the browser (this is what makes a Desk ID)
 - Which **leaf** corresponds to which real-world relationship when only a membership proof is presented
 - The economic terms of any prior loan used for standing
 
@@ -69,7 +69,7 @@ proof-server    → local proving (Docker, port 6300)
 Privacy split:
 
 - **Public ledger:** loan id, status, pseudonymous pks, payment commitment, Merkle root, nullifiers
-- **Witnesses (private):** user secret, PIN, amount, due slot, Merkle path for standing
+- **Witnesses (private):** browser secret, amount, due slot, Merkle path for standing. Desk ID also mixes in a fixed public number, `1234`. That number is not a password.
 - **Verifier output:** boolean membership only
 
 Grounded in Compact (`contract/tally.compact`): public `LoanPublic` vs witnesses; settle writes `relationshipLeaf` + `settleNullifier`; `proveStanding` checks a Merkle path against `relationships` without disclosing the leaf.

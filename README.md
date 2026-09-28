@@ -94,7 +94,7 @@ Same flow without a wallet (Demo/Simulator).
 
 - Loan amount
 - Due date
-- User secret and PIN
+- The browser secret that produces a Desk ID
 - Which allowlist leaf backs a standing proof
 - Economic terms of prior loans
 
@@ -112,7 +112,7 @@ contract         tally.compact — offerLoan, acceptLoan, disburse, repay, settl
 proof-server     Local proving for Preprod flows
 ```
 
-Identity comes from a desk secret and PIN (`tally:user:pk:v1`). It does not use `ownPublicKey()`. Public state is `LoanPublic`. Amount and due remain witnesses.
+Identity comes from a browser secret mixed with a fixed public number, `1234`. That number is a domain tag in the Desk ID hash. It is not a password and not a wallet PIN. Public state is `LoanPublic`. Amount and due remain witnesses.
 
 ## Setup
 

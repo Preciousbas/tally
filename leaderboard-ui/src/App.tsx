@@ -14,12 +14,20 @@ const SHOW_DEPLOY = DEFAULT_CONTRACT.trim().length === 0;
 
 const LACE_INSTALL = 'https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd';
 const ONEAM_INSTALL = 'https://www.1am.xyz/';
-const PRIVACY_DOC = 'https://github.com/Preciousbas/tally/blob/main/docs/privacy.mdx';
+const PRIVACY_DOC = 'https://tally-a9233c8f.mintlify.site/docs/privacy';
 
 const DESK_MODE_KEY = 'tally.deskMode';
 const LOCAL_BANNER_KEY = 'tally.localBannerDismissed';
 const LOCAL_LOANS_KEY = 'tally.localLoans.v1';
 const GRAIN_KEY = 'tally.stickCut';
+const LOAN_PAGE = 10;
+
+function loanMatchesQuery(loan: PublicLoan, rawQuery: string): boolean {
+  const q = rawQuery.trim().toLowerCase();
+  if (!q) return true;
+  if (String(loan.id).includes(q)) return true;
+  return loan.lenderPk.toLowerCase().includes(q) || loan.borrowerPk.toLowerCase().includes(q);
+}
 
 type WalletState = 'detecting' | 'no-wallet' | 'ready' | 'connecting' | 'connected';
 type Role = 'lender' | 'borrower' | 'verifier';
@@ -260,6 +268,9 @@ export default function App() {
   const [due, setDue] = useState('');
   const [paymentRef, setPaymentRef] = useState('');
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [loanQuery, setLoanQuery] = useState('');
+  const [appliedLoanQuery, setAppliedLoanQuery] = useState('');
+  const [visibleCount, setVisibleCount] = useState(LOAN_PAGE);
   const [localLoans, setLocalLoans] = useState<PublicLoan[]>(() => {
     try {
       const raw = localStorage.getItem(LOCAL_LOANS_KEY);
@@ -294,6 +305,10 @@ export default function App() {
 
   const { loans: chainLoans, refresh, allowlistRoot, allowlistRoots } = useTally(deskMode === 'chain' ? contractAddress || null : null);
   const loans = deskMode === 'local' ? localLoans : chainLoans;
+  const matchedLoans = [...loans]
+    .sort((a, b) => b.id - a.id)
+    .filter((loan) => loanMatchesQuery(loan, appliedLoanQuery));
+  const visibleLoans = matchedLoans.slice(0, visibleCount);
   const selected = loans.find((l) => l.id === selectedId) ?? loans[loans.length - 1];
   const selectedWalletName =
     walletOptions.find((w) => w.id === selectedWalletId)?.name
@@ -985,21 +1000,58 @@ export default function App() {
           {deskMode === 'local' && (
             <p className="quiet list-note">Local instruments are session-only for circuits. History may restore as a list after refresh.</p>
           )}
+          <form
+            className="loan-find"
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setAppliedLoanQuery(loanQuery);
+              setVisibleCount(LOAN_PAGE);
+            }}
+          >
+            <input
+              value={loanQuery}
+              onChange={(e) => setLoanQuery(e.target.value)}
+              placeholder="Loan id or Desk ID"
+              aria-label="Loan id or Desk ID"
+              autoComplete="off"
+              spellCheck={false}
+            />
+            <button type="submit" className="loan-find-submit" aria-label="Search">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="6.75" cy="6.75" r="4.25" stroke="currentColor" strokeWidth="1.25" />
+                <path d="M10.15 10.15L13.4 13.4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+              </svg>
+            </button>
+          </form>
           {loans.length === 0 ? (
             <p className="quiet">No instruments yet.</p>
+          ) : matchedLoans.length === 0 ? (
+            <p className="quiet">No matching instrument.</p>
           ) : (
-            loans.map((loan) => (
-              <button
-                key={loan.id}
-                type="button"
-                className={`row ${selected?.id === loan.id ? 'active' : ''}`}
-                onClick={() => setSelectedId(loan.id)}
-                aria-current={selected?.id === loan.id ? 'true' : undefined}
-              >
-                <span>#{loan.id}</span>
-                <span className={`seal ${loan.status.toLowerCase()}`} aria-label={`Status ${loan.status}`}>{loan.status}</span>
-              </button>
-            ))
+            <>
+              {visibleLoans.map((loan) => (
+                <button
+                  key={loan.id}
+                  type="button"
+                  className={`row ${selected?.id === loan.id ? 'active' : ''}`}
+                  onClick={() => setSelectedId(loan.id)}
+                  aria-current={selected?.id === loan.id ? 'true' : undefined}
+                >
+                  <span>#{loan.id}</span>
+                  <span className={`seal ${loan.status.toLowerCase()}`} aria-label={`Status ${loan.status}`}>{loan.status}</span>
+                </button>
+              ))}
+              {visibleCount < matchedLoans.length && (
+                <button
+                  type="button"
+                  className="btn list-more"
+                  onClick={() => setVisibleCount((count) => count + LOAN_PAGE)}
+                >
+                  Show more
+                </button>
+              )}
+            </>
           )}
         </aside>
 
