@@ -11,9 +11,11 @@ When a lender makes an offer on Preprod, they paste the borrower’s Desk ID int
 
 ## How the desk builds a Desk ID
 
-The desk keeps a **secret** on your computer (random bytes saved in the browser). It also uses a small number called a **PIN**. The Compact contract mixes secret and PIN into one public code. Same secret and same PIN always make the same Desk ID. A different browser profile usually has a different secret. That is why a two-person demo often uses two Chrome profiles on one machine.
+The real key is a browser secret. The desk saves it in localStorage under the key `tally-midnight-secret`. Whoever copies that secret can act as that Desk ID.
 
-The desk does not ask you to type a PIN in the UI right now. The PIN is a fixed witness value in the code (`1234`). A **witness** is a private fact the circuit checks. The public chain does not print it.
+The number `1234` is a fixed public mix-in in the Desk ID hash. It is a domain tag in the code, not a password anyone types. The desk never asks for it. The same secret and the same mix-in always make the same Desk ID. A different browser profile usually has a different secret. That is why a two-person demo often uses two Chrome profiles on one machine.
+
+The wallet only pays fees. Lace or 1AM is not the Desk ID.
 
 ## What you paste into Borrower id
 

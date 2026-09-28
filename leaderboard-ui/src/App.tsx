@@ -10,6 +10,7 @@ import { DESK_PIN, deriveRelationshipLeafHex, getBrowserDeskIdHex } from './desk
 
 const NETWORK_ID = import.meta.env.VITE_NETWORK_ID ?? 'preprod';
 const DEFAULT_CONTRACT = import.meta.env.VITE_DEFAULT_CONTRACT ?? '';
+const SHOW_DEPLOY = DEFAULT_CONTRACT.trim().length === 0;
 
 const LACE_INSTALL = 'https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd';
 const ONEAM_INSTALL = 'https://www.1am.xyz/';
@@ -747,6 +748,8 @@ export default function App() {
 
   const deploy = async () => {
     if (!requireWallet() || !walletAPI) return;
+    const addressBefore = (joinInput || contractAddress).trim();
+    if (addressBefore) return;
     setBusy('Deploying');
     try {
       getManager().setPreferredWallet(walletAPI);
@@ -915,7 +918,9 @@ export default function App() {
           </div>
           <div className="join-actions">
             <button type="submit" className="btn">Join</button>
-            <button type="button" className="btn" onClick={deploy} disabled={!isConnected || !!busy}>Deploy</button>
+            {SHOW_DEPLOY && (
+              <button type="button" className="btn" onClick={deploy} disabled={!isConnected || !!busy}>Deploy</button>
+            )}
             <button
               type="button"
               className="btn"

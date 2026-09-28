@@ -7,7 +7,7 @@ Preprod is Midnight’s public test network. You will use the same seals as Loca
 
 | | |
 | --- | --- |
-| Desk | [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app) |
+| Desk | [https://www.tallylend.site](https://www.tallylend.site) |
 | Network | Midnight Preprod |
 | Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
 | Faucet | [https://midnight-tmnight-preprod.nethermind.dev/](https://midnight-tmnight-preprod.nethermind.dev/) |
@@ -29,7 +29,7 @@ If the browser console shows `localhost:6300` connection refused, either start D
 
 ## Open the desk
 
-1. Go to [https://tally-jet-mu.vercel.app](https://tally-jet-mu.vercel.app)
+1. Go to [https://www.tallylend.site](https://www.tallylend.site)
 2. Stay on **Preprod**
 3. Click **Connect Wallet**
 
@@ -44,13 +44,13 @@ cd .. && npm run dev --workspace leaderboard-ui -- --mode preprod
 
 ## Join the contract
 
-Paste this address (64 hex characters) and click **Join**:
+The public desk is one shared Preprod contract. The address is already on the page, in the Join field and in the trust strip. You can copy it. Stay on that address and click **Join**.
 
 ```
 84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af
 ```
 
-**Deploy** creates a fresh contract if you want your own instance. Share the new address so the Borrower profile can Join the same one.
+Lender and Borrower both Join this same address. They do not each create a new book.
 
 ## Desk ID on Preprod
 
