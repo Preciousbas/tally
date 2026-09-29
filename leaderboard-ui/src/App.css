@@ -88,6 +88,40 @@ body {
   max-width: 36rem;
 }
 
+.start-card {
+  margin: 28px 0 8px;
+  max-width: 38rem;
+  padding: 22px 22px 18px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+}
+
+.start-card h2 {
+  font-family: Fraunces, serif;
+  font-weight: 560;
+  font-size: 1.6rem;
+  color: var(--bone);
+  margin: 0 0 14px;
+}
+
+.start-card ol {
+  margin: 0 0 16px;
+  padding-left: 1.2rem;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.start-card li + li { margin-top: 8px; }
+
+.start-card a {
+  color: var(--bone);
+  text-underline-offset: 3px;
+}
+
+.start-demo { margin-bottom: 8px; }
+
+.start-card .quiet { margin: 0; }
+
 .install-links {
   display: flex;
   flex-wrap: wrap;

@@ -15,9 +15,9 @@ const SHOW_DEPLOY = DEFAULT_CONTRACT.trim().length === 0;
 const LACE_INSTALL = 'https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd';
 const ONEAM_INSTALL = 'https://www.1am.xyz/';
 const PRIVACY_DOC = 'https://tally-a9233c8f.mintlify.site/docs/privacy';
+const PREPROD_FAUCET = 'https://faucet.preprod.midnight.network/';
 
-const DESK_MODE_KEY = 'tally.deskMode';
-const LOCAL_BANNER_KEY = 'tally.localBannerDismissed';
+const DESK_MODE_KEY = 'tally.deskMode.v2';
 const LOCAL_LOANS_KEY = 'tally.localLoans.v1';
 const GRAIN_KEY = 'tally.stickCut';
 const LOAN_PAGE = 10;
@@ -239,14 +239,6 @@ function readStoredDeskMode(): DeskMode {
   return 'chain';
 }
 
-function readBannerDismissed(): boolean {
-  try {
-    return localStorage.getItem(LOCAL_BANNER_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
 export default function App() {
   const [walletState, setWalletState] = useState<WalletState>('detecting');
   const [walletOptions, setWalletOptions] = useState<WalletOption[]>([]);
@@ -285,10 +277,7 @@ export default function App() {
   const [standingRoot, setStandingRoot] = useState<string | null>(null);
   const [standingResult, setStandingResult] = useState<StandingResult>(null);
   const [verifyRootInput, setVerifyRootInput] = useState('');
-  const [showLocalBanner, setShowLocalBanner] = useState(() => !readBannerDismissed());
-  const [isMobile, setIsMobile] = useState(false);
   const [deskReady, setDeskReady] = useState(false);
-  const autoLocalOnce = useRef(false);
 
   const simRef = useRef(new TallySimulator());
   const keysRef = useRef({
@@ -337,14 +326,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 640px)');
-    const sync = () => setIsMobile(mq.matches);
-    sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
-  }, []);
-
-  useEffect(() => {
     try {
       localStorage.setItem(DESK_MODE_KEY, deskMode);
     } catch {
@@ -388,13 +369,6 @@ export default function App() {
     }, 100);
     return () => clearInterval(t);
   }, []);
-
-  useEffect(() => {
-    if (walletState !== 'no-wallet' || autoLocalOnce.current) return;
-    autoLocalOnce.current = true;
-    setDeskMode('local');
-    setShowLocalBanner(true);
-  }, [walletState]);
 
   useEffect(() => {
     if (!selectedWalletId) {
@@ -781,15 +755,6 @@ export default function App() {
     }
   };
 
-  const dismissLocalBanner = () => {
-    setShowLocalBanner(false);
-    try {
-      localStorage.setItem(LOCAL_BANNER_KEY, '1');
-    } catch {
-      /* ignore */
-    }
-  };
-
   const isConnected = walletState === 'connected';
   const actionHint =
     role === 'lender'
@@ -883,8 +848,33 @@ export default function App() {
         </div>
       </header>
       <p className="mast-hint">
-        Preprod needs Lace or 1AM. Or switch to Local desk to run the full demo without a wallet.
+        Preprod is the live test network. A wallet records your activity on chain.
       </p>
+
+      {walletState === 'no-wallet' && deskMode === 'chain' && (
+        <section className="start-card" aria-labelledby="start-title">
+          <p className="eyebrow">Get started</p>
+          <h2 id="start-title">Get started in 3 steps</h2>
+          <ol>
+            <li>
+              Install{' '}
+              <a href={LACE_INSTALL} target="_blank" rel="noreferrer">Lace</a>
+              {' '}or{' '}
+              <a href={ONEAM_INSTALL} target="_blank" rel="noreferrer">1AM</a>.
+            </li>
+            <li>
+              Set the wallet to Preprod. Request free tNIGHT from the{' '}
+              <a href={PREPROD_FAUCET} target="_blank" rel="noreferrer">Midnight Preprod faucet</a>
+              , then generate tDUST in the wallet.
+            </li>
+            <li>Come back, connect, and make your first offer or join.</li>
+          </ol>
+          <button type="button" className="btn start-demo" onClick={() => setDeskMode('local')}>
+            Just looking? Try the demo without a wallet
+          </button>
+          <p className="quiet">This demo stays in the browser. It does not count on chain.</p>
+        </section>
+      )}
 
       <section className="hero">
         <h2>The other half stays private.</h2>
@@ -947,16 +937,6 @@ export default function App() {
         </form>
       )}
 
-      {showLocalBanner && isMobile && deskMode === 'chain' && (
-        <div className="notice notice-info" role="status">
-          <span>Try Local Desk first without any wallet.</span>
-          <div className="notice-actions">
-            <button type="button" onClick={() => { setDeskMode('local'); dismissLocalBanner(); }}>Local desk</button>
-            <button type="button" onClick={dismissLocalBanner}>Close</button>
-          </div>
-        </div>
-      )}
-
       {error && (
         <div className="notice" role="alert">
           <span>{error}</span>
@@ -978,7 +958,7 @@ export default function App() {
             <button type="button" className={deskMode === 'local' ? 'on' : ''} onClick={() => setDeskMode('local')}>Local desk</button>
           </div>
           <p className="seg-caption">
-            {deskMode === 'chain' ? 'Midnight Preprod' : 'Demo/Simulator'}
+            {deskMode === 'chain' ? 'Midnight Preprod' : 'Demo only. Not recorded on Preprod.'}
           </p>
         </div>
 
