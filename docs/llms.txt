@@ -2,7 +2,7 @@
 
 > Tally is private trade credit on Midnight. Amount stays off the public book. After settle, standing is yes or no only.
 
-Live desk: https://tally-jet-mu.vercel.app
+Live desk: https://www.tallylend.site
 Network: Midnight Preprod
 Contract: 84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af
 Demo video: https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing

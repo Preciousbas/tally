@@ -8,6 +8,14 @@ This project is built on the Midnight Network.
 
 [![ci](https://github.com/Preciousbas/tally/actions/workflows/ci.yml/badge.svg)](https://github.com/Preciousbas/tally/actions/workflows/ci.yml)
 
+## Try Tally in 5 minutes
+
+1. Install [Lace](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd) or [1AM](https://www.1am.xyz/).
+2. Set the wallet to Preprod. Request free tNIGHT from the [Midnight Preprod faucet](https://faucet.preprod.midnight.network/), then generate tDUST in the wallet.
+3. Open [the desk](https://www.tallylend.site), connect, and click Offer. Name the other person with their Desk ID.
+
+The local demo is on the same page if you want to look without a wallet. It does not count on chain.
+
 ## Demo
 
 Desk walkthrough with audio: Offer → Accept → Disburse → Repay → Settle → Prove standing → Verifier Pass. Amount stays **off-ledger**.
@@ -45,6 +53,20 @@ Two people make a private loan on Midnight. The amount and due date stay off the
 | Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
 
 Use **Lace** or **1AM** on Preprod to join the contract, or switch to **Local desk** for a full in-browser demo with no wallet.
+
+## Testers and feedback
+
+Public proof of use and notes from testers:
+
+- [docs/USERS.md](docs/USERS.md)
+- [docs/FEEDBACK.md](docs/FEEDBACK.md)
+
+To record testers, add these in the Vercel project:
+
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+
+Then export with `node --experimental-strip-types scripts/export-users.ts` and `node --experimental-strip-types scripts/export-feedback.ts`.
 
 ## Product tour
 

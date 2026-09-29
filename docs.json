@@ -17,7 +17,7 @@
   "logo": {
     "light": "/docs/images/tally-stick.svg",
     "dark": "/docs/images/tally-stick.svg",
-    "href": "https://tally-jet-mu.vercel.app"
+    "href": "https://www.tallylend.site"
   },
   "favicon": "/docs/favicon.svg",
   "appearance": {
@@ -41,7 +41,7 @@
     "primary": {
       "type": "button",
       "label": "Open desk",
-      "href": "https://tally-jet-mu.vercel.app"
+      "href": "https://www.tallylend.site"
     }
   },
   "footer": {

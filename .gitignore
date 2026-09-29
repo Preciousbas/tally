@@ -38,6 +38,7 @@ jspm_packages/
 *.key
 credentials.json
 service-account*.json
+README.md
 
 # Keep public Preprod Vite config (no secrets; URLs only)
 !leaderboard-ui/.env.preprod
@@ -76,7 +77,6 @@ ehthumbs.db
 docs/.preview/
 
 # Midnight template / community boilerplate (not the Tally product surface)
-CHANGELOG.md
 CODEOWNERS
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
