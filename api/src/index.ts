@@ -51,6 +51,11 @@ async function requirePrivateState(psp: {
   return current;
 }
 
+function publicTxId(result: { public?: { txId?: unknown } } | null | undefined): string {
+  const id = result?.public?.txId;
+  return id == null ? '' : String(id);
+}
+
 export class TallyAPI {
   private constructor(
     public readonly deployedContract: DeployedTallyContract,
@@ -84,28 +89,33 @@ export class TallyAPI {
   readonly deployedContractAddress: ContractAddress;
   readonly state$: Observable<TallyDerivedState>;
 
-  async offerLoan(borrowerPkHex: string, amount: bigint, dueSlot: bigint): Promise<void> {
+  async offerLoan(borrowerPkHex: string, amount: bigint, dueSlot: bigint): Promise<string> {
     const psp = this.providers.privateStateProvider;
     psp.setContractAddress(this.deployedContractAddress);
     const current = await requirePrivateState(psp);
     await psp.set(tallyPrivateStateKey, withTerms(current, amount, dueSlot));
-    await (this.deployedContract as any).callTx.offerLoan(utils.encodePk(borrowerPkHex));
+    const submitted = await (this.deployedContract as any).callTx.offerLoan(utils.encodePk(borrowerPkHex));
+    return publicTxId(submitted);
   }
 
-  async acceptLoan(loanId: number): Promise<void> {
-    await (this.deployedContract as any).callTx.acceptLoan(BigInt(loanId));
+  async acceptLoan(loanId: number): Promise<string> {
+    const submitted = await (this.deployedContract as any).callTx.acceptLoan(BigInt(loanId));
+    return publicTxId(submitted);
   }
 
-  async disburse(loanId: number, paymentCommitHex: string): Promise<void> {
-    await (this.deployedContract as any).callTx.disburse(BigInt(loanId), utils.encodePk(paymentCommitHex));
+  async disburse(loanId: number, paymentCommitHex: string): Promise<string> {
+    const submitted = await (this.deployedContract as any).callTx.disburse(BigInt(loanId), utils.encodePk(paymentCommitHex));
+    return publicTxId(submitted);
   }
 
-  async repay(loanId: number): Promise<void> {
-    await (this.deployedContract as any).callTx.repay(BigInt(loanId));
+  async repay(loanId: number): Promise<string> {
+    const submitted = await (this.deployedContract as any).callTx.repay(BigInt(loanId));
+    return publicTxId(submitted);
   }
 
-  async settle(loanId: number): Promise<void> {
-    await (this.deployedContract as any).callTx.settle(BigInt(loanId));
+  async settle(loanId: number): Promise<string> {
+    const submitted = await (this.deployedContract as any).callTx.settle(BigInt(loanId));
+    return publicTxId(submitted);
   }
 
   /**
@@ -116,7 +126,7 @@ export class TallyAPI {
     loanId: number,
     counterpartyPkHex: string,
     relationshipLeafHex: string,
-  ): Promise<void> {
+  ): Promise<string> {
     const psp = this.providers.privateStateProvider;
     psp.setContractAddress(this.deployedContractAddress);
     const current = await requirePrivateState(psp);
@@ -130,7 +140,8 @@ export class TallyAPI {
         utils.fromHex(leafHex.padStart(64, '0').slice(0, 64)),
       ),
     );
-    await (this.deployedContract as any).callTx.proveStanding();
+    const submitted = await (this.deployedContract as any).callTx.proveStanding();
+    return publicTxId(submitted);
   }
 
   static async deploy(providers: TallyProviders, secretKey: Uint8Array, logger?: Logger): Promise<TallyAPI> {

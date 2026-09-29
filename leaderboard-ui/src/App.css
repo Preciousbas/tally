@@ -120,7 +120,23 @@ body {
 
 .start-demo { margin-bottom: 8px; }
 
-.start-card .quiet { margin: 0; }
+.tester-count {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.consent-line {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--ink);
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+
+.consent-line input { margin-top: 4px; }
 
 .install-links {
   display: flex;

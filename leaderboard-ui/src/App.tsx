@@ -20,7 +20,18 @@ const PREPROD_FAUCET = 'https://faucet.preprod.midnight.network/';
 const DESK_MODE_KEY = 'tally.deskMode.v2';
 const LOCAL_LOANS_KEY = 'tally.localLoans.v1';
 const GRAIN_KEY = 'tally.stickCut';
+const CONSENT_KEY = 'tally.testerConsent';
 const LOAN_PAGE = 10;
+
+function readConsent(): 'yes' | 'no' | null {
+  try {
+    const value = localStorage.getItem(CONSENT_KEY);
+    if (value === 'yes' || value === 'no') return value;
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
 
 function loanMatchesQuery(loan: PublicLoan, rawQuery: string): boolean {
   const q = rawQuery.trim().toLowerCase();
@@ -246,6 +257,10 @@ export default function App() {
   const [walletAPI, setWalletAPI] = useState<InitialAPI | undefined>();
   const [wallet, setWallet] = useState<ConnectedAPI | null>(null);
   const [address, setAddress] = useState<string | null>(null);
+  const [testerConsent, setTesterConsent] = useState<'yes' | 'no' | null>(() => readConsent());
+  const [countMe, setCountMe] = useState(false);
+  const [testerCount, setTesterCount] = useState<number | null>(null);
+  const [testerLogReady, setTesterLogReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [contractAddress, setContractAddress] = useState(DEFAULT_CONTRACT);
@@ -291,6 +306,42 @@ export default function App() {
     }
     return managerRef.current;
   }, []);
+
+  const refreshTesterCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/users');
+      if (!res.ok) return;
+      const body = (await res.json()) as { count?: number; configured?: boolean };
+      setTesterLogReady(Boolean(body.configured));
+      if (typeof body.count === 'number') setTesterCount(body.count);
+    } catch {
+      setTesterLogReady(false);
+    }
+  }, []);
+
+  const logOnChain = useCallback(async (action: string, txId: string, usedContract: string) => {
+    if (readConsent() !== 'yes' || !address || !txId) return;
+    try {
+      await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: address,
+          action,
+          txId,
+          contractAddress: usedContract,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      await refreshTesterCount();
+    } catch {
+      /* the chain action already succeeded */
+    }
+  }, [address, refreshTesterCount]);
+
+  useEffect(() => {
+    void refreshTesterCount();
+  }, [refreshTesterCount]);
 
   const { loans: chainLoans, refresh, allowlistRoot, allowlistRoots } = useTally(deskMode === 'chain' ? contractAddress || null : null);
   const loans = deskMode === 'local' ? localLoans : chainLoans;
@@ -519,7 +570,9 @@ export default function App() {
     try {
       const result = await resolveApi();
       if (!contractAddress) setContractAddress(result.api.deployedContractAddress);
-      await result.api.offerLoan(borrowerPk, amt, dueDays);
+      const txId = await result.api.offerLoan(borrowerPk, amt, dueDays);
+      const usedContract = result.api.deployedContractAddress || contractAddress;
+      void logOnChain('offer', txId, usedContract);
       setToast('Offered — switch to Borrower to Accept.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -543,7 +596,8 @@ export default function App() {
     setBusy('Accepting');
     try {
       const result = await resolveApi();
-      await result.api.acceptLoan(selected.id);
+      const txId = await result.api.acceptLoan(selected.id);
+      void logOnChain('accept', txId, result.api.deployedContractAddress || contractAddress);
       setToast('Accepted — switch to Lender to Disburse.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -570,7 +624,8 @@ export default function App() {
     setBusy('Disbursing');
     try {
       const result = await resolveApi();
-      await result.api.disburse(selected.id, grain);
+      const txId = await result.api.disburse(selected.id, grain);
+      void logOnChain('disburse', txId, result.api.deployedContractAddress || contractAddress);
       setToast('Funded — switch to Borrower to Repay.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -594,7 +649,8 @@ export default function App() {
     setBusy('Repaying');
     try {
       const result = await resolveApi();
-      await result.api.repay(selected.id);
+      const txId = await result.api.repay(selected.id);
+      void logOnChain('repay', txId, result.api.deployedContractAddress || contractAddress);
       setToast('Repaid — Settle to mint the allowlist leaf.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -618,7 +674,8 @@ export default function App() {
     setBusy('Settling');
     try {
       const result = await resolveApi();
-      await result.api.settle(selected.id);
+      const txId = await result.api.settle(selected.id);
+      void logOnChain('settle', txId, result.api.deployedContractAddress || contractAddress);
       setToast('Settled — Prove standing, then Verifier can Verify access.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -668,7 +725,8 @@ export default function App() {
       const result = await resolveApi();
       const counterparty = role === 'lender' ? selected.borrowerPk : selected.lenderPk;
       const leafHex = deriveRelationshipLeafHex(selected.id, selected.lenderPk, selected.borrowerPk);
-      await result.api.proveStanding(selected.id, counterparty, leafHex);
+      const txId = await result.api.proveStanding(selected.id, counterparty, leafHex);
+      void logOnChain('proveStanding', txId, result.api.deployedContractAddress || contractAddress);
       const snapshot = await refresh();
       const root = snapshot?.allowlistRoot ?? allowlistRoot ?? null;
       if (!root) {
@@ -842,6 +900,9 @@ export default function App() {
         <div className="brand">
           <img src="/tally-stick.svg" alt="" width={18} height={60} />
           <h1>Tally</h1>
+          {testerLogReady && testerCount !== null && (
+            <p className="tester-count">{testerCount} testers on Preprod</p>
+          )}
         </div>
         <div className="mast-actions">
           {walletGate}
@@ -896,6 +957,26 @@ export default function App() {
         <span className="trust-sep" aria-hidden="true">·</span>
         <a href={PRIVACY_DOC} target="_blank" rel="noreferrer">Privacy model</a>
       </div>
+
+      {isConnected && deskMode === 'chain' && testerConsent === null && (
+        <section className="start-card" aria-labelledby="consent-title">
+          <h2 id="consent-title">Count this wallet</h2>
+          <label className="consent-line">
+            <input type="checkbox" checked={countMe} onChange={(e) => setCountMe(e.target.checked)} />
+            <span>Count me as a Tally tester. My wallet address will be listed publicly as proof of use.</span>
+          </label>
+          <div className="notice-actions">
+            <button type="button" className="btn primary" disabled={!countMe} onClick={() => {
+              localStorage.setItem(CONSENT_KEY, 'yes');
+              setTesterConsent('yes');
+            }}>Save</button>
+            <button type="button" className="btn" onClick={() => {
+              localStorage.setItem(CONSENT_KEY, 'no');
+              setTesterConsent('no');
+            }}>Not now</button>
+          </div>
+        </section>
+      )}
 
       {deskMode === 'chain' && (
         <form
