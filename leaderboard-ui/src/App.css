@@ -136,7 +136,39 @@ body {
   margin-bottom: 14px;
 }
 
-.consent-line input { margin-top: 4px; }
+.desk-foot {
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.feedback-card { margin-top: 24px; }
+
+.feedback-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-row { display: flex; gap: 8px; margin: 12px 0; }
+
+.feedback-card label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+
+.feedback-card input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  background: var(--surface-inset);
+  color: var(--bone);
+  border: 1px solid var(--rule);
+  padding: 8px 10px;
+  font: inherit;
+}
 
 .install-links {
   display: flex;

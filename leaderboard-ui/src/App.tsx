@@ -261,6 +261,12 @@ export default function App() {
   const [countMe, setCountMe] = useState(false);
   const [testerCount, setTesterCount] = useState<number | null>(null);
   const [testerLogReady, setTesterLogReady] = useState(false);
+  const [askFeedback, setAskFeedback] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [confused, setConfused] = useState('');
+  const [wish, setWish] = useState('');
+  const [xHandle, setXHandle] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [contractAddress, setContractAddress] = useState(DEFAULT_CONTRACT);
@@ -338,6 +344,18 @@ export default function App() {
       /* the chain action already succeeded */
     }
   }, [address, refreshTesterCount]);
+
+  const noteChainSuccess = useCallback((action: string, txId: string, usedContract: string) => {
+    void logOnChain(action, txId, usedContract);
+    try {
+      if (localStorage.getItem('tally.feedbackDone') === '1') return;
+      if (localStorage.getItem('tally.feedbackPrompted') === '1') return;
+      localStorage.setItem('tally.feedbackPrompted', '1');
+    } catch {
+      /* ignore */
+    }
+    setAskFeedback(true);
+  }, [logOnChain]);
 
   useEffect(() => {
     void refreshTesterCount();
@@ -572,7 +590,7 @@ export default function App() {
       if (!contractAddress) setContractAddress(result.api.deployedContractAddress);
       const txId = await result.api.offerLoan(borrowerPk, amt, dueDays);
       const usedContract = result.api.deployedContractAddress || contractAddress;
-      void logOnChain('offer', txId, usedContract);
+      void noteChainSuccess('offer', txId, usedContract);
       setToast('Offered — switch to Borrower to Accept.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -597,7 +615,7 @@ export default function App() {
     try {
       const result = await resolveApi();
       const txId = await result.api.acceptLoan(selected.id);
-      void logOnChain('accept', txId, result.api.deployedContractAddress || contractAddress);
+      void noteChainSuccess('accept', txId, result.api.deployedContractAddress || contractAddress);
       setToast('Accepted — switch to Lender to Disburse.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -625,7 +643,7 @@ export default function App() {
     try {
       const result = await resolveApi();
       const txId = await result.api.disburse(selected.id, grain);
-      void logOnChain('disburse', txId, result.api.deployedContractAddress || contractAddress);
+      void noteChainSuccess('disburse', txId, result.api.deployedContractAddress || contractAddress);
       setToast('Funded — switch to Borrower to Repay.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -650,7 +668,7 @@ export default function App() {
     try {
       const result = await resolveApi();
       const txId = await result.api.repay(selected.id);
-      void logOnChain('repay', txId, result.api.deployedContractAddress || contractAddress);
+      void noteChainSuccess('repay', txId, result.api.deployedContractAddress || contractAddress);
       setToast('Repaid — Settle to mint the allowlist leaf.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -675,7 +693,7 @@ export default function App() {
     try {
       const result = await resolveApi();
       const txId = await result.api.settle(selected.id);
-      void logOnChain('settle', txId, result.api.deployedContractAddress || contractAddress);
+      void noteChainSuccess('settle', txId, result.api.deployedContractAddress || contractAddress);
       setToast('Settled — Prove standing, then Verifier can Verify access.');
       setTimeout(() => refresh(), 2500);
     } catch (e) {
@@ -726,7 +744,7 @@ export default function App() {
       const counterparty = role === 'lender' ? selected.borrowerPk : selected.lenderPk;
       const leafHex = deriveRelationshipLeafHex(selected.id, selected.lenderPk, selected.borrowerPk);
       const txId = await result.api.proveStanding(selected.id, counterparty, leafHex);
-      void logOnChain('proveStanding', txId, result.api.deployedContractAddress || contractAddress);
+      void noteChainSuccess('proveStanding', txId, result.api.deployedContractAddress || contractAddress);
       const snapshot = await refresh();
       const root = snapshot?.allowlistRoot ?? allowlistRoot ?? null;
       if (!root) {
@@ -814,6 +832,34 @@ export default function App() {
   };
 
   const isConnected = walletState === 'connected';
+
+  const sendFeedback = async () => {
+    if (rating < 1) {
+      setError('Choose a rating from 1 to 5.');
+      return;
+    }
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: address ?? '',
+          rating,
+          confused,
+          add: wish,
+          xHandle,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      localStorage.setItem('tally.feedbackDone', '1');
+      setAskFeedback(false);
+      setFeedbackOpen(false);
+      setToast('Feedback saved.');
+    } catch {
+      setError('Feedback could not be saved.');
+    }
+  };
+
   const actionHint =
     role === 'lender'
       ? selected?.status === 'Accepted'
@@ -1277,6 +1323,41 @@ export default function App() {
           )}
         </article>
       </main>
+
+      {(askFeedback || feedbackOpen) && (
+        <section className="start-card feedback-card" aria-labelledby="feedback-title">
+          <div className="feedback-head">
+            <h2 id="feedback-title">Feedback</h2>
+            <button type="button" className="btn" onClick={() => {
+              setAskFeedback(false);
+              setFeedbackOpen(false);
+            }}>Close</button>
+          </div>
+          <p className="quiet">What was the desk like on this pass?</p>
+          <div className="rating-row" role="group" aria-label="Rating from 1 to 5">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button key={n} type="button" className={rating === n ? 'btn primary' : 'btn'} onClick={() => setRating(n)}>{n}</button>
+            ))}
+          </div>
+          <label>
+            What confused you?
+            <input value={confused} onChange={(e) => setConfused(e.target.value)} />
+          </label>
+          <label>
+            What should we add?
+            <input value={wish} onChange={(e) => setWish(e.target.value)} />
+          </label>
+          <label>
+            X handle, optional
+            <input value={xHandle} onChange={(e) => setXHandle(e.target.value)} placeholder="@name" />
+          </label>
+          <button type="button" className="btn primary" onClick={() => void sendFeedback()}>Send</button>
+        </section>
+      )}
+
+      <footer className="desk-foot">
+        <button type="button" className="btn" onClick={() => setFeedbackOpen(true)}>Feedback</button>
+      </footer>
     </div>
   );
 }
