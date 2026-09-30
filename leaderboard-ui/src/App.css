@@ -170,6 +170,22 @@ body {
   font: inherit;
 }
 
+.feedback-msg.error {
+  margin: 12px 0 0;
+  padding: 8px 10px;
+  color: var(--bone);
+  background: var(--surface-inset);
+  border-left: 3px solid var(--oxblood);
+}
+
+.hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .install-links {
   display: flex;
   flex-wrap: wrap;

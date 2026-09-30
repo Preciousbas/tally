@@ -267,6 +267,9 @@ export default function App() {
   const [confused, setConfused] = useState('');
   const [wish, setWish] = useState('');
   const [xHandle, setXHandle] = useState('');
+  const [website, setWebsite] = useState('');
+  const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [contractAddress, setContractAddress] = useState(DEFAULT_CONTRACT);
@@ -834,29 +837,52 @@ export default function App() {
   const isConnected = walletState === 'connected';
 
   const sendFeedback = async () => {
-    if (rating < 1) {
-      setError('Choose a rating from 1 to 5.');
+    if (feedbackStatus === 'sending') return;
+    if (rating < 1 && !confused.trim() && !wish.trim()) {
+      setFeedbackStatus('error');
+      setFeedbackError('Add a rating or a note.');
       return;
     }
+    setFeedbackStatus('sending');
+    setFeedbackError(null);
     try {
-      await fetch('/api/feedback', {
+      const res = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: address ?? '',
-          rating,
+          rating: rating >= 1 ? rating : undefined,
           confused,
           add: wish,
           xHandle,
-          timestamp: new Date().toISOString(),
+          walletAddress: address ?? undefined,
+          page: window.location.pathname,
+          desk: deskMode,
+          website,
         }),
       });
+      const type = res.headers.get('content-type') ?? '';
+      const body = type.includes('application/json') ? await res.json().catch(() => null) : null;
+      if (!res.ok || !type.includes('application/json')) {
+        const message = body && typeof body.error === 'string'
+          ? body.error
+          : 'Feedback could not be saved. Try again later.';
+        setFeedbackStatus('error');
+        setFeedbackError(message);
+        return;
+      }
       localStorage.setItem('tally.feedbackDone', '1');
+      setRating(0);
+      setConfused('');
+      setWish('');
+      setXHandle('');
+      setWebsite('');
+      setFeedbackStatus('sent');
       setAskFeedback(false);
       setFeedbackOpen(false);
       setToast('Feedback saved.');
     } catch {
-      setError('Feedback could not be saved.');
+      setFeedbackStatus('error');
+      setFeedbackError('Feedback could not be saved. Try again later.');
     }
   };
 
@@ -1341,22 +1367,33 @@ export default function App() {
           </div>
           <label>
             What confused you?
-            <input value={confused} onChange={(e) => setConfused(e.target.value)} />
+            <input maxLength={1000} value={confused} onChange={(e) => setConfused(e.target.value)} />
+            {confused.length > 900 && <span className="quiet">{confused.length} / 1000</span>}
           </label>
           <label>
             What should we add?
-            <input value={wish} onChange={(e) => setWish(e.target.value)} />
+            <input maxLength={1000} value={wish} onChange={(e) => setWish(e.target.value)} />
+            {wish.length > 900 && <span className="quiet">{wish.length} / 1000</span>}
           </label>
           <label>
             X handle, optional
-            <input value={xHandle} onChange={(e) => setXHandle(e.target.value)} placeholder="@name" />
+            <input maxLength={16} value={xHandle} onChange={(e) => setXHandle(e.target.value)} placeholder="@name" />
           </label>
-          <button type="button" className="btn primary" onClick={() => void sendFeedback()}>Send</button>
+          <div className="hp">
+            <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" value={website} onChange={(e) => setWebsite(e.target.value)} />
+          </div>
+          <button type="button" className="btn primary" disabled={feedbackStatus === 'sending'} onClick={() => void sendFeedback()}>
+            {feedbackStatus === 'sending' ? 'Sending…' : 'Send'}
+          </button>
+          {feedbackStatus === 'sending' && <p className="quiet busy-line">Sending…</p>}
+          {feedbackStatus === 'error' && feedbackError && (
+            <p className="feedback-msg error" role="alert">{feedbackError}</p>
+          )}
         </section>
       )}
 
       <footer className="desk-foot">
-        <button type="button" className="btn" onClick={() => setFeedbackOpen(true)}>Feedback</button>
+        <button type="button" className="btn" onClick={() => { setFeedbackStatus('idle'); setFeedbackError(null); setFeedbackOpen(true); }}>Feedback</button>
       </footer>
     </div>
   );
