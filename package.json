@@ -18,7 +18,9 @@
     "docs:preview": "node scripts/docs-preview.mjs"
   },
   "devDependencies": {
+    "@types/node": "^26.6.3",
     "@vitejs/plugin-react": "^5.1.4",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-top-level-await": "^1.6.0",
@@ -35,6 +37,7 @@
     "@midnight-ntwrk/midnight-js-protocol": "4.1.1",
     "@midnight-ntwrk/midnight-js-types": "4.1.1",
     "@midnight-ntwrk/midnight-js-utils": "4.1.1",
+    "@upstash/redis": "^1.39.0",
     "effect": "^3.14.0",
     "fp-ts": "^2.16.11",
     "graphql": "^16.11.0",
