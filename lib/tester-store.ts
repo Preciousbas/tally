@@ -105,22 +105,3 @@ export async function listTesters(): Promise<WalletRecord[]> {
   records.sort((a, b) => a.firstAt.localeCompare(b.firstAt));
   return records;
 }
-
-export type FeedbackNote = {
-  walletAddress: string;
-  rating: number;
-  confused: string;
-  add: string;
-  xHandle: string;
-  timestamp: string;
-};
-
-export async function recordFeedback(note: FeedbackNote): Promise<void> {
-  await redis(['RPUSH', 'tally:feedback', JSON.stringify(note)]);
-}
-
-export async function listFeedback(): Promise<FeedbackNote[]> {
-  const rows = await redis(['LRANGE', 'tally:feedback', '0', '-1']);
-  if (!Array.isArray(rows)) return [];
-  return rows.map((row) => JSON.parse(String(row)) as FeedbackNote);
-}
