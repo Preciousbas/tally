@@ -1,6 +1,6 @@
 # Tally Preprod testers
 
-Unique wallets that agreed to be listed. Run `node --experimental-strip-types scripts/export-users.ts` after `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set. This file is the export. It starts empty.
+Unique wallets that agreed to be listed. Run `node --experimental-strip-types scripts/export-users.ts` after `REDIS_URL` is set. This file is the export. It starts empty.
 
 | Wallet address | First action | Transaction | Date |
 | --- | --- | --- | --- |

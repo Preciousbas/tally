@@ -30,7 +30,7 @@ export default async function handler(req: NodeRequest, res: NodeResponse): Prom
       return;
     }
     res.status(503).json({
-      error: 'Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.',
+      error: 'Add REDIS_URL in Vercel.',
     });
     return;
   }

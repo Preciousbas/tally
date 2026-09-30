@@ -61,10 +61,11 @@ Public proof of use and notes from testers:
 - [docs/USERS.md](docs/USERS.md)
 - [docs/FEEDBACK.md](docs/FEEDBACK.md)
 
-To record testers, add these in the Vercel project:
+To record testers, add this in the Vercel project:
 
-- `UPSTASH_REDIS_REST_URL`
-- `UPSTASH_REDIS_REST_TOKEN`
+- `REDIS_URL` — the `redis://` URL from Railway (`redis-cli -u` uses the same string). Do not commit it.
+
+Upstash REST still works if `REDIS_URL` is empty: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
 
 Then export with `node --experimental-strip-types scripts/export-users.ts` and `node --experimental-strip-types scripts/export-feedback.ts`.
 

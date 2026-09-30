@@ -1,9 +1,10 @@
 /**
- * Tester log and feedback live in Upstash Redis.
- * Vercel env vars:
- * - UPSTASH_REDIS_REST_URL
- * - UPSTASH_REDIS_REST_TOKEN
+ * Tester log and feedback.
+ * Vercel env: REDIS_URL (redis://user:pass@host:port from Railway or redis-cli -u).
+ * Upstash REST still works if REDIS_URL is unset:
+ * UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.
  */
+import { createClient } from 'redis';
 
 export type TesterAction = 'offer' | 'accept' | 'disburse' | 'repay' | 'settle' | 'proveStanding';
 
@@ -26,14 +27,24 @@ export type WalletRecord = {
 const ACTIONS = new Set<TesterAction>(['offer', 'accept', 'disburse', 'repay', 'settle', 'proveStanding']);
 
 export function storeConfigured(): boolean {
-  return Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+  return Boolean(process.env.REDIS_URL) || Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
 }
 
-async function redis(command: unknown[]): Promise<unknown> {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
+async function redis(command: string[]): Promise<unknown> {
+  const url = process.env.REDIS_URL;
+  if (url) {
+    const client = createClient({ url });
+    await client.connect();
+    try {
+      return await client.sendCommand(command);
+    } finally {
+      await client.quit();
+    }
+  }
+  const rest = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) throw new Error('Tester store is not configured');
-  const res = await fetch(url, {
+  if (!rest || !token) throw new Error('Tester store is not configured');
+  const res = await fetch(rest, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(command),
