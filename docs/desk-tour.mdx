@@ -1,6 +1,6 @@
 ---
 title: Desk tour
-description: Local desk and Preprod. Lace or 1AM. Lender, Borrower, Verifier.
+description: Local desk and Preprod. Lace or 1AM. Lender, Borrower, Check a record.
 ---
 
 The desk is one screen. Mast, help flap, trust strip, mode and role controls, loan list, and the selected loan. Live app: [https://www.tallylend.site](https://www.tallylend.site)
@@ -9,24 +9,25 @@ The desk is one screen. Mast, help flap, trust strip, mode and role controls, lo
 
 | | Local desk | Preprod |
 | --- | --- | --- |
-| Label on screen | Demo/Simulator | Midnight Preprod |
+| Label on screen | Demo | Midnight Preprod |
 | Wallet | None | Lace or 1AM on Preprod |
 | Where state lives | Simulator inside the browser | Live Compact contract plus indexer |
-| Borrower id field | Hidden (demo keys) | Paste their Desk ID |
+| Borrower field | Hidden (demo keys) | Paste their private ID |
 | Proof server | Not used | Comes from the wallet settings |
 
 **Local desk** is a practice mode. It runs the same seals without talking to the chain. **Preprod** is Midnight’s public test network.
 
-If the browser finds no Midnight wallet after a few seconds, the desk switches to Local so you can still try the flow.
+A first visit with no saved choice opens on Local desk. The choice is remembered in this browser.
 
 ## Wallets
 
-**Connect Wallet** looks for Lace or 1AM in the browser.
+**Connect wallet** looks for Lace and 1AM in this browser.
 
-- Lace: [Chrome Web Store](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd)
-- 1AM: [https://www.1am.xyz/](https://www.1am.xyz/)
+- One wallet: it connects.
+- Both wallets: a chooser lists **1AM Wallet** and **Lace Wallet**.
+- Neither wallet: a modal links to [1AM](https://1am.xyz) and [Lace on the Chrome Web Store](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd).
 
-You need Connect for Join and every Preprod action. Local desk does not need a wallet.
+You need Connect for Preprod actions. Local desk does not need a wallet. The default contract address loads on its own. The 64-character field and **Use shared loan book** sit behind **Advanced**.
 
 ## Roles
 
@@ -34,48 +35,48 @@ One browser has three roles. Switch the control to match who is acting.
 
 | Role | What they do |
 | --- | --- |
-| Lender | Offer, Disburse, Settle, Prove standing |
-| Borrower | Accept, Repay, Settle, Prove standing |
-| Verifier | Paste allowlist root, Verify access → Pass or Fail |
+| Lender | Offer, then Send funds, Settle, and Prove good record once a loan exists |
+| Borrower | Accept, Repay, Settle, Prove good record, Prove loans repaid |
+| Check a record | Check record, and check a repaid count, → Pass or Fail |
 
-On Preprod, Lender and Borrower are usually two Chrome profiles so each one keeps its own Desk ID secret.
+On Preprod, Lender and Borrower are usually two Chrome profiles so each one keeps its own private ID secret.
 
 ## Trust strip
 
 Under the flap you will see:
 
-- Network name
-- Joined contract address (you can copy it)
-- **Desk ID** button
-- Link to the privacy write-up
+- Demo, or Midnight Preprod
+- **Your private ID**
+- **Show technical details** (the loan-book address, when you open it)
+- A link to the privacy write-up
 
-On Preprod the public desk is one shared contract. **Join** the 64-character address already on the page. The trust strip shows the same address and you can copy it.
+On Preprod the public desk is one shared contract. It is already loaded. Open **Advanced** only if you need to paste a different 64-character address and click **Use shared loan book**.
 
 ## Product tour (Preprod)
 
-![Offer on Preprod. Amount stays off-ledger. Borrower is named by Desk ID.](/docs/screenshots/preprod/01-offer.png)
+![Offer on Preprod. Amount stays Hidden. Borrower is named by private ID.](/docs/screenshots/preprod/01-offer.png)
 
-Offer. Amount is required and stays off-ledger. Borrower id is their Desk ID.
+Offer. Amount is required and stays Hidden. Borrower private ID is their private ID.
 
-![Accepted instrument ready to disburse.](/docs/screenshots/preprod/02-accepted-disburse.png)
+![Accepted loan ready to send funds.](/docs/screenshots/preprod/02-accepted-disburse.png)
 
-Accepted. Lender can Disburse.
+Accepted. Lender can Send funds.
 
-![Funded seal. Amount still off-ledger.](/docs/screenshots/preprod/03-funded.png)
+![Funded seal. Amount still Hidden.](/docs/screenshots/preprod/03-funded.png)
 
-Funded. Amount remains off-ledger.
+Funded. Amount remains Hidden.
 
 ![Repaid, ready to settle.](/docs/screenshots/preprod/04-repaid-settle.png)
 
 Repaid. Settle adds the allowlist leaf.
 
-![Settled instrument.](/docs/screenshots/preprod/05-settled.png)
+![Settled loan.](/docs/screenshots/preprod/05-settled.png)
 
-Settled. Prove standing, then copy the allowlist root.
+Settled. Prove good record, then open technical details to copy the allowlist root.
 
-![Standing confirmed with copyable root.](/docs/screenshots/preprod/06-standing-confirmed.png)
+![Record confirmed with copyable root.](/docs/screenshots/preprod/06-standing-confirmed.png)
 
-Standing confirmed. The root is what a verifier pastes.
+Record confirmed. The root is what someone checking a record uses.
 
 ## Local desk screenshots
 
@@ -83,13 +84,13 @@ Standing confirmed. The root is what a verifier pastes.
 
 ![Local desk, Funded.](/docs/screenshots/local/02-funded.png)
 
-![Local desk, Settled, Prove standing enabled.](/docs/screenshots/local/03-settled-prove.png)
+![Local desk, Settled, Prove good record enabled.](/docs/screenshots/local/03-settled-prove.png)
 
-![Local desk, Standing confirmed.](/docs/screenshots/local/04-standing-confirmed.png)
+![Local desk, Record confirmed.](/docs/screenshots/local/04-standing-confirmed.png)
 
-![Verifier Pass — membership only.](/docs/screenshots/local/05-verifier-pass.png)
+![Pass — membership only.](/docs/screenshots/local/05-verifier-pass.png)
 
-Verifier copy on screen: you only learn yes or no.
+Check a record copy on screen: you only learn yes or no.
 
 ## Next
 
@@ -98,6 +99,6 @@ Verifier copy on screen: you only learn yes or no.
     Checkable steps, about ten minutes, no wallet.
   </Card>
   <Card title="Preprod guide" href="/docs/preprod">
-    Join the published contract with Lace or 1AM.
+    Use the published contract with Lace or 1AM.
   </Card>
 </CardGroup>

@@ -145,3 +145,77 @@ describe('Tally proveStanding (Private Allowlist Access)', () => {
     expect(sim.verifyStanding('deadbeef')).toBe(false);
   });
 });
+
+describe('Tally proveRepaidCount', () => {
+  let sim: TallySimulator;
+  let lenderSk: Uint8Array;
+  let borrowerSk: Uint8Array;
+  let otherBorrowerSk: Uint8Array;
+  const pin = 1234;
+  let borrowerPk: Uint8Array;
+  let otherBorrowerPk: Uint8Array;
+  const grain = new Uint8Array(32).fill(9);
+
+  const settleBorrowed = (borrower: Uint8Array, named: Uint8Array) => {
+    const id = sim.offerLoan(lenderSk, pin, named, 50n, 1n);
+    sim.acceptLoan(borrower, pin, id);
+    sim.disburse(lenderSk, pin, id, grain);
+    sim.repay(borrower, pin, id);
+    sim.settle(borrower, pin, id);
+    return id;
+  };
+
+  beforeEach(() => {
+    sim = new TallySimulator();
+    lenderSk = new Uint8Array(32).fill(1);
+    borrowerSk = new Uint8Array(32).fill(2);
+    otherBorrowerSk = new Uint8Array(32).fill(4);
+    borrowerPk = sim.deriveUserPublicKey(borrowerSk, pin);
+    otherBorrowerPk = sim.deriveUserPublicKey(otherBorrowerSk, pin);
+  });
+
+  it('proves n=1, n=2, and n=3 for distinct settled borrower loans', () => {
+    const id1 = settleBorrowed(borrowerSk, borrowerPk);
+    expect(sim.proveRepaidCount(borrowerSk, pin, 1, [id1]).ok).toBe(true);
+
+    const id2 = settleBorrowed(borrowerSk, borrowerPk);
+    expect(sim.proveRepaidCount(borrowerSk, pin, 2, [id1, id2]).ok).toBe(true);
+
+    const id3 = settleBorrowed(borrowerSk, borrowerPk);
+    expect(sim.proveRepaidCount(borrowerSk, pin, 3, [id1, id2, id3]).ok).toBe(true);
+  });
+
+  it('fails when the borrower asks for more than they have repaid', () => {
+    const id = settleBorrowed(borrowerSk, borrowerPk);
+    expect(() => sim.proveRepaidCount(borrowerSk, pin, 2, [id])).toThrow('duplicate leaf');
+  });
+
+  it('fails when the same loan id is used twice for a count above 1', () => {
+    const id = settleBorrowed(borrowerSk, borrowerPk);
+    const id2 = settleBorrowed(borrowerSk, borrowerPk);
+    expect(() => sim.proveRepaidCount(borrowerSk, pin, 2, [id, id])).toThrow('duplicate leaf');
+    expect(() => sim.proveRepaidCount(borrowerSk, pin, 3, [id, id2, id])).toThrow('duplicate leaf');
+  });
+
+  it('fails when leaves from two different borrowers are mixed', () => {
+    const mine = settleBorrowed(borrowerSk, borrowerPk);
+    const theirs = settleBorrowed(otherBorrowerSk, otherBorrowerPk);
+    expect(() => sim.proveRepaidCount(borrowerSk, pin, 2, [mine, theirs])).toThrow('not a borrower leaf');
+  });
+
+  it('fails when a lender tries to count loans they only lent', () => {
+    const ids = [
+      settleBorrowed(borrowerSk, borrowerPk),
+      settleBorrowed(borrowerSk, borrowerPk),
+      settleBorrowed(borrowerSk, borrowerPk),
+    ];
+    expect(() => sim.proveRepaidCount(lenderSk, pin, 3, ids)).toThrow('not a borrower leaf');
+  });
+
+  it('rejects n=0 and n=4', () => {
+    const id = settleBorrowed(borrowerSk, borrowerPk);
+    expect(() => sim.proveRepaidCount(borrowerSk, pin, 0, [id])).toThrow('count out of range');
+    expect(() => sim.proveRepaidCount(borrowerSk, pin, 4, [id, id, id, id])).toThrow('count out of range');
+    expect(sim.proveRepaidCount(borrowerSk, pin, 1, [id]).ok).toBe(true);
+  });
+});

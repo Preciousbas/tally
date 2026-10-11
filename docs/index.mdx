@@ -1,6 +1,6 @@
 ---
 title: Introduction
-description: Private trade credit on Midnight. Amount stays off the chain. Standing is yes or no.
+description: Private loans on Midnight. Amount stays off the chain. A good record is yes or no.
 ---
 
 Tally is a desk for private loans between two people on **Midnight**. Midnight is a blockchain built so some facts can stay private.
@@ -9,15 +9,15 @@ Here is the idea in plain words. Two people make a loan. The **amount** (how muc
 
 ## The path every loan follows
 
-**Offer → Accept → Disburse → Repay → Settle → Prove standing**
+**Offer → Accept → Send funds → Repay → Settle → Prove good record**
 
 <Steps>
-  <Step title="Offer">The lender writes the amount and due in private. On the live network they name the borrower with a Desk ID.</Step>
+  <Step title="Offer">The lender writes the amount and due in private. On the live network they name the borrower with a private ID.</Step>
   <Step title="Accept">The borrower agrees.</Step>
-  <Step title="Disburse">The lender records that money was sent. The chain stores a sealed mark called a payment commitment. It still does not show the amount.</Step>
+  <Step title="Send funds">The lender records that money was sent. The chain stores a sealed mark called a payment commitment. It still does not show the amount.</Step>
   <Step title="Repay">The borrower marks the loan as paid back.</Step>
   <Step title="Settle">Either person closes the loan. Tally adds them to an allowlist. An allowlist is like a guest list of people who finished a repaid loan.</Step>
-  <Step title="Prove standing">Someone proves they are on that guest list. A verifier only sees Pass or Fail.</Step>
+  <Step title="Prove good record">Someone proves they are on that guest list. A checker only sees Pass or Fail.</Step>
 </Steps>
 
 ## How to use
@@ -27,7 +27,7 @@ Here is the idea in plain words. Two people make a loan. The **amount** (how muc
     The live app on Vercel. Try Local desk for a full walkthrough with no wallet.
   </Card>
   <Card title="Watch the demo" href="/docs/demo" icon="clapperboard">
-    A short video of Offer through Verifier Pass.
+    A short video of Offer through Check a record.
   </Card>
   <Card title="Local quickstart" href="/docs/quickstart" icon="play">
     About ten minutes on your computer. No Lace or 1AM needed.
@@ -44,10 +44,10 @@ Here is the idea in plain words. Two people make a loan. The **amount** (how muc
     The four packages in this repo and what Midnight already gives you.
   </Card>
   <Card title="Contract" href="/docs/contract" icon="file-code">
-    The six circuits and what each one writes.
+    The circuits and the public ledger fields.
   </Card>
   <Card title="Identity" href="/docs/identity" icon="fingerprint">
-    What Desk ID means and how the desk makes one.
+    What your private ID means and how the desk makes one.
   </Card>
   <Card title="Contributing" href="/docs/contributing" icon="git-branch">
     Install, test, run the desk, and preview these docs.
@@ -60,15 +60,15 @@ Here is the idea in plain words. Two people make a loan. The **amount** (how muc
 | --- | --- |
 | Desk | [https://www.tallylend.site](https://www.tallylend.site) |
 | Network | Midnight Preprod |
-| Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
+| Contract | `635a4817b625b7954f52b71180da0dbf6c1a50bb538824a3c51fc514e11e77b8` |
 
 **Preprod** means Midnight’s public test network. Tokens there are for testing. They are not real money.
 
 ## Try it in 5 minutes
 
-1. Install Lace or 1AM.
-2. Set the wallet to Preprod and request free tNIGHT from the [Midnight Preprod faucet](https://faucet.preprod.midnight.network/). Generate tDUST in the wallet.
-3. Open [the desk](https://www.tallylend.site), connect, and make an offer with the other person's Desk ID.
+1. Open [the desk](https://www.tallylend.site). A first visit opens on Local desk, with no wallet.
+2. To use Preprod, install Lace or 1AM, set the wallet to Preprod, and request free tNIGHT from the [Midnight Preprod faucet](https://faucet.preprod.midnight.network/). Generate tDUST in the wallet.
+3. Click **Connect wallet**, switch to **Preprod**, and make an offer with the other person's private ID.
 
 ## What Tally does not try to be
 
@@ -77,7 +77,7 @@ Here is the idea in plain words. Two people make a loan. The **amount** (how muc
 - A marketplace of many open loans
 - Mainnet (the live money network) yet
 
-Tally answers one standing question. Are you on the repaid allowlist. Yes or no.
+Tally answers one question. Are you on the repaid allowlist. Yes or no.
 
 ## Next
 
@@ -86,6 +86,6 @@ Tally answers one standing question. Are you on the repaid allowlist. Yes or no.
     Each step, who clicks, and what the chain can see.
   </Card>
   <Card title="Privacy" href="/docs/privacy">
-    What stays secret and what a verifier learns.
+    What stays secret and what a checker learns.
   </Card>
 </CardGroup>

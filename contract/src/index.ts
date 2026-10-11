@@ -7,8 +7,9 @@ export {
   withTerms,
   withPin,
   withStanding,
+  withRepaidCount,
 } from './witnesses.js';
-export type { TallyPrivateState } from './witnesses.js';
+export type { TallyPrivateState, RepaidCountSlot } from './witnesses.js';
 
 import * as TallyContract from '../managed/tally/contract/index.js';
 import { createWitnesses } from './witnesses.js';

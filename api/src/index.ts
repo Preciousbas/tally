@@ -18,7 +18,9 @@ import {
   createTallyPrivateState,
   withTerms,
   withStanding,
+  withRepaidCount,
   type TallyPrivateState,
+  type RepaidCountSlot,
 } from '../../contract/src/index';
 import * as utils from './utils/index.js';
 import { deployContract, findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
@@ -141,6 +143,39 @@ export class TallyAPI {
       ),
     );
     const submitted = await (this.deployedContract as any).callTx.proveStanding();
+    return publicTxId(submitted);
+  }
+
+  /**
+   * Prove the caller repaid at least n loans as borrower.
+   * n is public. Loan ids stay in private state. Unused slots copy slot 0.
+   */
+  async proveRepaidCount(
+    n: number,
+    slots: ReadonlyArray<{ loanId: number; lenderPkHex: string; leafHex: string }>,
+  ): Promise<string> {
+    if (!Number.isInteger(n) || n < 1 || n > 3 || slots.length < n) {
+      throw new Error('count out of range');
+    }
+    const parse = (slot: { loanId: number; lenderPkHex: string; leafHex: string }): RepaidCountSlot => {
+      const leafHex = slot.leafHex.replace(/^0x/, '').replace(/\s/g, '');
+      return {
+        loanId: BigInt(slot.loanId),
+        lenderPk: utils.encodePk(slot.lenderPkHex),
+        leaf: utils.fromHex(leafHex.padStart(64, '0').slice(0, 64)),
+      };
+    };
+    const counted = slots.slice(0, n).map(parse);
+    const padded: [RepaidCountSlot, RepaidCountSlot, RepaidCountSlot] = [
+      counted[0],
+      n >= 2 ? counted[1] : counted[0],
+      n >= 3 ? counted[2] : counted[0],
+    ];
+    const psp = this.providers.privateStateProvider;
+    psp.setContractAddress(this.deployedContractAddress);
+    const current = await requirePrivateState(psp);
+    await psp.set(tallyPrivateStateKey, withRepaidCount(current, padded));
+    const submitted = await (this.deployedContract as any).callTx.proveRepaidCount(BigInt(n));
     return publicTxId(submitted);
   }
 

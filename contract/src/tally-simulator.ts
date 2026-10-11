@@ -184,6 +184,50 @@ export class TallySimulator {
     return { ok: true, root };
   }
 
+  /**
+   * proveRepaidCount — borrower-only count of distinct settled leaves.
+   * n is 1, 2, or 3. Slots past n repeat the first loan id.
+   * Logic stand-in for the Compact circuit. Not the chain hash.
+   */
+  proveRepaidCount(
+    sk: Uint8Array,
+    pin: number,
+    n: number,
+    loanIds: readonly bigint[],
+  ): { ok: true } {
+    if (!Number.isInteger(n) || n < 1 || n > 3) throw new Error('count out of range');
+    if (loanIds.length < 1) throw new Error('count out of range');
+
+    const slots = loanIds.slice(0, 3);
+    while (slots.length < 3) slots.push(slots[0]);
+
+    const me = this.deriveUserPublicKey(sk, pin);
+    const leaves = slots.map((loanId) => {
+      const loan = this.loans.get(loanId);
+      if (!loan || loan.status !== LoanStatus.Settled) throw new Error('not a borrower leaf');
+      const expected = this.relationshipLeaf(loanId, loan.lenderPk, me);
+      const member = this.relationshipLeaves.some((leaf) => this.hex(leaf) === this.hex(expected));
+      if (!member) throw new Error('not a borrower leaf');
+      const historic = this.rootHistory.length > 0;
+      if (!historic) throw new Error('not on allowlist');
+      return expected;
+    });
+
+    const leaf0 = this.hex(leaves[0]);
+    const leaf1 = this.hex(leaves[1]);
+    const leaf2 = this.hex(leaves[2]);
+    if (n === 1) {
+      if (leaf1 !== leaf0 || leaf2 !== leaf0) throw new Error('padding must copy slot 0');
+    } else if (n === 2) {
+      if (leaf0 === leaf1) throw new Error('duplicate leaf');
+      if (leaf2 !== leaf0) throw new Error('padding must copy slot 0');
+    } else if (leaf0 === leaf1 || leaf0 === leaf2 || leaf1 === leaf2) {
+      throw new Error('duplicate leaf');
+    }
+
+    return { ok: true };
+  }
+
   /** Verifier-facing check: yes/no against current or historic allowlist root. */
   verifyStanding(claimedRoot: string): boolean {
     return claimedRoot === this.relationshipRoot() || this.rootHistory.includes(claimedRoot);

@@ -10,15 +10,15 @@ This project is built on the Midnight Network.
 
 ## Try Tally in 5 minutes
 
-1. Install [Lace](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd) or [1AM](https://www.1am.xyz/).
-2. Set the wallet to Preprod. Request free tNIGHT from the [Midnight Preprod faucet](https://faucet.preprod.midnight.network/), then generate tDUST in the wallet.
-3. Open [the desk](https://www.tallylend.site), connect, and click Offer. Name the other person with their Desk ID.
+1. Open [the desk](https://www.tallylend.site). A first visit opens on Local desk, with no wallet.
+2. To use Preprod, install [Lace](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd) or [1AM](https://www.1am.xyz/). Set the wallet to Preprod. Request free tNIGHT from the [Midnight Preprod faucet](https://faucet.preprod.midnight.network/), then generate tDUST in the wallet.
+3. Click **Connect wallet** and switch to **Preprod**. Name the other person with their private ID.
 
-The local demo is on the same page if you want to look without a wallet. It does not count on chain.
+The local demo does not count on chain.
 
 ## Demo
 
-Desk walkthrough with audio: Offer → Accept → Disburse → Repay → Settle → Prove standing → Verifier Pass. Amount stays **off-ledger**.
+Desk walkthrough with audio: Offer → Accept → Send funds → Repay → Settle → Prove good record → Check a record. Amount stays **Hidden**.
 
 **Video:** [Tally demo on Google Drive](https://drive.google.com/file/d/1kvrBCWi8tmJ0JUSjKFEFucGfp7BwmIAZ/view?usp=sharing)
 
@@ -50,9 +50,9 @@ Two people make a private loan on Midnight. The amount and due date stay off the
 |---|---|
 | Desk | https://www.tallylend.site |
 | Network | Midnight Preprod |
-| Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
+| Contract | `635a4817b625b7954f52b71180da0dbf6c1a50bb538824a3c51fc514e11e77b8` |
 
-Use **Lace** or **1AM** on Preprod to join the contract, or switch to **Local desk** for a full in-browser demo with no wallet.
+Use **Lace** or **1AM** on Preprod. The shared loan book loads on its own. Open **Advanced** only to paste a different address. **Local desk** is a full in-browser demo with no wallet.
 
 ## Testers and feedback
 
@@ -73,7 +73,7 @@ Then export with `node --experimental-strip-types scripts/export-users.ts` and `
 
 ![Offer](docs/screenshots/preprod/01-offer.png)
 
-Offer on Preprod. Amount stays off-ledger. Borrower is named by Desk ID, not a wallet address.
+Offer on Preprod. Amount stays Hidden. The borrower is named by private ID, not a wallet address.
 
 ![Funded](docs/screenshots/preprod/03-funded.png)
 
@@ -81,15 +81,15 @@ Lifecycle seals move Offered → Accepted → Funded → Repaid → Settled with
 
 ![Settled](docs/screenshots/preprod/05-settled.png)
 
-After settle, prove standing and copy the allowlist root for a third party.
+After settle, Prove good record. Open technical details to copy the allowlist root for a third party.
 
-![Verifier](docs/screenshots/local/05-verifier-pass.png)
+![Check a record](docs/screenshots/local/05-verifier-pass.png)
 
-Verifier checks membership only — Pass or Fail, never the book.
+Check a record learns membership only — Pass or Fail, never the book.
 
 ### Local desk
 
-Same flow without a wallet (Demo/Simulator).
+Same flow without a wallet. A first visit opens here.
 
 ![Local offered](docs/screenshots/local/01-offered.png)
 
@@ -97,11 +97,12 @@ Same flow without a wallet (Demo/Simulator).
 
 ## How it works
 
-1. **Offer** — Lender sets amount and due (private). Borrower is named by pseudonymous id on Preprod.
-2. **Accept** — Borrower accepts the instrument.
-3. **Disburse** — Lender binds a payment commitment. The amount itself is never disclosed on-chain.
+1. **Offer** — Lender sets amount and due (private). On Preprod the borrower is named by private ID.
+2. **Accept** — Borrower accepts the loan.
+3. **Send funds** — Lender binds a payment commitment. The contract circuit is `disburse`. The amount itself is never disclosed on-chain.
 4. **Repay → Settle** — Settlement inserts a relationship leaf and consumes a nullifier.
-5. **Prove standing** — A party proves allowlist membership. A verifier learns membership only.
+5. **Prove good record** — A party proves allowlist membership. The contract circuit is `proveStanding`. Someone checking a record learns membership only.
+6. **Prove loans repaid** — The borrower proves at least 1, 2, or 3 repaid loans. The contract circuit is `proveRepaidCount`. A checker learns that number and yes or no, not which loans. The public contract above includes this circuit. Its allowlist started empty. Settled loans on the previous contract stay there. A count proof passes only after loans are settled on this address.
 
 ## Privacy
 
@@ -117,25 +118,31 @@ Same flow without a wallet (Demo/Simulator).
 
 - Loan amount
 - Due date
-- The browser secret that produces a Desk ID
-- Which allowlist leaf backs a standing proof
+- The browser secret that produces a private ID (the contract calls it a Desk ID)
+- Which allowlist leaf backs a good-record proof
 - Economic terms of prior loans
 
-**What a membership verifier learns**
+**What someone checking a record learns**
 
 - A boolean: the prover is in the settled-relationship allowlist at a stated root
 - Nothing about amount, due, leaf index, or counterparty
 
+**What a repaid-count checker learns**
+
+- The number N, and yes or no
+- Not which loans, amounts, due dates, or lenders from this proof
+- Someone who already knows the private ID can still count that person’s settled rows on the public book. The proof does not hide those rows.
+
 ## Architecture
 
 ```
-leaderboard-ui   React desk (Lace / 1AM, Local + Preprod, Lender / Borrower / Verifier)
+leaderboard-ui   React desk (Lace / 1AM, Local + Preprod, Lender / Borrower / Check a record)
 api              Contract glue and witnesses
-contract         tally.compact — offerLoan, acceptLoan, disburse, repay, settle, proveStanding
+contract         tally.compact — offerLoan, acceptLoan, disburse, repay, settle, proveStanding, proveRepaidCount
 proof-server     Local proving for Preprod flows
 ```
 
-Identity comes from a browser secret mixed with a fixed public number, `1234`. That number is a domain tag in the Desk ID hash. It is not a password and not a wallet PIN. Public state is `LoanPublic`. Amount and due remain witnesses.
+Identity comes from a browser secret mixed with a fixed public number, `1234`. That number is a domain tag in the private-ID hash. The contract calls that hash a Desk ID. It is not a password and not a wallet PIN. Public state is `LoanPublic`. Amount and due remain witnesses.
 
 ## Setup
 

@@ -45,6 +45,16 @@ witness getRelationshipPath(): MerkleTreePath<10, Bytes<32>>;
 witness getStandingLoanId(): Uint<64>;
 /** Counterparty pk for that settled loan (other half of the relationship leaf). */
 witness getStandingCounterpartyPk(): Bytes<32>;
+/** Three fixed slots for proveRepaidCount. Unused slots repeat slot 0. */
+witness getRepaidLoanId0(): Uint<64>;
+witness getRepaidLenderPk0(): Bytes<32>;
+witness getRepaidPath0(): MerkleTreePath<10, Bytes<32>>;
+witness getRepaidLoanId1(): Uint<64>;
+witness getRepaidLenderPk1(): Bytes<32>;
+witness getRepaidPath1(): MerkleTreePath<10, Bytes<32>>;
+witness getRepaidLoanId2(): Uint<64>;
+witness getRepaidLenderPk2(): Bytes<32>;
+witness getRepaidPath2(): MerkleTreePath<10, Bytes<32>>;
 
 circuit deriveUserPublicKey(sk: Bytes<32>, pin: Uint<16>): Bytes<32> {
   const pinHash = persistentHash<Uint<16>>(pin);
@@ -186,4 +196,49 @@ export circuit proveStanding(): [] {
   assert(disclose(leaf == asLender || leaf == asBorrower), "not a party leaf");
   const computed = merkleTreePathRoot<10, Bytes<32>>(path);
   assert(relationships.checkRoot(disclose(computed)), "not on allowlist");
+}
+
+/**
+ * Borrower-shaped leaf on some historic allowlist root.
+ * Lender-shaped leaves fail. The leaf itself is not disclosed.
+ */
+circuit repaidBorrowerLeaf(
+  loanId: Uint<64>,
+  lenderPk: Bytes<32>,
+  path: MerkleTreePath<10, Bytes<32>>
+): Bytes<32> {
+  const me = deriveUserPublicKey(getUserSecret(), getPin());
+  const expected = relationshipLeaf(loanId, lenderPk, me);
+  const leaf = path.leaf;
+  assert(disclose(leaf == expected), "not a borrower leaf");
+  const computed = merkleTreePathRoot<10, Bytes<32>>(path);
+  assert(relationships.checkRoot(disclose(computed)), "not on allowlist");
+  return leaf;
+}
+
+/**
+ * Prove at least n repaid loans as the borrower. n is public (1, 2, or 3).
+ * Writes nothing. Slots past n repeat slot 0 and do not add to the count.
+ */
+export circuit proveRepaidCount(n: Uint<8>): [] {
+  assert(disclose(n >= 1), "count out of range");
+  assert(disclose(n <= 3), "count out of range");
+
+  const leaf0 = repaidBorrowerLeaf(getRepaidLoanId0(), getRepaidLenderPk0(), getRepaidPath0());
+  const leaf1 = repaidBorrowerLeaf(getRepaidLoanId1(), getRepaidLenderPk1(), getRepaidPath1());
+  const leaf2 = repaidBorrowerLeaf(getRepaidLoanId2(), getRepaidLenderPk2(), getRepaidPath2());
+
+  if (disclose(n == 1)) {
+    assert(disclose(leaf1 == leaf0), "padding must copy slot 0");
+    assert(disclose(leaf2 == leaf0), "padding must copy slot 0");
+  } else {
+    if (disclose(n == 2)) {
+      assert(disclose(leaf0 != leaf1), "duplicate leaf");
+      assert(disclose(leaf2 == leaf0), "padding must copy slot 0");
+    } else {
+      assert(disclose(leaf0 != leaf1), "duplicate leaf");
+      assert(disclose(leaf0 != leaf2), "duplicate leaf");
+      assert(disclose(leaf1 != leaf2), "duplicate leaf");
+    }
+  }
 }

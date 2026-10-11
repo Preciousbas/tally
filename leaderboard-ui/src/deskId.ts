@@ -22,6 +22,15 @@ const stubWitnesses = {
   getRelationshipPath: () => [{}, null] as const,
   getStandingLoanId: () => [{}, 0n] as const,
   getStandingCounterpartyPk: () => [{}, new Uint8Array(32)] as const,
+  getRepaidLoanId0: () => [{}, 0n] as const,
+  getRepaidLenderPk0: () => [{}, new Uint8Array(32)] as const,
+  getRepaidPath0: () => [{}, null] as const,
+  getRepaidLoanId1: () => [{}, 0n] as const,
+  getRepaidLenderPk1: () => [{}, new Uint8Array(32)] as const,
+  getRepaidPath1: () => [{}, null] as const,
+  getRepaidLoanId2: () => [{}, 0n] as const,
+  getRepaidLenderPk2: () => [{}, new Uint8Array(32)] as const,
+  getRepaidPath2: () => [{}, null] as const,
 };
 
 function compactContract(): CompactContract {

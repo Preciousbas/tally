@@ -1,31 +1,33 @@
 ---
 title: Identity
-description: How the desk names people on a loan with Desk ID.
+description: How the desk names people on a loan with a private ID.
 ---
 
-On the desk you will see a button labeled **Desk ID**. Tap it and you copy a long code. That code is how Tally knows which person a loan is talking about when you make an offer.
+On the desk you will see a button labeled **Your private ID**. The tip says it is a private name for you on Tally, and that it is not your wallet address. Tap it and you copy a long code. That code is how Tally knows which person a loan is talking about when you make an offer.
 
-Your **Lace** or **1AM** wallet is a different tool. Lace and 1AM are browser wallets for Midnight. They hold test tokens, pay fees, and show a popup so you can approve a transaction. A **transaction** is a signed change sent to the network. Think of the wallet as the pen that signs the paper. Desk ID is the name written on the paper.
+The contract calls this value a **Desk ID**. Open **Show technical details** on the How it works section to see that name. The button on the desk does not.
 
-When a lender makes an offer on Preprod, they paste the borrower’s Desk ID into the form. If that code is wrong, the wrong browser cannot accept. If it matches, the right person can.
+Your **Lace** or **1AM** wallet is a different tool. Lace and 1AM are browser wallets for Midnight. They hold test tokens, pay fees, and show a popup so you can approve a transaction. A **transaction** is a signed change sent to the network. Think of the wallet as the pen that signs the paper. Your private ID is the name written on the paper.
 
-## How the desk builds a Desk ID
+When a lender makes an offer on Preprod, they paste the borrower’s private ID into **Borrower private ID**. If that code is wrong, the wrong browser cannot accept. If it matches, the right person can.
 
-The real key is a browser secret. The desk saves it in localStorage under the key `tally-midnight-secret`. Whoever copies that secret can act as that Desk ID.
+## How the desk builds your private ID
 
-The number `1234` is a fixed public mix-in in the Desk ID hash. It is a domain tag in the code, not a password anyone types. The desk never asks for it. The same secret and the same mix-in always make the same Desk ID. A different browser profile usually has a different secret. That is why a two-person demo often uses two Chrome profiles on one machine.
+The real key is a browser secret. The desk saves it in localStorage under the key `tally-midnight-secret`. Whoever copies that secret can act as that private ID.
 
-The wallet only pays fees. Lace or 1AM is not the Desk ID.
+The number `1234` is a fixed public mix-in in the hash. It is a domain tag in the code, not a password anyone types. The desk never asks for it. The same secret and the same mix-in always make the same private ID. A different browser profile usually has a different secret. That is why a two-person demo often uses two Chrome profiles on one machine.
 
-## What you paste into Borrower id
+The wallet only pays fees. Lace or 1AM is not your private ID.
 
-On Preprod, the Offer form asks for **Borrower id**. Paste the other person’s Desk ID (64 hex characters). Do not paste a Lace payment address that starts like `mn_addr_`.
+## What you paste into Borrower private ID
 
-On Local desk, the demo already knows the built-in borrower. The Borrower id field stays hidden.
+On Preprod, the Offer form asks for **Borrower private ID**. Paste the other person’s private ID (64 hex characters). Do not paste a Lace payment address that starts like `mn_addr_`.
 
-## Relationship leaf (for standing)
+On Local desk, the demo already knows the built-in borrower. That field stays hidden.
 
-When a loan **Settles**, the contract adds a **relationship leaf**. That is a sealed mark made from the loan id and both people’s Desk IDs. Later, **Prove standing** rebuilds that mark in private and checks it sits in the allowlist tree. The verifier never sees which leaf you used. They only see Pass or Fail.
+## Relationship leaf
+
+When a loan **Settles**, the contract adds a **relationship leaf**. That is a sealed mark made from the loan id and both people’s private IDs. Later, **Prove good record** rebuilds that mark in private and checks it sits in the allowlist tree. Someone checking a record never sees which leaf you used. They only see Pass or Fail.
 
 ## Next
 
@@ -34,6 +36,6 @@ When a loan **Settles**, the contract adds a **relationship leaf**. That is a se
     What the public chain can see and what it cannot.
   </Card>
   <Card title="Preprod guide" href="/docs/preprod">
-    Copy Desk ID on one profile and paste it on the other.
+    Copy a private ID on one profile and paste it on the other.
   </Card>
 </CardGroup>

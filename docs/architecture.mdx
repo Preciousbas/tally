@@ -53,16 +53,16 @@ You do not host your own chain.
 
 | Piece | Job |
 | --- | --- |
-| `contract/tally.compact` | The six loan circuits and the public ledger shape |
+| `contract/tally.compact` | The loan circuits, including proveRepaidCount, and the public ledger shape |
 | `contract` witnesses and simulator | Private inputs and the Local desk stand-in |
 | `api` TallyAPI | deploy, join, and each circuit call |
-| `leaderboard-ui` | Screens, roles, Desk ID, Local vs Preprod |
+| `leaderboard-ui` | Screens, roles, private ID, Local vs Preprod |
 | `proof-server/Dockerfile` | Local prover version pin |
 
 ## What happens on a Preprod click
 
-1. You Connect a wallet on Preprod
-2. You Join the contract address already on the public desk. A separate contract is only for someone who wants their own book.
+1. You Connect a wallet on Preprod. The chooser lists 1AM and Lace when both are installed.
+2. The public contract address is already loaded. Open Advanced and click Use shared loan book only if you pasted a different address.
 3. The desk writes private witnesses, then asks the wallet to prove and submit
 4. The UI refreshes loan rows from the indexer
 
@@ -70,7 +70,7 @@ Local desk skips the wallet and indexer. It calls the in-browser simulator inste
 
 ## Private state in the browser
 
-Private loan terms sit in memory for the joined contract. If that store is missing after a long session, Join again.
+Private loan terms sit in memory for the loaded contract. If that store is missing after a long session, open Advanced and click Use shared loan book again.
 
 ## Desk hosting vs docs hosting
 

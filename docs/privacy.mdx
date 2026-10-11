@@ -1,6 +1,6 @@
 ---
 title: Privacy
-description: Amount stays private. A verifier only learns yes or no.
+description: Amount stays private. A checker only learns yes or no.
 ---
 
 Privacy is the point of Tally. An explorer can see that loans move through seals. An explorer cannot see how much money was in a loan.
@@ -9,8 +9,8 @@ Privacy is the point of Tally. An explorer can see that loans move through seals
 
 - That a loan id exists
 - The **status** seal (Offered, Accepted, Funded, Repaid, Settled)
-- Two **Desk ID** codes for lender and borrower (long public codes, not real names)
-- That a **payment commitment** was set at Disburse (a sealed mark, not the amount)
+- Two **private ID** codes for lender and borrower (long public codes, not real names). The contract calls each one a Desk ID
+- That a **payment commitment** was set when funds were sent (a sealed mark, not the amount)
 - The **allowlist** Merkle root (a fingerprint of the guest list of settled relationships)
 - That a **nullifier** was used at Settle (a one-time ticket so the same settle cannot be reused)
 
@@ -18,17 +18,25 @@ Privacy is the point of Tally. An explorer can see that loans move through seals
 
 - The loan **amount**
 - The **due** date
-- Your browser **secret** (the value that produces a Desk ID)
-- Which allowlist leaf you used when you prove standing
+- Your browser **secret** (the value that produces your private ID)
+- Which allowlist leaf you used when you prove a good record
 - The money terms of older loans
 
-## What a membership verifier learns
+## What someone checking a record learns
 
-A **verifier** is a third person who only checks standing. On the desk they paste an allowlist root and click Verify access.
+On the desk this role is **Check a record**. They open technical details if they need the allowlist root, then click **Check record**.
 
 They learn one answer. Pass or Fail. That means “is this prover on the settled-relationship allowlist for this contract.”
 
 They do not learn amount, due, leaf index, or who the other party was.
+
+## What a repaid-count check learns
+
+**Prove loans repaid** is a separate proof. The borrower shows they repaid at least N loans, where N is 1, 2, or 3. A checker learns that number and Pass or Fail. They do not learn which loans, the amounts, the due dates, or the lenders from this proof. The proof also does not put the borrower’s private ID on the transcript.
+
+Loan rows are public and already show the borrower private ID and status. Someone who already knows that ID can count that person’s settled loans by reading the book. This circuit does not hide that.
+
+The leaf format is unchanged. The public Preprod contract includes this circuit. That book started empty. Settled loans on the previous contract stay there.
 
 ## Private facts vs public facts
 
@@ -36,13 +44,13 @@ Private facts live in **witnesses**. Witnesses are values the circuit checks ins
 
 Public facts live in `LoanPublic` rows and in the allowlist and nullifier sets. Those are what indexers and explorers can read.
 
-Instrument rows on the desk always say **Amount: off-ledger**. Off-ledger means “kept off the public book.”
+Loan rows on the desk always say **Amount: Hidden**. Hidden means “kept off the public book.”
 
 ## Next
 
 <CardGroup cols={2}>
   <Card title="Identity" href="/docs/identity">
-    How Desk ID is made and when you paste it.
+    How your private ID is made and when you paste it.
   </Card>
   <Card title="How it works" href="/docs/how-it-works">
     Each seal and what gets written.

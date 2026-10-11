@@ -1,23 +1,23 @@
 ---
 title: How it works
-description: Offer, Accept, Disburse, Repay, Settle, then Prove standing.
+description: Offer, Accept, Send funds, Repay, Settle, then Prove good record.
 ---
 
-Every Tally loan is between two people. The desk and the Compact contract share the same six steps. **Compact** is Midnight’s language for private smart contracts. A **circuit** is one named action in that contract.
+Every Tally loan is between two people. The desk and the Compact contract share the same steps. **Compact** is Midnight’s language for private smart contracts. A **circuit** is one named action in that contract.
 
-Amount and due are checked inside the proof. They stay in witnesses. Status is what an explorer can see.
+Amount and due are checked inside the proof. They stay in witnesses. Status is what an explorer can see. On the desk those two fields read **Hidden**.
 
 ```mermaid
 flowchart LR
   A[Offer] --> B[Accept]
-  B --> C[Disburse]
+  B --> C[Send funds]
   C --> D[Repay]
   D --> E[Settle]
-  E --> F[Prove standing]
-  F --> G[Verifier yes or no]
+  E --> F[Prove good record]
+  F --> G[Check a record]
 ```
 
-On the desk, the wooden flap labeled **How a stick is cut** lists the same steps. It is a help panel, not a separate page.
+On the desk, the flap labeled **How a loan works** lists the same steps. It is a help panel, not a separate page. The contract still names the send-funds circuit `disburse` and the good-record circuit `proveStanding`.
 
 ## Status seals
 
@@ -26,13 +26,13 @@ Each loan carries a seal. The seal is the public status.
 | Seal | After this action | What the public row holds |
 | --- | --- | --- |
 | Vacant | Empty slot | — |
-| Offered | Offer | Lender and borrower Desk IDs |
+| Offered | Offer | Lender and borrower private IDs |
 | Accepted | Accept | Same identities |
-| Funded | Disburse | Plus a payment commitment |
+| Funded | Send funds | Plus a payment commitment |
 | Repaid | Repay | Status only |
 | Settled | Settle | Leaf added to the allowlist |
 
-Instrument rows always show **Amount: off-ledger**.
+Loan rows on the desk show **Amount: Hidden**. The hex ids, the payment commitment, and the allowlist root stay behind **Show technical details**.
 
 ## Offer
 
@@ -40,19 +40,19 @@ Who clicks: **Lender**.
 
 The lender sets amount and due as private witnesses. The circuit checks that both are greater than zero and that you are not lending to yourself. A new loan id is created. The public row shows Offered.
 
-On Local desk the borrower is built in. On Preprod you paste the borrower’s **Desk ID**.
+On Local desk the borrower is built in, and an empty desk shows only **Offer**. On Preprod you paste the borrower’s **private ID**. The desk calls that value **Your private ID**. The contract calls the same value a Desk ID.
 
 ## Accept
 
 Who clicks: **Borrower**.
 
-Only the Desk ID named in the offer can accept. The seal becomes Accepted.
+Only the private ID named in the offer can accept. The seal becomes Accepted. Accept, Repay, Settle, and Prove stay hidden until a loan exists.
 
-## Disburse
+## Send funds
 
 Who clicks: **Lender**.
 
-Disburse means “record that payout happened.” You pass a **payment commitment**. That is a 32-byte sealed mark. It is not the amount. The seal becomes Funded.
+Send funds means “record that payout happened.” The contract circuit is `disburse`. You pass a **payment commitment**. That is a 32-byte sealed mark. It is not the amount. The seal becomes Funded.
 
 ## Repay
 
@@ -70,11 +70,13 @@ Settle closes the loan after Repaid. The contract:
 2. Inserts a **relationship leaf** into the allowlist tree
 3. Sets the seal to Settled
 
-## Prove standing
+## Prove good record
 
-Who clicks: a party to a Settled loan, then a **Verifier**.
+Who clicks: a party to a Settled loan, then someone using **Check a record**.
 
-**Prove standing** builds a membership proof. That means “show I belong on the allowlist without showing which leaf.” The desk copies an allowlist **root** (a fingerprint of the guest list). The Verifier pastes that root and clicks **Verify access**. The seal is Pass or Fail.
+**Prove good record** builds a membership proof. That means “show I belong on the allowlist without showing which leaf.” The desk copies an allowlist **root** (a fingerprint of the guest list) when technical details are open. **Check a record** uses that root and clicks **Check record**. The seal is Pass or Fail.
+
+**Prove loans repaid** is a second proof. The borrower shows they repaid at least 1, 2, or 3 loans. The checker learns that number and Pass or Fail, not which loans.
 
 ## Next
 

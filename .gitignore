@@ -107,3 +107,9 @@ docs/capture-screenshots.mjs
 docs/capture-screenshots.ps1
 docs/**/DEMO*
 **/DEMO_SCRIPT.md
+.vercel
+.env*
+!leaderboard-ui/.env.preprod
+notes/
+.agents/
+skills-lock.json

@@ -3,7 +3,7 @@ title: Local quickstart
 description: Finish the full loan path in about ten minutes with no wallet.
 ---
 
-By the end you will Offer, Accept, Disburse, Repay, and Settle a loan in the browser, then Prove standing and see Verifier **Pass**. Amount never shows on the instrument row.
+By the end you will Offer, Accept, Send funds, Repay, and Settle a loan in the browser, then Prove good record and see **Pass** under Check a record. Amount reads **Hidden** on the loan row.
 
 This path does not use Midnight Preprod. For the live test network, open the [Preprod guide](/docs/preprod).
 
@@ -27,11 +27,11 @@ npm run dev --workspace leaderboard-ui -- --mode preprod
 
 Open [http://localhost:3000](http://localhost:3000). Or use the hosted desk at [https://www.tallylend.site](https://www.tallylend.site).
 
-## 2. Switch to Local desk
+## 2. Open Local desk
 
-Click **Local desk** in the toolbar. The caption should read Demo/Simulator.
+A first visit already opens on **Local desk**. The caption should read “Demo only. Not recorded on Preprod.” If you have used Preprod before, click **Local desk** in the toolbar.
 
-If no Lace or 1AM wallet is installed, the desk may switch to Local on its own.
+You do not need Lace or 1AM for this path.
 
 ## 3. Offer as Lender
 
@@ -41,38 +41,38 @@ Stay on **Lender**.
 2. Due in days: `30` or leave blank (defaults to 30)
 3. Click **Offer**
 
-A row `#1` appears with seal **Offered**. Amount reads **off-ledger**.
+A row `#1` appears with seal **Offered**. Amount reads **Hidden**. Until that row exists, the desk shows only **Offer**.
 
-![Local offered instrument.](/docs/screenshots/local/01-offered.png)
+![Local offered loan.](/docs/screenshots/local/01-offered.png)
 
 ## 4. Accept as Borrower
 
 Switch the role to **Borrower**. Click **Accept**. Seal becomes **Accepted**.
 
-## 5. Disburse as Lender
+## 5. Send funds as Lender
 
-Switch to **Lender**. Payment may stay empty on Local desk. Click **Disburse**. Seal becomes **Funded**.
+Switch to **Lender**. Payment may stay empty on Local desk. Click **Send funds**. Seal becomes **Funded**.
 
-![Local funded instrument.](/docs/screenshots/local/02-funded.png)
+![Local funded loan.](/docs/screenshots/local/02-funded.png)
 
 ## 6. Repay and Settle
 
 1. Borrower → **Repay** → **Repaid**
 2. Lender or Borrower → **Settle** → **Settled**
 
-![Settled, Prove standing enabled.](/docs/screenshots/local/03-settled-prove.png)
+![Settled, Prove good record enabled.](/docs/screenshots/local/03-settled-prove.png)
 
-## 7. Prove standing
+## 7. Prove good record
 
-As Lender or Borrower, click **Prove standing**. You should see **Standing confirmed** and a copyable allowlist root.
+As Lender or Borrower, click **Prove good record**. You should see **Record confirmed**. Open **Show technical details** to copy the allowlist root.
 
-![Standing confirmed on Local desk.](/docs/screenshots/local/04-standing-confirmed.png)
+![Record confirmed on Local desk.](/docs/screenshots/local/04-standing-confirmed.png)
 
-## 8. Verifier Pass
+## 8. Check a record
 
-Switch to **Verifier**. Click **Verify access**. Standing seal: **Pass**.
+Switch to **Check a record**. Click **Check record**. The seal reads **Pass**.
 
-![Verifier Pass — yes or no only.](/docs/screenshots/local/05-verifier-pass.png)
+![Pass — yes or no only.](/docs/screenshots/local/05-verifier-pass.png)
 
 ## If something fails
 
@@ -80,7 +80,7 @@ Switch to **Verifier**. Click **Verify access**. Standing seal: **Pass**.
 | --- | --- |
 | Amount error | Use a whole number greater than 0 |
 | Local simulator reset | Refresh cleared memory. Run Offer through Settle again |
-| Standing Fail | Finish Settle first, or paste the root from a fresh Prove standing |
+| Record fails | Finish Settle first, or open technical details and use the root from a fresh Prove good record |
 | Empty list after refresh | Offer through Settle again before proving |
 
 ## Next

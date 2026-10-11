@@ -11,7 +11,8 @@ export type TallyCircuitKeys =
   | 'disburse'
   | 'repay'
   | 'settle'
-  | 'proveStanding';
+  | 'proveStanding'
+  | 'proveRepaidCount';
 export type TallyProviders = MidnightProviders<TallyCircuitKeys, PrivateStateId, TallyPrivateState>;
 export type DeployedTallyContract = FoundContract<any>;
 

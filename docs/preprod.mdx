@@ -9,14 +9,14 @@ Preprod is Midnight’s public test network. You will use the same seals as Loca
 | --- | --- |
 | Desk | [https://www.tallylend.site](https://www.tallylend.site) |
 | Network | Midnight Preprod |
-| Contract | `84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af` |
-| Faucet | [https://midnight-tmnight-preprod.nethermind.dev/](https://midnight-tmnight-preprod.nethermind.dev/) |
+| Contract | `635a4817b625b7954f52b71180da0dbf6c1a50bb538824a3c51fc514e11e77b8` |
+| Faucet | [https://faucet.preprod.midnight.network/](https://faucet.preprod.midnight.network/) |
 
 ## Before you start
 
-1. Two Chrome profiles (one for Lender, one for Borrower). Use the desk **Verifier** role as the third view.
-2. Install [Lace](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd) or [1AM](https://www.1am.xyz/) and set the network to **Preprod**.
-3. Get **tNIGHT** from the faucet. Then generate **tDUST** in the wallet. tDUST pays fees on Preprod.
+1. Two Chrome profiles (one for Lender, one for Borrower). Use **Check a record** as the third view.
+2. Install [Lace](https://chromewebstore.google.com/detail/lace/gafhhkghbfjjkeiennaehnffkwbomagd) or [1AM](https://1am.xyz) and set the network to **Preprod**.
+3. Get **tNIGHT** from the [Midnight Preprod faucet](https://faucet.preprod.midnight.network/). Then generate **tDUST** in the wallet. tDUST pays fees on Preprod.
 4. Set the wallet proof server. Release wallets only allow `localhost` or hosts under `*.midnight.network` / `*.1am.xyz`. For many people that means **1AM ProofStation** on Preprod, or Docker on `http://localhost:6300`.
 
 ### Local Docker proof server (optional)
@@ -30,8 +30,8 @@ If the browser console shows `localhost:6300` connection refused, either start D
 ## Open the desk
 
 1. Go to [https://www.tallylend.site](https://www.tallylend.site)
-2. Stay on **Preprod**
-3. Click **Connect Wallet**
+2. Click **Preprod**
+3. Click **Connect wallet**. If both Lace and 1AM are installed, choose one. If neither is installed, the page links to the install pages.
 
 Or run locally after compile:
 
@@ -42,35 +42,35 @@ cd contract && compact compile +0.31.1 tally.compact managed/tally
 cd .. && npm run dev --workspace leaderboard-ui -- --mode preprod
 ```
 
-## Join the contract
+## Use the shared loan book
 
-The public desk is one shared Preprod contract. The address is already on the page, in the Join field and in the trust strip. You can copy it. Stay on that address and click **Join**.
+The public desk loads one shared Preprod contract. You do not need to paste it. Open **Advanced** only to see the 64-character address, copy it, or click **Use shared loan book**.
 
 ```
-84c44946900ca4ad4456518b09a42c01424dd8b626797310c5ed5b4b933b10af
+635a4817b625b7954f52b71180da0dbf6c1a50bb538824a3c51fc514e11e77b8
 ```
 
-Lender and Borrower both Join this same address. They do not each create a new book.
+Lender and Borrower both use this same address. They do not each create a new book.
 
-## Desk ID on Preprod
+## Private ID on Preprod
 
-1. On the Borrower profile: Connect, Join, click **Desk ID**, copy
-2. On the Lender profile: Offer → paste that code into **Borrower id**
+1. On the Borrower profile: Connect, click **Your private ID**, copy
+2. On the Lender profile: Offer → paste that code into **Borrower private ID**
 3. Do not paste a Lace `mn_addr_…` payment address
 
 More detail: [Identity](/docs/identity).
 
 ## Loan steps
 
-1. **Lender — Offer** (amount, due, Borrower Desk ID)
+1. **Lender — Offer** (amount, due, Borrower private ID)
 2. **Borrower — Accept**
-3. **Lender — Disburse** (payment field can hold a Lace payment id when you have one)
+3. **Lender — Send funds** (payment field can hold a Lace payment id when you have one)
 4. **Borrower — Repay**
 5. **Either — Settle**
-6. **Party — Prove standing** (copy the allowlist root)
-7. **Verifier — Verify access** → Pass or Fail
+6. **Party — Prove good record** (open technical details to copy the allowlist root)
+7. **Check a record — Check record** → Pass or Fail
 
-![Preprod offer with Desk ID.](/docs/screenshots/preprod/01-offer.png)
+![Preprod offer with a private ID.](/docs/screenshots/preprod/01-offer.png)
 
 ## Common errors
 
@@ -79,10 +79,10 @@ More detail: [Identity](/docs/identity).
 | Set your wallet to Preprod | Switch Lace or 1AM to Preprod |
 | Insufficient DUST | Faucet tNIGHT, then generate tDUST |
 | Proof server unreachable / Request failed with no popup | Fix wallet prover URI (ProofStation or local Docker on 6300) |
-| Contract address must be 64 hex | Fix the Join field |
-| This instrument is not addressed to your key | Wrong profile or wrong Desk ID |
-| Desk private state is missing | Join again on this desk |
-| Allowlist root not in indexer yet | Wait a few seconds and refresh after Prove standing |
+| Contract address must be 64 hex | Open Advanced and check the address |
+| This loan is not addressed to your private ID | Wrong profile or wrong private ID |
+| Desk private state is missing | Use the shared loan book again on this desk |
+| The root is not visible yet | Wait a few seconds, refresh, then open technical details after Prove good record |
 
 ## Next
 
@@ -91,6 +91,6 @@ More detail: [Identity](/docs/identity).
     Desk, API, Compact, proof server.
   </Card>
   <Card title="Identity" href="/docs/identity">
-    How Desk ID works when you paste Borrower id.
+    How your private ID works when you paste Borrower private ID.
   </Card>
 </CardGroup>

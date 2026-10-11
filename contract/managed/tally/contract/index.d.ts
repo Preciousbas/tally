@@ -21,6 +21,30 @@ export type Witnesses<PS> = {
                                                                                   }];
   getStandingLoanId(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
   getStandingCounterpartyPk(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, Uint8Array];
+  getRepaidLoanId0(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
+  getRepaidLenderPk0(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, Uint8Array];
+  getRepaidPath0(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, { leaf: Uint8Array,
+                                                                               path: { sibling: { field: bigint
+                                                                                                },
+                                                                                       goes_left: boolean
+                                                                                     }[]
+                                                                             }];
+  getRepaidLoanId1(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
+  getRepaidLenderPk1(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, Uint8Array];
+  getRepaidPath1(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, { leaf: Uint8Array,
+                                                                               path: { sibling: { field: bigint
+                                                                                                },
+                                                                                       goes_left: boolean
+                                                                                     }[]
+                                                                             }];
+  getRepaidLoanId2(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
+  getRepaidLenderPk2(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, Uint8Array];
+  getRepaidPath2(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, { leaf: Uint8Array,
+                                                                               path: { sibling: { field: bigint
+                                                                                                },
+                                                                                       goes_left: boolean
+                                                                                     }[]
+                                                                             }];
 }
 
 export type ImpureCircuits<PS> = {
@@ -33,6 +57,7 @@ export type ImpureCircuits<PS> = {
   repay(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   settle(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   proveStanding(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
+  proveRepaidCount(context: __compactRuntime.CircuitContext<PS>, n_0: bigint): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type ProvableCircuits<PS> = {
@@ -45,6 +70,7 @@ export type ProvableCircuits<PS> = {
   repay(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   settle(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   proveStanding(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
+  proveRepaidCount(context: __compactRuntime.CircuitContext<PS>, n_0: bigint): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type PureCircuits = {
@@ -60,6 +86,7 @@ export type Circuits<PS> = {
   repay(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   settle(context: __compactRuntime.CircuitContext<PS>, loanId_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   proveStanding(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
+  proveRepaidCount(context: __compactRuntime.CircuitContext<PS>, n_0: bigint): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type Ledger = {

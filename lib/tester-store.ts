@@ -1,11 +1,9 @@
 /**
  * Tester log and feedback.
- * Vercel env: REDIS_URL (redis://user:pass@host:port from Railway or redis-cli -u).
- * Upstash REST still works if REDIS_URL is unset:
- * UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.
+ * Vercel env: set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.
+ * Those HTTP settings are used first. REDIS_URL is only a fallback, and a failed
+ * TCP connection must not crash the serverless function.
  */
-import { createClient } from 'redis';
-
 export type TesterAction = 'offer' | 'accept' | 'disburse' | 'repay' | 'settle' | 'proveStanding';
 
 export type TesterEvent = {
@@ -30,17 +28,7 @@ export function storeConfigured(): boolean {
   return Boolean(process.env.REDIS_URL) || Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
 }
 
-async function redis(command: string[]): Promise<unknown> {
-  const url = process.env.REDIS_URL;
-  if (url) {
-    const client = createClient({ url });
-    await client.connect();
-    try {
-      return await client.sendCommand(command);
-    } finally {
-      await client.quit();
-    }
-  }
+async function upstash(command: string[]): Promise<unknown> {
   const rest = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
   if (!rest || !token) throw new Error('Tester store is not configured');
@@ -53,6 +41,38 @@ async function redis(command: string[]): Promise<unknown> {
   const body = (await res.json()) as { result?: unknown; error?: string };
   if (body.error) throw new Error(body.error);
   return body.result;
+}
+
+async function redis(command: string[]): Promise<unknown> {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    return upstash(command);
+  }
+  const url = process.env.REDIS_URL;
+  if (!url) throw new Error('Tester store is not configured');
+  const { createClient } = await import('redis');
+  const client = createClient({ url, socket: { connectTimeout: 4000 } });
+  client.on('error', () => {
+    /* A missing listener here crashes the Vercel function before the handler can respond. */
+  });
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error('Redis connection timed out')), 4000);
+  });
+  const finish = <T>(work: Promise<T>) => {
+    work.catch(() => {});
+    return Promise.race([work, timeout]);
+  };
+  try {
+    await finish(client.connect());
+    return await finish(client.sendCommand(command));
+  } finally {
+    if (timer) clearTimeout(timer);
+    try {
+      await client.quit();
+    } catch {
+      client.disconnect();
+    }
+  }
 }
 
 export function parseTesterEvent(raw: unknown): TesterEvent | null {
